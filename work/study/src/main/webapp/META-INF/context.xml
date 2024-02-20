@@ -1,0 +1,17 @@
+<Context>
+
+		<Resource	
+		name="jdbc/mysql"
+		auth="Container"
+		type="javax.sql.DataSource"
+		username="root"
+		password="tiger"
+		driverClassName="com.mysql.jdbc.Driver"
+		factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
+		url="jdbc:mysql://127.0.0.1:3306/study"
+		maxActive="100"
+		MaxIdle="10"
+	
+	/>
+	
+</Context>
