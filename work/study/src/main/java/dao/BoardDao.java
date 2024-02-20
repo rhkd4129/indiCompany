@@ -122,6 +122,89 @@ public class BoardDao {
 		return result;
 	}
 	
+	public BoardDto boardContent(int boardCode) throws SQLException {
+		BoardDto boardDto = new BoardDto();
+		ResultSet rs = null;
+		Connection conn = null; 
+		PreparedStatement pstmt = null;
+		String sql ="SELECT * FROM board WHERE boardCode = ?";
+				
+		try {
+			conn = connectionPool.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setObject(1, boardCode);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				boardDto.setBoardCode(rs.getInt("boardCode"));
+				boardDto.setTtile(rs.getString("title"));
+				boardDto.setContent(rs.getString("content"));
+				
+			}
+			
+		}catch (Exception e) {
+			logger.log(Level.SEVERE, "게시판 상세 페이지 오류", e);
+		}
+		finally {
+			if(rs!= null)
+				try {
+					rs.close();
+				} catch (Exception e) {
+					logger.log(Level.SEVERE, "ResultSet close 오류 발생", e);
+				}					
+			if(pstmt!= null) 
+				try {
+					pstmt.close();
+				} catch (Exception e) {
+					logger.log(Level.SEVERE, "PreparedStatement close 오류 발생", e);
+				}
+				
+			if(conn!= null) 
+				try {
+					conn.close();
+				} catch (Exception e) {
+					logger.log(Level.SEVERE, "Connection close 오류 발생", e);
+				}			
+	}
+		return boardDto;
+	}
+	
+	
 
-
+	public int update(int boardCode) throws SQLException {
+		 int result = 0;
+		 Connection conn = null;
+		 PreparedStatement pstmt = null;
+		 String sql = "update board set title=?, content=?, where sabun=?";
+		    try {
+		    	conn = connectionPool.getConnection();
+				pstmt = conn.prepareStatement(sql);
+		    
+		        pstmt.setObject(1, boardCode);
+		        result = pstmt.executeUpdate();
+		    } catch (Exception e) {
+		        System.out.println("update Exception" + e.getMessage());
+		    } finally {
+		 		
+				if(pstmt!= null) 
+					try {
+						pstmt.close();
+					} catch (Exception e) {
+						logger.log(Level.SEVERE, "PreparedStatement close 오류 발생", e);
+					}
+					
+				if(conn!= null) 
+					try {
+						conn.close();
+					} catch (Exception e) {
+						logger.log(Level.SEVERE, "Connection close 오류 발생", e);
+					}			
+		    }
+		    return result;
+		}
+//	
+//	
+//	
+	
 }
+

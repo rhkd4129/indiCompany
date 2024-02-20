@@ -24,7 +24,7 @@
     <c:forEach var="board" items="${boardList}">
         <tr>
             <td>${board.boardCode}</td>
-            <td>${board.title}</td>
+            <td><a href = 'boardContent.do?boardCode=${board.boardCode}'>${board.title}</a></td>
             <td>${board.content}</td>
         </tr>
     </c:forEach>

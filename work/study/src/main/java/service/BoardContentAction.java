@@ -12,33 +12,26 @@ import control.FrontController;
 import dao.BoardDao;
 import dto.BoardDto;
 
-public class BoardInsertProAction implements CommandProcess {
-	private static final Logger logger = Logger.getLogger(BoardInsertProAction.class.getName());
+public class BoardContentAction implements CommandProcess {
+	private static final Logger logger = Logger.getLogger(BoardContentAction.class.getName());
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 	
 		try {
 			request.setCharacterEncoding("utf-8");
 			
-			String title = request.getParameter("title");
-			String content = request.getParameter("content");
-			BoardDto boardDto  = new BoardDto();
-			boardDto.setTtile(title);
-			boardDto.setContent(content);
-			
+			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));
+	
+		
 			BoardDao boardDao = BoardDao.getInstance();
-			int result = boardDao.boardInsert(boardDto);
-			if(result ==0) {
-				logger.log(Level.SEVERE, "새글 작성 중 오류");
-			}
-			request.setAttribute("result", result);
+			BoardDto boardDto= boardDao.boardContent(boardCode);
+			request.setAttribute("board", boardDto);
 			
 		}catch (Exception e) {
 			logger.log(Level.SEVERE, "새글 작성 중 오류");
 	
 		}
-		return "views/BoardInsertPro.jsp";
+		return "views/BoardContent.jsp";
 
 	}
-
 }

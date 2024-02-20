@@ -12,7 +12,7 @@ import dao.BoardDao;
 import dto.BoardDto;
 import java.util.logging.Level;
 public class BoardList implements CommandProcess {
-	private static final Logger logger = Logger.getLogger(FrontController.class.getName());
+	private static final Logger logger = Logger.getLogger(BoardList.class.getName());
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		

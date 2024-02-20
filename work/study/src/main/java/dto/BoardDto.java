@@ -32,7 +32,7 @@ public class BoardDto {
 	
 	
 	public String getContent(){
-		return title;
+		return content;
 	}
 	public void setContent(String content) {
 		this.content = content;
