@@ -202,9 +202,40 @@ public class BoardDao {
 		    }
 		    return result;
 		}
-//	
-//	
-//	
+			
+	
+	public int delete(int boardCode) throws SQLException {
+		 int result = 0;
+		 Connection conn = null;
+		 PreparedStatement pstmt = null;
+		 String sql = "delete from board where boardCode = ?";
+		    try {
+		    	conn = connectionPool.getConnection();
+				pstmt = conn.prepareStatement(sql);
+		    
+		        pstmt.setObject(1, boardCode);
+		        result = pstmt.executeUpdate();
+		    } catch (Exception e) {
+		    	logger.log(Level.SEVERE, "게시물 삭제중  오류 발생", e);
+		    } finally {
+		 		
+				if(pstmt!= null) 
+					try {
+						pstmt.close();
+					} catch (Exception e) {
+						logger.log(Level.SEVERE, "PreparedStatement close 오류 발생", e);
+					}
+					
+				if(conn!= null) 
+					try {
+						conn.close();
+					} catch (Exception e) {
+						logger.log(Level.SEVERE, "Connection close 오류 발생", e);
+					}			
+		    }
+		    return result;
+		}
+	
 	
 }
 
