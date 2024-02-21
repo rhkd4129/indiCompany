@@ -11,7 +11,7 @@
 <body>
 	<c:if test ="${result>0}">
 		<script type="text/javascript">
-			alert("수정완료");
+			alert("삭제완료");
 			location.href="boardList.do";
 			
 		</script>
@@ -19,8 +19,8 @@
 	
 	<c:if test ="${result == 0}">
 		<script type="text/javascript">
-			alert("수정 오류");
-			location.href="boardContent.do?boardCode=${boardCode}";
+			alert("오류");
+			location.href="boardInsertForm.do";
 		</script>
 	</c:if>
 	

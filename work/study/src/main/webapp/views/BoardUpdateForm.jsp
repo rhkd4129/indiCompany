@@ -7,11 +7,12 @@
 <title>Insert title here</title>
 </head>
 <body>
-	 <form action = "BoardUpdatePro.do" method="post">
+	 <form action = "boardUpdatePro.do" method="post">
 	        
 
-				     <label for="boardCode" >글번호</label>
-                     <input type="text"  id="boardCode" name="boardCode" value="${board.boardCode}" readonly>
+				     <label for="boardCode" >글번호</label>:  ${board.boardCode}
+				     
+                     <input type="hidden"  id="boardCode" name="boardCode" value="${board.boardCode}" readonly>
 				
 					<div>
                         <label for="title">제목</label>

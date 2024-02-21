@@ -32,7 +32,7 @@
 					onclick="location.href='boardUpdateForm.do?boardCode=${board.boardCode}'">
 					 
 					<input type="button" value="삭제" 
-					onclick="location.href='boardDeleteForm.do?boardCode=${board.boardCode}'">
+					onclick="location.href='boardDeletePro.do?boardCode=${board.boardCode}'">
 
 				
 					<input type="button" value="목록"

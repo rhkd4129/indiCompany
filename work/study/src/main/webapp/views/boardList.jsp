@@ -23,12 +23,12 @@
     </tr>
     <c:forEach var="board" items="${boardList}">
         <tr>
-            <td>${board.boardCode}</td>
+            <td>${board.num}</td>
             <td><a href = 'boardContent.do?boardCode=${board.boardCode}'>${board.title}</a></td>
             <td>${board.content}</td>
         </tr>
     </c:forEach>
 </table>
-
+	
 </body>
 </html>

@@ -4,7 +4,8 @@ public class BoardDto {
 	private int boardCode;
 	private String title;
 	private String content;
-	
+	private int status;
+	private int num;
 	
 	public BoardDto() {}
 	
@@ -39,6 +40,21 @@ public class BoardDto {
 		
 	}
 	
+	public int getStatus(){
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+		
+	}
 	
+	
+	public int getNum(){
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
+		
+	}
 }
 

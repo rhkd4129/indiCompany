@@ -23,5 +23,8 @@
 		</div>
 		<input type="submit" value="저장">
 	</form>
+	
+	<input type="button" value="목록"
+					onclick="location.href='boardList.do'">
 </body>
 </html>

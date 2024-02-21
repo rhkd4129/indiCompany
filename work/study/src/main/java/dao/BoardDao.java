@@ -38,7 +38,10 @@ public class BoardDao {
 		ResultSet rs = null;
 		Connection conn = null; 
 		Statement stmt = null;
-		String sql = "SELECT * FROM board";
+		String sql = "SELECT b.*, (@row_number := @row_number + 1) AS num "
+				+ "FROM (SELECT @row_number := 0) AS init, board AS b "
+				+ "WHERE STATUS = 0";
+
 		
 		try {
 			conn = connectionPool.getConnection();
@@ -49,6 +52,7 @@ public class BoardDao {
 				board.setBoardCode(rs.getInt(1));
 				board.setTtile(rs.getString(2));
 				board.setContent(rs.getString(3));
+				board.setNum(rs.getInt(5)); 	
 				boardList.add(board);
 			}
 		} catch (Exception e) {
@@ -91,8 +95,8 @@ public class BoardDao {
 			conn = connectionPool.getConnection();
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1, boardDto.getTitle());
-			pstmt.setString(2, boardDto.getContent());
+			pstmt.setObject(1, boardDto.getTitle());
+			pstmt.setObject(2, boardDto.getContent());
 			result = pstmt.executeUpdate();
 			
 		}catch (Exception e) {
@@ -171,21 +175,23 @@ public class BoardDao {
 	
 	
 
-	public int update(int boardCode) throws SQLException {
+	public int boardUpdate(BoardDto boardDto) throws SQLException {
 		 int result = 0;
 		 Connection conn = null;
 		 PreparedStatement pstmt = null;
-		 String sql = "update board set title=?, content=?, where sabun=?";
+		 String sql = "update board set title=?, content=? where boardCode=?";
+
 		    try {
 		    	conn = connectionPool.getConnection();
 				pstmt = conn.prepareStatement(sql);
 		    
-		        pstmt.setObject(1, boardCode);
+		        pstmt.setObject(1,boardDto.getTitle() );
+		        pstmt.setObject(2,boardDto.getContent() );
+		        pstmt.setObject(3,boardDto.getBoardCode() );
 		        result = pstmt.executeUpdate();
 		    } catch (Exception e) {
-		        System.out.println("update Exception" + e.getMessage());
+		    	logger.log(Level.SEVERE, "boardUpdate 오류 발생", e);
 		    } finally {
-		 		
 				if(pstmt!= null) 
 					try {
 						pstmt.close();
@@ -204,26 +210,23 @@ public class BoardDao {
 		}
 			
 	
-	public int delete(int boardCode) throws SQLException {
+	public int boardDelete(int boardCode) throws SQLException {
 		 int result = 0;
 		 Connection conn = null;
 		 PreparedStatement pstmt = null;
-		 String sql = "delete from board where boardCode = ?";
+		 String sql = "update board set status=1 where boardCode=?";
 		    try {
 		    	conn = connectionPool.getConnection();
 				pstmt = conn.prepareStatement(sql);
-		    
-		        pstmt.setObject(1, boardCode);
+				pstmt.setObject(1,boardCode );
 		        result = pstmt.executeUpdate();
 		    } catch (Exception e) {
 		    	logger.log(Level.SEVERE, "게시물 삭제중  오류 발생", e);
 		    } finally {
-		 		
 				if(pstmt!= null) 
 					try {
 						pstmt.close();
 					} catch (Exception e) {
-						logger.log(Level.SEVERE, "PreparedStatement close 오류 발생", e);
 					}
 					
 				if(conn!= null) 
