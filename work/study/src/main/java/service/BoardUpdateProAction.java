@@ -31,7 +31,7 @@ public class BoardUpdateProAction implements CommandProcess{
 			
 			
 			BoardDao boardDao = BoardDao.getInstance();
-			result = boardDao.boardUpdate(boardDto);
+			result = boardDao.insertBoard(boardDto);
 			request.setAttribute("result", result);
 			request.setAttribute("boardCode", boardCode);
 			

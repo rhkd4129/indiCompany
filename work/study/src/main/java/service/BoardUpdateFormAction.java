@@ -18,13 +18,10 @@ public class BoardUpdateFormAction implements CommandProcess {
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 //		private static final Logger logger = Logger.getLogger(BoardUpdateFormAction.class.getName());
 		try {
-			request.setCharacterEncoding("utf-8");
-			
-			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));
-	
-		
+
+			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));		
 			BoardDao boardDao = BoardDao.getInstance();
-			BoardDto boardDto= boardDao.boardContent(boardCode);
+			BoardDto boardDto= boardDao.selectBoard(boardCode);
 			request.setAttribute("board", boardDto);
 			
 		}catch (Exception e) {

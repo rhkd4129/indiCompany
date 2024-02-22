@@ -13,7 +13,7 @@ public class ConnectionPool {
 
     private static ConnectionPool instance = null;
     private static DataSource dataSource = null;
-    private static final Logger logger = Logger.getLogger(BoardDao.class.getName());
+    private static final Logger logger = Logger.getLogger(ConnectionPool.class.getName());
     private ConnectionPool() {}
 
     public static ConnectionPool getInstance() {
@@ -28,10 +28,9 @@ public class ConnectionPool {
             try {
                 Context context = new InitialContext();
                 dataSource = (DataSource) context.lookup("java:comp/env/jdbc/mysql");
-                logger.info("데이터베이스 연결");
-            } catch (NamingException e) {
-//                throw new SQLException("Error initializing datasource", e);
-		    	logger.log(Level.SEVERE, "게시물 삭제중  오류 발생", e);
+                logger.info("데이터베이스 연결성공");
+            } catch (Exception e) {
+		    	logger.log(Level.SEVERE, "데이터 베이스 연결 실패 서버 종료", e);
 		    	System.exit(1);
             }
         }

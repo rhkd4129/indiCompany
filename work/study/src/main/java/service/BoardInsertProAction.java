@@ -27,7 +27,7 @@ public class BoardInsertProAction implements CommandProcess {
 			boardDto.setContent(content);
 			
 			BoardDao boardDao = BoardDao.getInstance();
-			int result = boardDao.boardInsert(boardDto);
+			int result = boardDao.insertBoard(boardDto);
 			if(result ==0) {
 				logger.log(Level.SEVERE, "새글 작성 중 오류");
 			}

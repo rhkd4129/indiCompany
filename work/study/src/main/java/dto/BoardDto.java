@@ -4,7 +4,7 @@ public class BoardDto {
 	private int boardCode;
 	private String title;
 	private String content;
-	private int status;
+	private String status;
 	private int num;
 	
 	public BoardDto() {}
@@ -40,10 +40,10 @@ public class BoardDto {
 		
 	}
 	
-	public int getStatus(){
+	public String getStatus(){
 		return status;
 	}
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 		
 	}

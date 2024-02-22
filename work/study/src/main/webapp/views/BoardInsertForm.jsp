@@ -5,26 +5,32 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="views/layout.css">
 </head>
 <body>
-	<h2>등록하기</h2>
-	<form action="boardInsertPro.do" method="post">
-
-		
-		<div>
-			<label for="title" >제목</label>
-	        <input type="text" name="title">
-		</div>
-		
-		
-		<div>
-			<label for="content" >내용</label>
-	        <input type="text" name="content">
-		</div>
-		<input type="submit" value="저장">
-	</form>
+	<div class="board">
+			<h2>등록하기</h2>
+		<form action="boardInsertPro_redirect.do" method="post">
 	
-	<input type="button" value="목록"
-					onclick="location.href='boardList.do'">
+			
+			<div>
+				<label for="title" >제목</label>
+		        <input type="text" name="title">
+			</div>
+			
+			
+			<div>
+				<label for="content" >내용</label>
+		        <input type="text" name="content">
+			</div>
+			<input type="submit" value="저장">
+		</form>
+		
+		<input type="button" value="목록"
+						onclick="location.href='boardList.do'">
+	
+	
+	</div>
+
 </body>
 </html>

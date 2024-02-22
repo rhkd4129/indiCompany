@@ -6,13 +6,13 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+	<title>Insert title here</title>
+	<link rel="stylesheet" type="text/css" href="views/layout.css">
 </head>
 <body>
 
-
-<h2>게시판 상세보기</h2>
-
+<div class="board">
+	<h2>게시판 상세보기</h2>
 		<table border="1">
 		    <tr>
 		        <th>게시물 번호</th>
@@ -27,17 +27,18 @@
 		
 		</table>
 
-		<div>
+		<div class="btn_group">
 			<input type="button" value="수정" 
 					onclick="location.href='boardUpdateForm.do?boardCode=${board.boardCode}'">
 					 
 					<input type="button" value="삭제" 
-					onclick="location.href='boardDeletePro.do?boardCode=${board.boardCode}'">
-
+					onclick="location.href='boardDeletePro_redirect.do?boardCode=${board.boardCode}'">
+	
 				
 					<input type="button" value="목록"
 					onclick="location.href='boardList.do'">
 		</div>
+	</div>
 				
 
 </body>

@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import control.FrontController;
 import dto.BoardDto;
+import util.ErrorProcess;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -21,10 +22,7 @@ public class BoardDao {
 	private static final Logger logger = Logger.getLogger(BoardDao.class.getName());
 	private static BoardDao instance;
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
-	
-	
 	private BoardDao() {}
-	
 	
 	public static BoardDao getInstance(){
 		if(instance == null) {
@@ -33,14 +31,55 @@ public class BoardDao {
 		return instance;
 	}
 	
-	public List<BoardDto> boardList() throws SQLException{
+	
+	public int executeUpdate(String sql, Object... params) throws SQLException {
+	    Integer result = null;
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    try {
+	        conn = connectionPool.getConnection();
+	        pstmt = conn.prepareStatement(sql);
+
+	        // 매개변수 설정
+	        for (int i = 0; i < params.length; i++) {
+	            pstmt.setObject(i + 1, params[i]);
+	        }
+	        // SQL 실행
+	        result = pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        logger.log(Level.SEVERE, "SQL 실행 중 오류 발생", e);
+	    } finally {
+	    	ErrorProcess.errorProcess(null, conn, null, pstmt);
+	    }
+		return result;
+	    
+	}
+	
+	
+	
+	
+	public int insertBoard(BoardDto boardDto) throws SQLException {
+	    String sql = "INSERT INTO BOARD (TITLE, CONTENT) VALUES (?, ?)";
+	    return executeUpdate(sql, boardDto.getTitle(), boardDto.getContent());
+	}
+	public int updateBoard(BoardDto boardDto) throws SQLException {
+	    String sql = "UPDATE BOARD SET TITLE = ?, CONTENT = ? WHERE BOARDCODE = ?";
+	    return executeUpdate(sql, boardDto.getTitle(), boardDto.getContent(), boardDto.getBoardCode());
+	}
+
+	public int deleteBoard(int boardCode) throws SQLException {
+	    String sql = "UPDATE BOARD SET STATUS=N WHERE BOARDCODE=?";
+	    return executeUpdate(sql, boardCode);
+	}
+	
+	public List<BoardDto> listBoard() throws SQLException{
 		List<BoardDto> boardList = new ArrayList<BoardDto>();
 		ResultSet rs = null;
 		Connection conn = null; 
 		Statement stmt = null;
-		String sql = "SELECT b.*, (@row_number := @row_number + 1) AS num "
-				+ "FROM (SELECT @row_number := 0) AS init, board AS b "
-				+ "WHERE STATUS = 0";
+		String sql = "SELECT b.*, (@row_number := @row_number + 1) AS NUM"
+				+ "FROM (SELECT @row_number := 0) AS init, BOARD AS b "
+				+ "WHERE STATUS = Y";
 
 		
 		try {
@@ -59,79 +98,19 @@ public class BoardDao {
 			logger.log(Level.SEVERE, "게시판 목록 조회 중 오류 발생", e);
 		}
 		finally {
-				if(rs!= null)
-					try {
-						rs.close();
-					} catch (Exception e) {
-						logger.log(Level.SEVERE, "ResultSet close 오류 발생", e);
-					}					
-				if(stmt!= null) 
-					try {
-						stmt.close();
-					} catch (Exception e) {
-						logger.log(Level.SEVERE, "Statement close 오류 발생", e);
-					}
-					
-				if(conn!= null) 
-					try {
-						conn.close();
-					} catch (Exception e) {
-						logger.log(Level.SEVERE, "Connection close 오류 발생", e);
-					}			
+			ErrorProcess.errorProcess(rs, conn, stmt, null);
 		}
 		return boardList;
 	}
 
+
 	
-	
-	public int boardInsert(BoardDto boardDto) throws SQLException {
-		int result = 0;
-		ResultSet rs = null;
-		Connection conn = null; 
-		PreparedStatement pstmt = null;
-		String sql ="INSERT INTO board (title, content) VALUES (?,?)";
-				
-		try {
-			conn = connectionPool.getConnection();
-			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setObject(1, boardDto.getTitle());
-			pstmt.setObject(2, boardDto.getContent());
-			result = pstmt.executeUpdate();
-			
-		}catch (Exception e) {
-			logger.log(Level.SEVERE, "게시판 새글 작성 중 오류 발생", e);
-		}
-		finally {
-			if(rs!= null)
-				try {
-					rs.close();
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "ResultSet close 오류 발생", e);
-				}					
-			if(pstmt!= null) 
-				try {
-					pstmt.close();
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "PreparedStatement close 오류 발생", e);
-				}
-				
-			if(conn!= null) 
-				try {
-					conn.close();
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "Connection close 오류 발생", e);
-				}			
-	}
-		return result;
-	}
-	
-	public BoardDto boardContent(int boardCode) throws SQLException {
+	public BoardDto selectBoard(int boardCode) throws SQLException {
 		BoardDto boardDto = new BoardDto();
 		ResultSet rs = null;
 		Connection conn = null; 
 		PreparedStatement pstmt = null;
-		String sql ="SELECT * FROM board WHERE boardCode = ?";
+		String sql ="SELECT * FROM BOARD WHERE BOARDCODE = ?";
 				
 		try {
 			conn = connectionPool.getConnection();
@@ -150,94 +129,13 @@ public class BoardDao {
 			logger.log(Level.SEVERE, "게시판 상세 페이지 오류", e);
 		}
 		finally {
-			if(rs!= null)
-				try {
-					rs.close();
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "ResultSet close 오류 발생", e);
-				}					
-			if(pstmt!= null) 
-				try {
-					pstmt.close();
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "PreparedStatement close 오류 발생", e);
-				}
-				
-			if(conn!= null) 
-				try {
-					conn.close();
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "Connection close 오류 발생", e);
-				}			
+			ErrorProcess.errorProcess(rs, conn, null, pstmt);
 	}
 		return boardDto;
 	}
 	
 	
 
-	public int boardUpdate(BoardDto boardDto) throws SQLException {
-		 int result = 0;
-		 Connection conn = null;
-		 PreparedStatement pstmt = null;
-		 String sql = "update board set title=?, content=? where boardCode=?";
-
-		    try {
-		    	conn = connectionPool.getConnection();
-				pstmt = conn.prepareStatement(sql);
-		    
-		        pstmt.setObject(1,boardDto.getTitle() );
-		        pstmt.setObject(2,boardDto.getContent() );
-		        pstmt.setObject(3,boardDto.getBoardCode() );
-		        result = pstmt.executeUpdate();
-		    } catch (Exception e) {
-		    	logger.log(Level.SEVERE, "boardUpdate 오류 발생", e);
-		    } finally {
-				if(pstmt!= null) 
-					try {
-						pstmt.close();
-					} catch (Exception e) {
-						logger.log(Level.SEVERE, "PreparedStatement close 오류 발생", e);
-					}
-					
-				if(conn!= null) 
-					try {
-						conn.close();
-					} catch (Exception e) {
-						logger.log(Level.SEVERE, "Connection close 오류 발생", e);
-					}			
-		    }
-		    return result;
-		}
-			
-	
-	public int boardDelete(int boardCode) throws SQLException {
-		 int result = 0;
-		 Connection conn = null;
-		 PreparedStatement pstmt = null;
-		 String sql = "update board set status=1 where boardCode=?";
-		    try {
-		    	conn = connectionPool.getConnection();
-				pstmt = conn.prepareStatement(sql);
-				pstmt.setObject(1,boardCode );
-		        result = pstmt.executeUpdate();
-		    } catch (Exception e) {
-		    	logger.log(Level.SEVERE, "게시물 삭제중  오류 발생", e);
-		    } finally {
-				if(pstmt!= null) 
-					try {
-						pstmt.close();
-					} catch (Exception e) {
-					}
-					
-				if(conn!= null) 
-					try {
-						conn.close();
-					} catch (Exception e) {
-						logger.log(Level.SEVERE, "Connection close 오류 발생", e);
-					}			
-		    }
-		    return result;
-		}
 	
 	
 }

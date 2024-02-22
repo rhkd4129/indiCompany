@@ -18,7 +18,7 @@ public class BoardList implements CommandProcess {
 		
 		BoardDao boardDao = BoardDao.getInstance();
 		try {
-			List<BoardDto> boardList =boardDao.boardList();
+			List<BoardDto> boardList =boardDao.listBoard();
 			request.setAttribute("boardList", boardList);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "게시판 목록 조회 중 오류 발생", e);

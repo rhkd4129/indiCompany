@@ -1,0 +1,14 @@
+@charset "UTF-8";
+
+
+.board {
+        border: 1px solid black; 
+        margin:15%;
+        text-align: center; 
+    }
+table{margin: 0 auto; }
+
+
+.btn_group{
+	margin:5%;
+}    

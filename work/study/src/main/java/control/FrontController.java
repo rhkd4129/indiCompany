@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -19,14 +20,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import dto.BoardDto;
 import service.CommandProcess;
 
-
-
-//@WebServlet("/Controller")
+/*
+ *   프론트 컨트롤러 서블릿 하나로 클라이언트의 요청을 받음 
+ *   프론트 컨트롤러가 요청에 맞는 컨트롤러를 찾아서 호출 
+ *   프론트 컨트롤러를 제외한 나머지 컨트롤러는 서블릿을 사용하지 않아도 됨 
+ * */
+@WebServlet(name = "FrontController" , urlPatterns = "*.do")
 public class FrontController extends HttpServlet {
    private static final long serialVersionUID = 1L;
    private static final Logger logger = Logger.getLogger(FrontController.class.getName());
+   //자바 표준 라이브러리에 포함된 로깅 기능
    private Map<String, Object> CommandMap = new HashMap<String, Object>(); 
 
    public FrontController() {super();}
@@ -68,16 +74,16 @@ public class FrontController extends HttpServlet {
 	        logger.log(Level.INFO, "configFilePath------->"+configFilePath);
 	        pr.load(f);
 	    } catch (FileNotFoundException e) {
-	        e.printStackTrace();
+	    	logger.log(Level.SEVERE, "FileNotFoundException 중 오류 발생1", e);
 	    } catch (IOException e) {
-	        e.printStackTrace();
+	    	logger.log(Level.SEVERE, "IOException 중 오류 발생1", e);
 	    } finally {
 	        if (f != null) {
 	            try {
 	                f.close();
 	            } 
 	            catch (IOException ex) {
-	            	logger.log(Level.SEVERE, "커맨드 로딩 중 오류 발생1", ex);
+	            	logger.log(Level.SEVERE, "loadProperties 중 오류 발생", ex);
 	            }
 	        }
 	    }
@@ -111,13 +117,33 @@ public class FrontController extends HttpServlet {
 		   		}
 	        } 
 		   	catch (Exception e2) {
-	            logger.log(Level.SEVERE, "커맨드 로딩 중 오류 발생2", e2);
-	            System.exit(1);
+	            logger.log(Level.SEVERE, "loadCommands 로딩 중 오류 발생", e2);
+//	            System.exit(1);
 	        }
 	}
    
+   @Override
+   protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       request.setCharacterEncoding("UTF-8");
+       response.setCharacterEncoding("UTF-8");
 
+       // 클라이언트의 요청 메서드를 확인
+       String method = request.getMethod();
 
+       // 요청 메서드에 따라 처리
+       if (method.equalsIgnoreCase("GET")) {
+           doGet(request, response);
+       } else if (method.equalsIgnoreCase("POST")) {
+           doPost(request, response);
+       } else {
+           // 다른 요청 메서드에 대한 처리
+           // 예: PUT, DELETE 등
+           // 기본적으로는 405 Method Not Allowed 응답을 보낼 수 있습니다.
+           response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+       }
+   }
+
+   
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
       requestServletPro(request,response);
    }
@@ -133,7 +159,7 @@ public class FrontController extends HttpServlet {
     */
    
    protected void requestServletPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      String view = null;
+	   String view = null;
       CommandProcess com = null;
       try {
       String command = request.getRequestURI();
@@ -152,13 +178,21 @@ public class FrontController extends HttpServlet {
 //         CommandMap에서 앞서 파싱한 커맨드에 해당하는 커맨드 클래스의 인스턴스를 가져옴
 //         해당 커맨드 인스턴스의 reqeuestPro 메서드를 호출하여 실제 요청 처리를 수행합니다. 이 메서드는 각 커맨드 클래스마다 구현.
 //         reqeuestPro 메서드 실행 결과로 뷰의 경로얻음
-	   	  RequestDispatcher dispatcher = request.getRequestDispatcher(view);
-	   	  logger.log(Level.INFO, "5:reqeusetservletproview----->"+ view);
-	      dispatcher.forward(request, response);
+         //Ajax or NOT aJAX
+         
+         if(command.contains("ajax")) {
+        	 
+         }else if(command.contains("redirect")){
+        	 System.out.println("이거 리다이렉트?");
+        	 response.sendRedirect("/boardList.do"); // 리다이렉트 수행
+         }else {
+        	 RequestDispatcher dispatcher = request.getRequestDispatcher(view);
+             dispatcher.forward(request, response);
+         }
       } catch (Exception e) {
          
-         logger.log(Level.SEVERE, "커맨드 로딩 중 오류 발생");
-         System.exit(1);
+         logger.log(Level.SEVERE, "requestServletPro 중 오류 발생");
+         System.exit(1); // 이거 없애야
       }
       /*   
        *  얻은 뷰의 경로를 사용하여 RequestDispatcher를 생성합니다.

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,15 +23,16 @@ public class BoardDeleteProAction implements CommandProcess {
 			
 			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));
 			BoardDao boardDao = BoardDao.getInstance();
-			result= boardDao.boardDelete(boardCode);
-			request.setAttribute("result", result);
+			result= boardDao.deleteBoard(boardCode);
 			
 		}catch (Exception e) {
 			logger.log(Level.SEVERE, "글 삭제 중 오류");
 	
 		}
 		  logger.log(Level.INFO, "redirect시도");
-//		  response.sendRedirect(request.getContextPath() + "/views/boardList.jsp");
+//		  RequestDispatcher dispatcher = request.getRequestDispatcher("/boardList.do");
+//		  dispatcher.forward(request, response);
+
 		  return "views/boardList.jsp"; // 더 이상의 처리가 필요하지 않으므로 null을 반환합니다.
 	}
 

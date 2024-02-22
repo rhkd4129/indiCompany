@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" isErrorPage="true"%>
+<%  response.setStatus(200);  %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,6 +9,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h2>시스템 점검중입니다</h2>
+	<h2>Error!</h2>
+	관리자에 문의하세요!	
 </body>
 </html>

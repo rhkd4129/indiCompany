@@ -24,7 +24,7 @@ public class BoardContentAction implements CommandProcess {
 	
 		
 			BoardDao boardDao = BoardDao.getInstance();
-			BoardDto boardDto= boardDao.boardContent(boardCode);
+			BoardDto boardDto= boardDao.selectBoard(boardCode);
 			request.setAttribute("board", boardDto);
 			
 		}catch (Exception e) {
