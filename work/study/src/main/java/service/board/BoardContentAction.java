@@ -1,6 +1,7 @@
-package service;
+package service.board;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,7 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import control.FrontController;
 import dao.BoardDao;
+import dao.CommentDao;
 import dto.BoardDto;
+import dto.CommentDto;
+import util.CommandProcess;
 
 public class BoardContentAction implements CommandProcess {
 	private static final Logger logger = Logger.getLogger(BoardContentAction.class.getName());
@@ -24,8 +28,13 @@ public class BoardContentAction implements CommandProcess {
 	
 		
 			BoardDao boardDao = BoardDao.getInstance();
+			CommentDao commentDao =CommentDao.getInstance();
+			
 			BoardDto boardDto= boardDao.selectBoard(boardCode);
+			List<CommentDto> commentList = commentDao.listComment(boardCode);
+			
 			request.setAttribute("board", boardDto);
+			request.setAttribute("commentList", commentList);
 			
 		}catch (Exception e) {
 			logger.log(Level.SEVERE, "새글 작성 중 오류");

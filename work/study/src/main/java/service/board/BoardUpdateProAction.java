@@ -1,4 +1,4 @@
-package service;
+package service.board;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.BoardDao;
 import dto.BoardDto;
+import util.CommandProcess;
 
 public class BoardUpdateProAction implements CommandProcess{
 	private static final Logger logger = Logger.getLogger(BoardUpdateProAction.class.getName());

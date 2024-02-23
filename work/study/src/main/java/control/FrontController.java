@@ -20,8 +20,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import dto.BoardDto;
-import service.CommandProcess;
+import util.CommandProcess;
 
 /*
  *   프론트 컨트롤러 서블릿 하나로 클라이언트의 요청을 받음 
@@ -118,7 +120,6 @@ public class FrontController extends HttpServlet {
 	        } 
 		   	catch (Exception e2) {
 	            logger.log(Level.SEVERE, "loadCommands 로딩 중 오류 발생", e2);
-//	            System.exit(1);
 	        }
 	}
    
@@ -126,15 +127,9 @@ public class FrontController extends HttpServlet {
    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
        request.setCharacterEncoding("UTF-8");
        response.setCharacterEncoding("UTF-8");
-
-       // 클라이언트의 요청 메서드를 확인
        String method = request.getMethod();
-
-       // 요청 메서드에 따라 처리
-       if (method.equalsIgnoreCase("GET")) {
-           doGet(request, response);
-       } else if (method.equalsIgnoreCase("POST")) {
-           doPost(request, response);
+       if (method.equalsIgnoreCase("GET")||method.equalsIgnoreCase("POST")) {
+    	   requestServletPro(request,response);
        } else {
            // 다른 요청 메서드에 대한 처리
            // 예: PUT, DELETE 등
@@ -142,21 +137,18 @@ public class FrontController extends HttpServlet {
            response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
        }
    }
-
-   
-   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      requestServletPro(request,response);
-   }
-
-   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      requestServletPro(request,response);
-   }
    /*
    	requestServletPro 메서드는 FrontController 클래스 내에서 클라이언트의 모든 요청을 처리하는 핵심 메서드. 
    	이 메서드는 GET 또는 POST 요청이 발생했을 때 호출되며, 실제로 클라이언트의 요청을 처리하고 응답을 생성. 
-   	
    	요청 URI에서 컨텍스트 경로제외하고 실제 커맨드 값 을통해 해당 커맨드 객체  MAP에 가져온후 requestPro를 호출하여 실제 처리 실행 
     */
+   public static void  processJsonResponse(HttpServletRequest request, HttpServletResponse response, Object responseObject) throws IOException {
+       ObjectMapper objectMapper = new ObjectMapper();
+       String jsonResponse = objectMapper.writeValueAsString(responseObject);
+       response.setContentType("application/json");
+       response.setCharacterEncoding("UTF-8");
+       response.getWriter().write(jsonResponse);
+   }
    
    protected void requestServletPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	   String view = null;
@@ -173,21 +165,22 @@ public class FrontController extends HttpServlet {
 //       com == listACtion의 인스턴스 
          com =  (CommandProcess)CommandMap.get(command);
          logger.log(Level.INFO, "3:com----->"+ com);
-         view  = com.requestPro(request, response);
+        
 
 //         CommandMap에서 앞서 파싱한 커맨드에 해당하는 커맨드 클래스의 인스턴스를 가져옴
 //         해당 커맨드 인스턴스의 reqeuestPro 메서드를 호출하여 실제 요청 처리를 수행합니다. 이 메서드는 각 커맨드 클래스마다 구현.
 //         reqeuestPro 메서드 실행 결과로 뷰의 경로얻음
          //Ajax or NOT aJAX
-         
-         if(command.contains("ajax")) {
-        	 
+         view  = com.requestPro(request, response);
+         if(command.contains("json")) {
+        
          }else if(command.contains("redirect")){
         	 System.out.println("이거 리다이렉트?");
         	 response.sendRedirect("/boardList.do"); // 리다이렉트 수행
          }else {
         	 RequestDispatcher dispatcher = request.getRequestDispatcher(view);
              dispatcher.forward(request, response);
+             System.out.println("이건 포워드");
          }
       } catch (Exception e) {
          

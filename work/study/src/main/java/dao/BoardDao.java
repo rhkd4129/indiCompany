@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import control.FrontController;
 import dto.BoardDto;
 import util.ErrorProcess;
+import util.ExecuteDmlQuery;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -32,44 +33,23 @@ public class BoardDao {
 	}
 	
 	
-	public int executeUpdate(String sql, Object... params) throws SQLException {
-	    Integer result = null;
-	    Connection conn = null;
-	    PreparedStatement pstmt = null;
-	    try {
-	        conn = connectionPool.getConnection();
-	        pstmt = conn.prepareStatement(sql);
-
-	        // 매개변수 설정
-	        for (int i = 0; i < params.length; i++) {
-	            pstmt.setObject(i + 1, params[i]);
-	        }
-	        // SQL 실행
-	        result = pstmt.executeUpdate();
-	    } catch (SQLException e) {
-	        logger.log(Level.SEVERE, "SQL 실행 중 오류 발생", e);
-	    } finally {
-	    	ErrorProcess.errorProcess(null, conn, null, pstmt);
-	    }
-		return result;
-	    
-	}
+	
 	
 	
 	
 	
 	public int insertBoard(BoardDto boardDto) throws SQLException {
 	    String sql = "INSERT INTO BOARD (TITLE, CONTENT) VALUES (?, ?)";
-	    return executeUpdate(sql, boardDto.getTitle(), boardDto.getContent());
+	    return ExecuteDmlQuery.executeDmlQuery(sql, boardDto.getTitle(), boardDto.getContent());
 	}
 	public int updateBoard(BoardDto boardDto) throws SQLException {
-	    String sql = "UPDATE BOARD SET TITLE = ?, CONTENT = ? WHERE BOARDCODE = ?";
-	    return executeUpdate(sql, boardDto.getTitle(), boardDto.getContent(), boardDto.getBoardCode());
+	    String sql = "UPDATE BOARD SET TITLE = ?, CONTENT = ? WHERE BOARD_CODE = ?";
+	    return ExecuteDmlQuery.executeDmlQuery(sql, boardDto.getTitle(), boardDto.getContent(), boardDto.getBoardCode());
 	}
 
 	public int deleteBoard(int boardCode) throws SQLException {
-	    String sql = "UPDATE BOARD SET STATUS=N WHERE BOARDCODE=?";
-	    return executeUpdate(sql, boardCode);
+	    String sql = "UPDATE BOARD SET STATUS='N' WHERE BOARD_CODE=?";
+	    return ExecuteDmlQuery.executeDmlQuery(sql, boardCode);
 	}
 	
 	public List<BoardDto> listBoard() throws SQLException{
@@ -77,9 +57,10 @@ public class BoardDao {
 		ResultSet rs = null;
 		Connection conn = null; 
 		Statement stmt = null;
-		String sql = "SELECT b.*, (@row_number := @row_number + 1) AS NUM"
-				+ "FROM (SELECT @row_number := 0) AS init, BOARD AS b "
-				+ "WHERE STATUS = Y";
+		String sql = "SELECT b.*, (@row_number := @row_number + 1) AS NUM "
+	            + "FROM (SELECT @row_number := 0) AS init, BOARD AS b "
+	            + "WHERE STATUS = 'Y'";
+
 
 		
 		try {
@@ -110,7 +91,7 @@ public class BoardDao {
 		ResultSet rs = null;
 		Connection conn = null; 
 		PreparedStatement pstmt = null;
-		String sql ="SELECT * FROM BOARD WHERE BOARDCODE = ?";
+		String sql ="SELECT * FROM BOARD WHERE BOARD_CODE = ?";
 				
 		try {
 			conn = connectionPool.getConnection();
@@ -119,7 +100,7 @@ public class BoardDao {
 			pstmt.setObject(1, boardCode);
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
-				boardDto.setBoardCode(rs.getInt("boardCode"));
+				boardDto.setBoardCode(rs.getInt("BOARD_CODE"));
 				boardDto.setTtile(rs.getString("title"));
 				boardDto.setContent(rs.getString("content"));
 				

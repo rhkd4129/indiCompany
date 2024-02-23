@@ -3,13 +3,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ include file="/views/header.jsp" %>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 	 <link rel="stylesheet" type="text/css" href="views/css/layout.css">
-	 <script src="views/js/jquery.js"></script>
+	 
 	 
 	 <script>
 	 $(document).ready(function(){
@@ -38,39 +39,7 @@
 		 	             }
 		 	         });
 	 	 	    });
-	 	 		function drawTable(){
-	 	 			$.ajax({
-		 	             type: "GET",
-		 	             url: "/boardList.do", // 데이터를 처리할 서버 URL 지정
-		 	  
-		 	             success: function(response) { // 성공적으로 서버 응답을 받았을 때 동작 
-		 	                 console.log(response);
-		 	             	 
-		 	                 
-		 	             },
-		 	             error: function(xhr, status, error) { // 서버 요청 실패했을 때의 동작
-		 	                 console.error("글 작성 중 오류가 발생했습니다.");  
-		 	             }
-		 	         });
-	 	 		}
-	 	 	
-	 	 	  function drawBoard(boardList) {
-	 	         var $table = $('.board .tab');
-	
-	 	         // 테이블 초기화
-	 	         $table.empty();
-	 	         
-	 	         // 테이블에 데이터 추가
-	 	         $.each(boardList, function(index, board) {
-	 	             var $row = $('<tr>');
-	 	             var $numCell = $('<td>').text(board.num);
-	 	             var $titleCell = $('<td>').html('<a href="boardContent.do?boardCode=' + board.boardCode + '">' + board.title + '</a>');
-	 	             var $contentCell = $('<td>').text(board.content);
-	 	             
-	 	             $row.append($numCell, $titleCell, $contentCell);
-	 	             $table.append($row);
-	 	         });
-	 	     }
+	 
 
 	 	 	});
 	 	 
@@ -97,21 +66,6 @@
 	    </c:forEach>
 	</table>
 </div>
-	<div class="board">
-			<h2>등록하기</h2>
-			
-			<div>
-				<label for="title" >제목</label>
-		        <input type="text" name="title">
-			</div>	
-			<div>
-				<label for="content" >내용</label>
-		        <input type="text" name="content">
-			</div>
-			<input id="submit" type="button" value="저장">
-	</div>
-
-
 	
 </body>
 </html>

@@ -1,4 +1,4 @@
-package service;
+package service.board;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import control.FrontController;
 import dao.BoardDao;
 import dto.BoardDto;
+import util.CommandProcess;
 
 public class BoardUpdateFormAction implements CommandProcess {
 

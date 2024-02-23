@@ -1,4 +1,4 @@
-package service;
+package service.board;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import control.FrontController;
 import dao.BoardDao;
 import dto.BoardDto;
+import util.CommandProcess;
+
 import java.util.logging.Level;
 public class BoardList implements CommandProcess {
 	private static final Logger logger = Logger.getLogger(BoardList.class.getName());

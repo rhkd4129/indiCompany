@@ -1,4 +1,4 @@
-package service;
+package service.board;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import control.FrontController;
 import dao.BoardDao;
 import dto.BoardDto;
+import util.CommandProcess;
 
 public class BoardInsertProAction implements CommandProcess {
 	private static final Logger logger = Logger.getLogger(BoardInsertProAction.class.getName());
@@ -18,7 +19,7 @@ public class BoardInsertProAction implements CommandProcess {
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 	
 		try {
-			request.setCharacterEncoding("utf-8");
+			
 			
 			String title = request.getParameter("title");
 			String content = request.getParameter("content");
