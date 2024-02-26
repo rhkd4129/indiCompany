@@ -1,10 +1,9 @@
 package service.board;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.servlet.RequestDispatcher;
+import java.sql.SQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,25 +13,20 @@ import dto.BoardDto;
 import util.CommandProcess;
 
 public class BoardDeleteProAction implements CommandProcess {
-	private static final Logger logger = Logger.getLogger(BoardDeleteProAction.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BoardDeleteProAction.class);
 	@Override
-	public String requestPro(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		int result = 0;
+	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer result = null;
+		Integer boardCode = null;
 		try {
-			request.setCharacterEncoding("utf-8");
-			
-			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));
+			boardCode = Integer.parseInt(request.getParameter("boardCode"));
 			BoardDao boardDao = BoardDao.getInstance();
 			result= boardDao.deleteBoard(boardCode);
-			
+		}catch (SQLException e) {
+			logger.error("SQL 오류 발생 : {}",e);
 		}catch (Exception e) {
-			logger.log(Level.SEVERE, "글 삭제 중 오류");
-	
+			logger.error("오류 발생 : {}",e);
 		}
-		  logger.log(Level.INFO, "redirect시도");
-//		  RequestDispatcher dispatcher = request.getRequestDispatcher("/boardList.do");
-//		  dispatcher.forward(request, response);
 
 		  return "views/boardList.jsp"; // 더 이상의 처리가 필요하지 않으므로 null을 반환합니다.
 	}

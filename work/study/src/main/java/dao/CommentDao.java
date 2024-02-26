@@ -7,16 +7,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import control.FrontController;
 import dto.BoardDto;
 import dto.CommentDto;
-import util.ErrorProcess;
+import util.ObjectClose;
 import util.ExecuteDmlQuery;
 
 public class CommentDao {
-	private static final Logger logger = Logger.getLogger(BoardDao.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(CommentDao.class);
 	private static CommentDao instance;
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 	private CommentDao() {}
@@ -47,11 +49,13 @@ public class CommentDao {
 				comment.setCommentContent(rs.getString("COMMENT_CONTENT"));
 				commentList.add(comment);
 			}
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "댓글 목록 조회 중 오류 발생", e);
+		}catch (Exception e) {
+			logger.error("댓글 목록 조회중 오류 발생 : {}", e);
 		}
 		finally {
-			ErrorProcess.errorProcess(rs, conn, null, pstmt);
+			ObjectClose.close(conn);
+			ObjectClose.close(pstmt);
+			ObjectClose.close(rs);
 		}
 		return commentList;
 	}

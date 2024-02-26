@@ -6,11 +6,15 @@
 </head>
 <body>
 
+
+
 <script type="text/javascript">
+	
     window.onload = function() {
         location.href="/boardList.do";
     };
 </script>
+
 
 </body>
 </html>

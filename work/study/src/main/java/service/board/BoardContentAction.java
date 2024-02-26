@@ -1,10 +1,10 @@
 package service.board;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,16 +17,13 @@ import dto.CommentDto;
 import util.CommandProcess;
 
 public class BoardContentAction implements CommandProcess {
-	private static final Logger logger = Logger.getLogger(BoardContentAction.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BoardContentAction.class);
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
-	
+		Integer boardCode = null;
 		try {
-			request.setCharacterEncoding("utf-8");
 			
-			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));
-	
-		
+			boardCode =  Integer.parseInt(request.getParameter("boardCode"));
 			BoardDao boardDao = BoardDao.getInstance();
 			CommentDao commentDao =CommentDao.getInstance();
 			
@@ -36,11 +33,12 @@ public class BoardContentAction implements CommandProcess {
 			request.setAttribute("board", boardDto);
 			request.setAttribute("commentList", commentList);
 			
+		}catch (SQLException e) {
+			logger.error("SQL 오류 발생 : {}",e);
 		}catch (Exception e) {
-			logger.log(Level.SEVERE, "새글 작성 중 오류");
-	
+			logger.error("오류 발생 : {}",e);
 		}
-		return "views/BoardContent.jsp";
+		return "views/boardContent.jsp";
 
 	}
 }

@@ -5,12 +5,12 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<link rel="stylesheet" type="text/css" href="views/layout.css">
+<link rel="stylesheet" type="text/css" href="views/css/layout.css">
 </head>
 <body>
 	<div class="board">
 			<h2>등록하기</h2>
-		<form action="boardInsertPro_redirect.do" method="post">
+		<form action="/redirect/boardInsertPro.do" method="post">
 	
 			
 			<div>

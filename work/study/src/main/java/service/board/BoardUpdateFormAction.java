@@ -1,8 +1,10 @@
 package service.board;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.SQLException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,10 +16,9 @@ import dto.BoardDto;
 import util.CommandProcess;
 
 public class BoardUpdateFormAction implements CommandProcess {
-
+	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateFormAction.class);
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
-//		private static final Logger logger = Logger.getLogger(BoardUpdateFormAction.class.getName());
 		try {
 
 			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));		
@@ -25,11 +26,12 @@ public class BoardUpdateFormAction implements CommandProcess {
 			BoardDto boardDto= boardDao.selectBoard(boardCode);
 			request.setAttribute("board", boardDto);
 			
+		}catch (SQLException e) {
+			logger.error("SQL 오류 발생 : {}",e);
 		}catch (Exception e) {
-//			logger.log(Level.SEVERE, "새글 작성 중 오류");
-	
+			logger.error("오류 발생 : {}",e);
 		}
-		return "views/BoardUpdateForm.jsp";
+		return "views/boardUpdateForm.jsp";
 
 	}
 

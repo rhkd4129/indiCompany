@@ -12,7 +12,8 @@
     $(function() {
         var boardCode = "${board.boardCode}";
         getCommentList(boardCode)
-     
+     	let a = 'ab';
+        console.log(a);
         var comment = $('<input>').attr({
             'type': 'text',
             'id': 'commentContent',
@@ -77,11 +78,11 @@
           
             commentListDiv.empty(); // 기존에 있던 댓글을 비우고 새로운 목록으로 갱신
             var table = $('<table border="1">');
-            var headerRow = $('<tr>').append($('<th>').text('내용')).append($('<th>').text('추천수'));
+            var headerRow = $('<tr>').append($('<th>').text('내용'));
             table.append(headerRow);
 
             $.each(commentList, function(index, comment) {
-                var row = $('<tr>').append($('<td>').text(comment.commentContent)).append($('<td>').text(comment.recommend));
+                var row = $('<tr>').append($('<td>').text(comment.commentContent));
                 table.append(row);
             });
 
@@ -119,8 +120,8 @@
 			    </tr>
 			    <tr>
 			          <td>${board.boardCode}</td>
-			          <td>${board.title}</td>
-			          <td>${board.content}</td>
+			          <td>${board.boardTitle}</td>
+			          <td>${board.boardContent}</td>
 			    </tr>
 			
 			</table>

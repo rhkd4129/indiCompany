@@ -9,7 +9,7 @@
 </head>
 <body>
 	<div class="board">
-		 <form action = "boardUpdateProredirect.do" method="post">
+		 <form action = "/redirect/boardUpdatePro.do" method="post">
         
 
 			     <label for="boardCode" >글번호</label>:  ${board.boardCode}
@@ -18,13 +18,13 @@
 			
 				<div>
                        <label for="title">제목</label>
-                       <input type="text" name="title" value="${board.title}">
+                       <input type="text" name="boardTitle" value="${board.boardTitle}">
 
                    </div>
 						
 				<div>
                        <label for="content">내용</label>
-                       <input type="text" name="content" value="${board.content}">
+                       <input type="text" name="boardContent" value="${board.boardContent}">
 
                    </div>
            
