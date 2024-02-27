@@ -15,7 +15,8 @@
 
 <div class ="board">
 	<h2>게시판</h2>
-	<a href="/boardInsertForm.do">새글 작성하기</a>
+	<a href="/boardInsertForm.do">새글 작성하기</a><br>
+	<a href="/nonexistent-page.jsp">error page</a>
 	
 	<table border="1">
 	    <tr>

@@ -19,11 +19,14 @@ public class BoardUpdateFormAction implements CommandProcess {
 	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateFormAction.class);
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
+		Integer boardCode = null;
+		BoardDao boardDao = null;
+		BoardDto boardDto = null;
 		try {
 
-			int boardCode =  Integer.parseInt(request.getParameter("boardCode"));		
-			BoardDao boardDao = BoardDao.getInstance();
-			BoardDto boardDto= boardDao.selectBoard(boardCode);
+			boardCode  =  Integer.parseInt(request.getParameter("boardCode"));		
+			boardDao   =  BoardDao.getInstance();
+			boardDto   =  boardDao.selectBoard(boardCode);
 			request.setAttribute("board", boardDto);
 			
 		}catch (SQLException e) {

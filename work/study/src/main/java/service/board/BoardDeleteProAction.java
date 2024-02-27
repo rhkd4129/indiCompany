@@ -16,11 +16,12 @@ public class BoardDeleteProAction implements CommandProcess {
 	private static final Logger logger = LoggerFactory.getLogger(BoardDeleteProAction.class);
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Integer result = null;
-		Integer boardCode = null;
+		Integer result , boardCode = null;
+		BoardDao boardDao = null;
+		
 		try {
 			boardCode = Integer.parseInt(request.getParameter("boardCode"));
-			BoardDao boardDao = BoardDao.getInstance();
+			boardDao = BoardDao.getInstance();
 			result= boardDao.deleteBoard(boardCode);
 		}catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}",e);

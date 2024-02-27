@@ -27,8 +27,7 @@ public class BoardDao {
 	private static BoardDao instance;
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
-	private BoardDao() {
-	}
+	private BoardDao() {}
 
 	public static BoardDao getInstance() {
 		if (instance == null) {
@@ -38,7 +37,7 @@ public class BoardDao {
 	}
 
 	public int insertBoard(BoardDto boardDto) throws SQLException {
-		String sql = "INSERT INTO BOARD (BOARD_TITLE, BOADRD_CONTENT) VALUES (?, ?)";
+		String sql = "INSERT INTO BOARD (BOARD_TITLE, BOARD_CONTENT) VALUES (?, ?)";
 		return ExecuteDmlQuery.executeDmlQuery(sql, boardDto.getBoardTitle(), boardDto.getBoardContent());
 	}
 
@@ -52,6 +51,7 @@ public class BoardDao {
 		String sql = "UPDATE BOARD SET USE_YN='N' WHERE BOARD_CODE=?";
 		return ExecuteDmlQuery.executeDmlQuery(sql, boardCode);
 	}
+	
 
 	public List<BoardDto> listBoard() throws SQLException {
 		List<BoardDto> boardList = new ArrayList<BoardDto>();
@@ -73,7 +73,6 @@ public class BoardDao {
 				boardList.add(board);
 			}
 		} catch (Exception e) {
-
 			logger.info("댓글 목록 조회 중 오류 발생", e);
 		} finally {
 			ObjectClose.selDbClose(conn, pstmt, rs);
@@ -91,14 +90,13 @@ public class BoardDao {
 		try {
 			conn = connectionPool.getConnection();
 			pstmt = conn.prepareStatement(sql);
-
 			pstmt.setObject(1, boardCode);
 			rs = pstmt.executeQuery();
+			
 			if (rs.next()) {
 				boardDto.setBoardCode(rs.getInt("BOARD_CODE"));
 				boardDto.setBoardTitle(rs.getString("BOARD_TITLE"));
-				boardDto.setBoardContent(rs.getString("BOADRD_CONTENT"));
-			
+				boardDto.setBoardContent(rs.getString("BOARD_CONTENT"));
 			}
 		} catch (Exception e) {
 			logger.info("게시판 상세페이지 오류", e);

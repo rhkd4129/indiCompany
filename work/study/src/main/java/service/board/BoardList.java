@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,14 +20,17 @@ public class BoardList implements CommandProcess {
 	private static final Logger logger = LoggerFactory.getLogger(BoardList.class);
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		List<BoardDto> boardList = new ArrayList<BoardDto>();
+		BoardDao boardDao = null;
 		
-		BoardDao boardDao = BoardDao.getInstance();
 		try {
-			List<BoardDto> boardList =boardDao.listBoard();
+			boardDao =	BoardDao.getInstance();
+			boardList = boardDao.listBoard();
 			request.setAttribute("boardList", boardList);
-			System.out.println(boardList.get(1).getBoardContent());
-		} catch (SQLException e) {
+		}catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}",e);
+		}catch (Exception e) {
+			logger.error(" 오류 발생 : {}",e);
 		}
 	
 		return "views/boardList.jsp";

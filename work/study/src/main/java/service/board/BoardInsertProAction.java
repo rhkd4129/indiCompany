@@ -16,23 +16,28 @@ import util.CommandProcess;
 
 public class BoardInsertProAction implements CommandProcess {
 	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateProAction.class);
+
 	@Override
-	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
-	
+	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String title,content = null;
+		BoardDao boardDao 	 = null;
+		BoardDto boardDto 	 = null;
+		Integer result 		 = null;
+		
 		try {
-			String title = request.getParameter("title");
-			String content = request.getParameter("content");
-			BoardDto boardDto  = new BoardDto();
+			title = request.getParameter("title");
+			content = request.getParameter("content");
+			boardDto = new BoardDto();
 			boardDto.setBoardTitle(title);
 			boardDto.setBoardContent(content);
+			boardDao = BoardDao.getInstance();
+			result = boardDao.insertBoard(boardDto);
 			
-			BoardDao boardDao = BoardDao.getInstance();
-			int result = boardDao.insertBoard(boardDto);
 			request.setAttribute("result", result);
-		}catch (SQLException e) {
-			logger.error("SQL 오류 발생 : {}",e);
-		}catch (Exception e) {
-			logger.error("오류 발생 : {}",e);
+		} catch (SQLException e) {
+			logger.error("SQL 오류 발생 : {}", e);
+		} catch (Exception e) {
+			logger.error("오류 발생 : {}", e);
 		}
 		return "views/boardInsertPro.jsp";
 

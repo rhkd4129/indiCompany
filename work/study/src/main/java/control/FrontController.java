@@ -30,20 +30,15 @@ import org.slf4j.LoggerFactory;
 @WebServlet(name = "FrontController", urlPatterns = "*.do")
 public class FrontController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
 	private static final Logger logger = LoggerFactory.getLogger(FrontController.class);
 	private Map<String, Object> CommandMap = new HashMap<String, Object>();
 
-	public FrontController() {
-		super();
-	}
-
 	/**
-	 * 1.web.xml에 들어감 servlet 태그 내에 Controller라는 서블릿을 등록 servlet-class 태그 내에는
-	 * control.Controller 클래스가 지정 init-param 태그를 통해 서블릿의 초기화 파라미터를 설정. param-name은
-	 * "config"로 지정 param-value는 "/WEB-INF/command.properties"로 지정 servlet-mapping
+	 * 1.web.xml에 들어감 servlet 태그 내에 Controller라는 서블릿 등록 servlet-class 태그 내에는 control.Controller 클래스 지정 
+	 * init-param 태그를 통해 서블릿의 초기화 파라미터를 설정. param-name은 "config"로 지정
+	 * param-value는 "/WEB-INF/command.properties"로 지정 servlet-mapping
 	 * 태그 내에서는 Controller 서블릿의 URL 패턴을 설정 이 경우 "*.do"로 설정되었기 때문에, 확장자가 ".do"인 URL
-	 * 요청은 모두다 이 서블릿으로 매핑 Front Controller 적용 이 서블릿에 다 거쳐감 서블릿 초기 파라미터 읽고
+	 * 요청은 모두 다 이 서블릿으로 매핑 Front Controller 적용 이 서블릿에 다 거쳐감 서블릿 초기 파라미터 읽고
 	 * 외부파일(프로터타파일 로딩) 서블릿 초기화시 로딩 각 url에 대응하는 커맨드 객체를 생성하고 이를 commandMap저장
 	 **/
 
@@ -82,8 +77,8 @@ public class FrontController extends HttpServlet {
 		}
 		return pr;
 	}
-// 파일 경로를 기반으로 FileInputStream을 생성하여 파일을 열고, Properties 객체에 파일 내용을 로드합니다.
-// 파일이 존재하지 않거나 입출력 예외가 발생하면 각각에 대한 예외 처리를 수행합니다.
+// 파일 경로를 기반으로 FileInputStream을 생성 및 파일 열고, Properties 객체에 파일 내용을 로드
+// 파일이 존재하지 않거나 입출력 예외가 발생하면 각각에 대한 예외 처리 수행
 
 	private void loadCommands(Properties pr) {
 		try {
@@ -96,6 +91,7 @@ public class FrontController extends HttpServlet {
 				// service.ListAction가 클래스로 변함
 				Class<?> commClass = Class.forName(className);
 				CommandProcess commandInstance = (CommandProcess) commClass.getDeclaredConstructor().newInstance();
+				//onstructor<?> constructor = commClass.getDeclaredConstructor(int.class, String.class);
 				// service.ListAction가 인스턴스로 변신
 				CommandMap.put(command, commandInstance);
 
@@ -125,26 +121,26 @@ public class FrontController extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		String method = null;
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		String method = request.getMethod();
+		method = request.getMethod();
 		if (method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("POST")) {
 			requestServletPro(request, response);
 		} else {
 			// 다른 요청 메서드에 대한 처리
 			// 예: PUT, DELETE 등
-			// 기본적으로는 405 Method Not Allowed 응답을
+			// 기본적으로는 405 Method Not Allowed 응답
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 		}
 	}
 
 	/*
-	 * requestServletPro 메서드는 FrontController 클래스 내에서 클라이언트의 모든 요청을 처리하는 핵심 메서드. 이
-	 * 메서드는 GET 또는 POST 요청이 발생했을 때 호출되며, 실제로 클라이언트의 요청을 처리하고 응답을 생성. 요청 URI에서 컨텍스트
+	 * requestServletPro 메서드는 FrontController 클래스 내에서 클라이언트의 모든 요청을 처리하는 핵심 메서드. 
+	 * 이 메서드는 GET 또는 POST 요청이 발생했을 때 호출되며, 실제로 클라이언트의 요청을 처리하고 응답을 생성. 요청 URI에서 컨텍스트
 	 * 경로제외하고 실제 커맨드 값 을통해 해당 커맨드 객체 MAP에 가져온후 requestPro를 호출하여 실제 처리 실행
 	 */
-	public static void processJsonResponse(HttpServletRequest request, HttpServletResponse response,
-			Object responseObject) throws IOException {
+	public static void processJsonResponse(HttpServletRequest request, HttpServletResponse response,Object responseObject) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		String jsonResponse = objectMapper.writeValueAsString(responseObject);
 		response.setContentType("application/json");
@@ -170,16 +166,15 @@ public class FrontController extends HttpServlet {
 			logger.info("requestServletPro :com : {}", com);
 			/*
 			 * CommandMap에서 앞서 파싱한 커맨드에 해당하는 커맨드 클래스의 인스턴스를 가져옴 해당 커맨드 인스턴스의 reqeuestPro
-			 * 메서드를 호출하여 실제 요청 처리를 수행합니다. 이 메서드는 각 커맨드 클래스마다 구현. reqeuestPro 메서드 실행 결과로 뷰의
-			 * 경로얻음
+			 * 메서드를 호출하여 실제 요청 처리를 수행. 이 메서드는 각 커맨드 클래스마다 구현. reqeuestPro 메서드 실행 결과로 뷰 경로얻음
 			 */
 			view = com.requestPro(request, response);
 			logger.info("requestServletPro view : {}", view);
 			if (command.startsWith("/json")) {
-				logger.info("json");	
+				logger.info("json");
 			} else if (command.startsWith("/redirect")) {
 				response.sendRedirect("/boardList.do"); // 리다이렉트 수행
-			}else {
+			} else {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(view);
 				dispatcher.forward(request, response);
 			}
@@ -197,10 +192,10 @@ public class FrontController extends HttpServlet {
 
 		}
 		/*
-		 * 얻은 뷰의 경로를 사용하여 RequestDispatcher를 생성합니다. forward 메서드를 호출하여 요청과 응답을 해당 뷰로
-		 * 디스패치합니다. 디스패치되는 뷰는 클라이언트에게 보여질 화면을 나타냅니다. 이렇게 requestServletPro 메서드는 요청된 URI를
-		 * 커맨드 매핑을 통해 해당하는 커맨드 클래스로 연결하고, 그 결과를 처리하여 뷰에 디스패치하는 역할을 수행합니다. 이를 통해 클라이언트의
-		 * 요청을 적절한 커맨드로 연결하고, 커맨드의 처리 결과를 적절한 화면으로 전달합니다.
+		 * 얻은 뷰의 경로를 사용하여 RequestDispatcher를 생성합니다. forward 메서드를 호출하여 요청과 응답을 해당 뷰로 디스패치.
+		 * 디스패치되는 뷰는 클라이언트에게 보여질 화면을 나타냄 이렇게 requestServletPro 메서드는 요청된 URI를
+		 * 커맨드 매핑을 통해 해당하는 커맨드 클래스로 연결하고, 그 결과를 처리하여 뷰에 디스패치하는 역할 수행. 
+		 * 이를 통해 클라이언트의 요청을 적절한 커맨드로 연결, 커맨드의 처리 결과를 적절한 화면으로 전달.
 		 */
 
 	}

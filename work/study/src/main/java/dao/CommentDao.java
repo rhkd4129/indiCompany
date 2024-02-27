@@ -37,7 +37,6 @@ public class CommentDao {
 		PreparedStatement pstmt = null;
 		String sql = "SELECT * FROM COMMENT WHERE BOARD_CODE=?";
 
-		
 		try {
 			conn = connectionPool.getConnection();
 			pstmt = conn.prepareStatement(sql);
@@ -51,11 +50,8 @@ public class CommentDao {
 			}
 		}catch (Exception e) {
 			logger.error("댓글 목록 조회중 오류 발생 : {}", e);
-		}
-		finally {
-			ObjectClose.close(conn);
-			ObjectClose.close(pstmt);
-			ObjectClose.close(rs);
+		}finally {
+			ObjectClose.selDbClose(conn,pstmt,rs);
 		}
 		return commentList;
 	}

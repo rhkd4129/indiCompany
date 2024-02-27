@@ -5,25 +5,25 @@
 <head>
 <meta charset="UTF-8">
 	<title>Insert title here</title>
-	<link rel="stylesheet" type="text/css" href="views/layout.css">
+	<link rel="stylesheet" type="text/css" href="views/css/layout.css">
 </head>
 <body>
 	<div class="board">
 		 <form action = "/redirect/boardUpdatePro.do" method="post">
         
-
+				<h2>수정하기</h2>
 			     <label for="boardCode" >글번호</label>:  ${board.boardCode}
 			     
                     <input type="hidden"  id="boardCode" name="boardCode" value="${board.boardCode}" readonly>
 			
 				<div>
-                       <label for="title">제목</label>
+                       <label for="boardTitle">제목</label>
                        <input type="text" name="boardTitle" value="${board.boardTitle}">
 
                    </div>
 						
 				<div>
-                       <label for="content">내용</label>
+                       <label for="boardContent">내용</label>
                        <input type="text" name="boardContent" value="${board.boardContent}">
 
                    </div>
