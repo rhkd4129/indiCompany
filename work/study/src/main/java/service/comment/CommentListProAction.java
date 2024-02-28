@@ -17,22 +17,25 @@ import dao.CommentDao;
 import dto.BoardDto;
 import dto.CommentDto;
 import util.CommandProcess;
+import util.ProcessJsonResponse;
 
 public class CommentListProAction implements CommandProcess {
 
-	private static final Logger logger = LoggerFactory.getLogger(FrontController.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommentListProAction.class);
 	@Override
  	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
-	
+		BoardDto boardDto 		= null;
+		CommentDto commentDto 	= null;
 		try {
 			int boardCode = Integer.parseInt(request.getParameter("boardCode")); 
 			BoardDao boardDao = BoardDao.getInstance();
 			CommentDao commentDao =CommentDao.getInstance();
-			BoardDto boardDto= boardDao.selectBoard(boardCode);
-			List<CommentDto> commentList = commentDao.listComment(boardCode);
-            FrontController.processJsonResponse(request, response, commentList);		
+			commentDto.setBoardCode(boardCode);
+			
+			List<CommentDto> commentList = commentDao.listComment(commentDto);
+			ProcessJsonResponse.processJsonResponse(request, response, commentList);		
 		}catch (Exception e) {
-			logger.error("댓글작성 중 오류 : {}",e);
+			logger.error("댓글목록 조회 중 오류 : {}",e.getMessage());
 	
 		}
 		return null;

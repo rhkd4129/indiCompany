@@ -35,9 +35,9 @@ public class BoardInsertProAction implements CommandProcess {
 			
 			request.setAttribute("result", result);
 		} catch (SQLException e) {
-			logger.error("SQL 오류 발생 : {}", e);
+			logger.error("SQL 오류 발생 : {}",  e.getMessage());
 		} catch (Exception e) {
-			logger.error("오류 발생 : {}", e);
+			logger.error("오류 발생 : {}",  e.getMessage());
 		}
 		return "views/boardInsertPro.jsp";
 

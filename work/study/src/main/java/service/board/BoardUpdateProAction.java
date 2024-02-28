@@ -23,27 +23,26 @@ public class BoardUpdateProAction implements CommandProcess {
 		BoardDao boardDao = null;
 		
 		try {
-			boardCode = Integer.parseInt(request.getParameter("boardCode"));
+			
 			title 	  = request.getParameter("boardTitle");
 			content   = request.getParameter("boardContent");
-
+			logger.info("Dfdfdf");
+			boardCode = Integer.parseInt(request.getParameter("boardCode"));
+			
 			boardDto.setBoardCode(boardCode);
 			boardDto.setBoardTitle(title);
 			boardDto.setBoardContent(content);
-
+			boardDto.toString();
 			boardDao = BoardDao.getInstance();
-			result = boardDao.insertBoard(boardDto);
-			
-			request.setAttribute("result", result);
-			request.setAttribute("boardCode", boardCode);
-
+			result = boardDao.updateBoard(boardDto);
 		} catch (SQLException e) {
-			logger.error("SQL 오류 발생 : {}", e);
+			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		} catch (Exception e) {
-			logger.error("오류 발생 : {}", e);
+			logger.error("오류 발생 : {}", e.getMessage());
 		}
+		
 
-		return "views/boardUpdatePro.jsp";
+		return "null";
 	}
 
 }

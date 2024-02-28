@@ -28,14 +28,17 @@ public class ExecuteDmlQuery {
 			conn = connectionPool.getConnection();
 			pstmt = conn.prepareStatement(sql);
 
-			for (int i = 0; i < params.length; i++) {
-				pstmt.setObject(i + 1, params[i]);
-			}
-			result = pstmt.executeUpdate();
-			if(result >= 0) {
-				logger.info("{} 행 {}",result , sql.substring(0,7));
-			}else {
-				logger.info("??? 알 수 없는  오류");
+			if (params != null && params.length > 0) {
+				for (int i = 0; i < params.length; i++) {
+					if (params[i] == null) continue;
+					pstmt.setObject(i + 1, params[i]);
+				}
+				result = pstmt.executeUpdate();
+				if(result >= 0) {
+					logger.info("{} 행 {}",result , sql.substring(0,7));
+				}else {
+					logger.info("??? 알 수 없는  오류");
+				}
 			}
 		} finally {
 			ObjectClose.iudDbClose(conn, pstmt);
@@ -43,5 +46,32 @@ public class ExecuteDmlQuery {
 		return result;
 
 	}
+	
+	public static  <T> T executeSelectQuery(String sql, ExceuteSelectQuery<T> exceuteSelectQuery, Object... params) throws SQLException {
+        T result = null;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = connectionPool.getConnection();
+            pstmt = conn.prepareStatement(sql);
+       
+            if (params != null) {
+                for (int i = 0; i < params.length; i++) {
+                    pstmt.setObject(i + 1, params[i]);
+                }
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    result = exceuteSelectQuery.SelectRow(rs);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error executing query", e);
+        } finally {
+			ObjectClose.iudDbClose(conn, pstmt);;
+		}
+        return result;
+    }
 	
 }

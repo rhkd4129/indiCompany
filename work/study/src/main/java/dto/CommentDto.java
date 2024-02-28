@@ -5,10 +5,7 @@ public class CommentDto {
     private int boardCode;
     private String commentContent;
     
-
-    public CommentDto() {
-        // 기본 생성자
-    }
+	public CommentDto() {}
 
  
     public int getCommentCode() {
@@ -34,4 +31,12 @@ public class CommentDto {
     public void setCommentContent(String commentContent) {
         this.commentContent = commentContent;
     }
+    
+
+    @Override
+	public String toString() {
+		return "CommentDto [commentCode=" + commentCode + ", boardCode=" + boardCode + ", commentContent="
+				+ commentContent + "]";
+	}
+
 }

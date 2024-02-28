@@ -13,6 +13,17 @@ public class ObjectClose {
 
 	private static final Logger logger = LoggerFactory.getLogger(ObjectClose.class);
 
+	public static void iudDbClose(Connection conn, PreparedStatement pstmt) {
+		close(conn);
+		close(pstmt);
+	}
+
+	public static void selDbClose(Connection conn, PreparedStatement pstmt, ResultSet rs) {
+		close(conn);
+		close(pstmt);
+		close(rs);
+	}
+	
 	public static void close(ResultSet rs) {
 		if (rs != null) {
 			try {
@@ -51,16 +62,5 @@ public class ObjectClose {
 				logger.error("Connection close 오류 발생: {}", e);
 			}
 		}
-	}
-
-	public static void iudDbClose(Connection conn, PreparedStatement pstmt) {
-		close(conn);
-		close(pstmt);
-	}
-
-	public static void selDbClose(Connection conn, PreparedStatement pstmt, ResultSet rs) {
-		close(conn);
-		close(pstmt);
-		close(rs);
 	}
 }

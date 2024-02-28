@@ -26,13 +26,14 @@ public class BoardUpdateFormAction implements CommandProcess {
 
 			boardCode  =  Integer.parseInt(request.getParameter("boardCode"));		
 			boardDao   =  BoardDao.getInstance();
-			boardDto   =  boardDao.selectBoard(boardCode);
+			boardDto.setBoardCode(boardCode);
+			boardDto   =  boardDao.selectBoard(boardDto);
 			request.setAttribute("board", boardDto);
 			
 		}catch (SQLException e) {
-			logger.error("SQL 오류 발생 : {}",e);
+			logger.error("SQL 오류 발생 : {}",e.getMessage());
 		}catch (Exception e) {
-			logger.error("오류 발생 : {}",e);
+			logger.error("오류 발생 : {}",e.getMessage());
 		}
 		return "views/boardUpdateForm.jsp";
 

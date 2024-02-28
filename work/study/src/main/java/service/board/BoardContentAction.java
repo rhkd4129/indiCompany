@@ -27,23 +27,23 @@ public class BoardContentAction implements CommandProcess {
 		BoardDao boardDao 		= null;
 		CommentDao commentDao	= null;
 		BoardDto boardDto 		= null;
-		
-
+		CommentDto commentDto 	= null;
+	
 		try {
-
+			
 			boardCode = Integer.parseInt(request.getParameter("boardCode"));
 			boardDao = BoardDao.getInstance();
 		    commentDao = CommentDao.getInstance();
-		    boardDto = boardDao.selectBoard(boardCode);
-		    commentList= commentDao.listComment(boardCode);
+		    boardDto.setBoardCode(boardCode);		    
+		    
+		    BoardDto resultBoardDto = boardDao.selectBoard(boardDto);
+			request.setAttribute("board", resultBoardDto);
 
-			request.setAttribute("board", boardDto);
-			request.setAttribute("commentList", commentList);
 
 		} catch (SQLException e) {
-			logger.error("SQL 오류 발생 : {}", e);
+			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		} catch (Exception e) {
-			logger.error("오류 발생 : {}", e);
+			logger.error("오류 발생 : {}", e.getMessage());
 		}
 		return "views/boardContent.jsp";
 

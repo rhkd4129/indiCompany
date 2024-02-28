@@ -5,15 +5,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-
-
-
-<script type="text/javascript">
-	
-    window.onload = function() {
-        location.href="/boardList.do";
-    };
-</script>
-
+	<% response.sendRedirect("/boardList.do");%>
 </body>
 </html>

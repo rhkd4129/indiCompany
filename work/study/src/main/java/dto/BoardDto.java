@@ -4,11 +4,10 @@ public class BoardDto {
 	private int boardCode;
 	private String boardTitle;
 	private String boardContent;
-	private String use_yn;
+	private String useYn;
 	private int num;
 
-	public BoardDto() {
-	}
+	public BoardDto() {}
 
 	public int getBoardCode() {
 		return boardCode;
@@ -34,12 +33,12 @@ public class BoardDto {
 		this.boardContent = boardContent;
 	}
 
-	public String getUse_yn() {
-		return use_yn;
+	public String getUseYn() {
+		return useYn;
 	}
 
-	public void setUse_yn(String use_yn) {
-		this.use_yn = use_yn;
+	public void setUseYn(String useUYn) {
+		this.useUYn = useUYn;
 	}
 
 	public int getNum() {

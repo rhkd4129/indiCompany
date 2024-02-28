@@ -37,10 +37,10 @@ public class ConnectionPool {
                 logger.info("데이터베이스 연결성공");
             } catch (NamingException e) {
                 
-                logger.error("데이터 베이스 연결 실패(Naming)  서버종료 : {}",e);
+                logger.error("데이터 베이스 연결 실패(Naming)  서버종료 : {}",e.getMessage());
                 System.exit(1);
             }catch (Exception e) {
-            	logger.error("데이터 베이스 연결 실패(??)  서버종료 : {}",e);
+            	logger.error("데이터 베이스 연결 실패(??)  서버종료 : {}",e.getMessage());
                 System.exit(1);
 			}
         }

@@ -27,7 +27,8 @@ public class BoardDao {
 	private static BoardDao instance;
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
-	private BoardDao() {}
+	private BoardDao() {
+	}
 
 	public static BoardDao getInstance() {
 		if (instance == null) {
@@ -47,63 +48,43 @@ public class BoardDao {
 				boardDto.getBoardCode());
 	}
 
-	public int deleteBoard(int boardCode) throws SQLException {
+	public int deleteBoard(BoardDto boardDto) throws SQLException {
 		String sql = "UPDATE BOARD SET USE_YN='N' WHERE BOARD_CODE=?";
-		return ExecuteDmlQuery.executeDmlQuery(sql, boardCode);
+		return ExecuteDmlQuery.executeDmlQuery(sql, boardDto.getBoardCode());
 	}
-	
 
-	public List<BoardDto> listBoard() throws SQLException {
-		List<BoardDto> boardList = new ArrayList<BoardDto>();
-		ResultSet rs = null;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+	
+	
+	public BoardDto mapResultSetToBoardDto(ResultSet rs) throws SQLException {
+		BoardDto boardResultDto = new BoardDto();
+		boardResultDto.setBoardCode(rs.getInt("BOARD_CODE"));
+		boardResultDto.setBoardTitle(rs.getString("BOARD_TITLE"));
+		boardResultDto.setBoardContent(rs.getString("BOARD_CONTENT"));
+		return boardResultDto;
+	}
+
+	
+	
+	public BoardDto selectBoard(BoardDto boardDto) throws SQLException {
+		String sql = "SELECT BOARD_CODE , BOARD_TITLE, BOARD_CONTENT, " + "FROM BOARD WHERE BOARD_CODE = ?";
+		return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
+			BoardDto boardResultDto = mapResultSetToBoardDto(rs);
+			return boardDto;
+		}, boardDto.getBoardCode());
+	}
+
+	
+	public List<BoardDto> listBoard(BoardDto boardDto) throws SQLException {
 		String sql = "SELECT b.*, (@row_number := @row_number + 1) AS NUM "
 				+ "FROM (SELECT @row_number := 0) AS init, BOARD AS b " + "WHERE USE_YN = 'Y'";
-		try {
-			conn = connectionPool.getConnection();
-			pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
+		List<BoardDto> boardList = new ArrayList<>();
+		return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
 			while (rs.next()) {
-				BoardDto board = new BoardDto();
-				board.setBoardCode(rs.getInt(1));
-				board.setBoardTitle(rs.getString(2));
-				board.setBoardContent(rs.getString(3));
-				board.setNum(rs.getInt(5));
-				boardList.add(board);
+				BoardDto boardResultDto = mapResultSetToBoardDto(rs);
+				boardList.add(boardResultDto);
 			}
-		} catch (Exception e) {
-			logger.info("댓글 목록 조회 중 오류 발생", e);
-		} finally {
-			ObjectClose.selDbClose(conn, pstmt, rs);
-		}
-		return boardList;
-	}
-
-	public BoardDto selectBoard(int boardCode) throws SQLException {
-		BoardDto boardDto = new BoardDto();
-		ResultSet rs = null;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		String sql = "SELECT * FROM BOARD WHERE BOARD_CODE = ?";
-
-		try {
-			conn = connectionPool.getConnection();
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setObject(1, boardCode);
-			rs = pstmt.executeQuery();
-			
-			if (rs.next()) {
-				boardDto.setBoardCode(rs.getInt("BOARD_CODE"));
-				boardDto.setBoardTitle(rs.getString("BOARD_TITLE"));
-				boardDto.setBoardContent(rs.getString("BOARD_CONTENT"));
-			}
-		} catch (Exception e) {
-			logger.info("게시판 상세페이지 오류", e);
-		} finally {
-			ObjectClose.selDbClose(conn, pstmt, rs);
-		}
-		return boardDto;
+			return boardList;
+		}, boardDto.getBoardCode());
 	}
 
 }
