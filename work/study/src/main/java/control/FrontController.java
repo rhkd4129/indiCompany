@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -46,6 +47,7 @@ public class FrontController extends HttpServlet {
 
 	public void init(ServletConfig config) throws ServletException {
 		Properties pr = LoadProperties.loadProperties(config);
+		System.out.println("Hello");
 		if (pr != null) {
 			loadCommands(pr);
 		}
@@ -103,7 +105,7 @@ public class FrontController extends HttpServlet {
 		if (!(method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("POST"))) {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 		}
-		requestServletPro(request, response);
+//		requestServletPro(request, response);
 	}
 
 	/*
@@ -128,15 +130,35 @@ public class FrontController extends HttpServlet {
 
 			logger.info("requestServletPro :comeand : {}", command);
 			logger.info("requestServletPro :com : {}", com);
-			/*
+			
+			Map<String, Object> cfgData = new HashMap<>();
+			
+			Enumeration<String> params = request.getParameterNames();
+			System.out.println(params);
+
+			cfgData.put("req", request);
+			cfgData.put("res", response);
+			while (params.hasMoreElements()) {
+				String name = params.nextElement();
+				String value = request.getParameter(name);
+				
+				if (name == null) continue;
+				cfgData.put(name, value);
+			}
+		        
+		        
+			
+//			cfgData.put("params", request.getParameterValues(command));
+			
+			/*          
 			 * CommandMap에서 앞서 파싱한 커맨드에 해당하는 커맨드 클래스의 인스턴스를 가져옴 해당 커맨드 인스턴스의 reqeuestPro
 			 * 메서드를 호출하여 실제 요청 처리를 수행. 이 메서드는 각 커맨드 클래스마다 구현. reqeuestPro 메서드 실행 결과로 뷰 경로얻음
 			 */
 			view = com.requestPro(request, response);
 //			logger.info("requestServletPro view : {}", view);
-			if (command.startsWith("/json")) {
-				logger.info("json");
-			} else if (command.startsWith("/redirect")) {
+			if (command.contains("json")) {
+//				return false;
+			} else if (command.contains("redirect")) {
 				logger.info("redirect");
 				response.sendRedirect("/boardList.do"); // 리다이렉트 수행
 			} else {
@@ -144,6 +166,8 @@ public class FrontController extends HttpServlet {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(view);
 				dispatcher.forward(request, response);
 			}
+			
+			// 에러 페이지
 		} catch (ClassCastException e) {
 			logger.error("(ClassCast 오류발생: {}", e.getMessage());
 			// 형변환 실패
