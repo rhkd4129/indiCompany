@@ -57,6 +57,7 @@
 				},
 				success : function(commentList) {
 					console.log("댓글목록 불러오기 성공");
+					console.log(commentList);
 					drawBoard(commentList);
 				},
 				error : function(xhr, status, error) {

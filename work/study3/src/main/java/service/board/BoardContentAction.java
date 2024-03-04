@@ -29,8 +29,10 @@ public class BoardContentAction implements CommandProcess {
 		CommentDto commentDto 	= null;
 	
 		try {
+			
 			boardCode = Integer.parseInt(request.getParameter("boardCode"));
 			boardDao = BoardDao.getInstance();
+			boardDto = new BoardDto(); 
 		    boardDto.setBoardCode(boardCode);		    
 		    
 		    BoardDto resultBoardDto = boardDao.selectBoard(boardDto);

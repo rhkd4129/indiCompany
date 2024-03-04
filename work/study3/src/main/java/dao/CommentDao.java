@@ -43,7 +43,7 @@ public class CommentDao {
             commentReusltDto.setCommentContent(rs.getString("COMMENT_CONTENT"));
             commentList.add(commentDto);
             return commentList;
-        }, commentDto.getCommentCode());
+        }, commentDto.getBoardCode());
 	}
 	
 	

@@ -47,7 +47,7 @@ public class FrontController extends HttpServlet {
 
 	public void init(ServletConfig config) throws ServletException {
 		Properties pr = util.LoadProperties.loadProperties(config);
-		System.out.println("sss");
+		
 		
 		if (pr != null) {
 			loadCommands(pr);
@@ -133,20 +133,20 @@ public class FrontController extends HttpServlet {
 			logger.info("requestServletPro :comeand : {}", command);
 			logger.info("requestServletPro :com : {}", com);
 			
-			Map<String, Object> cfgData = new HashMap<>();
-			
-			Enumeration<String> params = request.getParameterNames();
-			System.out.println(params);
-
-			cfgData.put("req", request);
-			cfgData.put("res", response);
-			while (params.hasMoreElements()) {
-				String name = params.nextElement();
-				String value = request.getParameter(name);
-				
-				if (name == null) continue;
-				cfgData.put(name, value);
-			}
+//			Map<String, Object> cfgData = new HashMap<>();
+//			
+//			Enumeration<String> params = request.getParameterNames();
+//			System.out.println(params);
+//
+//			cfgData.put("req", request);
+//			cfgData.put("res", response);
+//			while (params.hasMoreElements()) {
+//				String name = params.nextElement();
+//				String value = request.getParameter(name);
+//				
+//				if (name == null) continue;
+//				cfgData.put(name, value);
+//			}
 		        
 		        
 			
@@ -157,9 +157,9 @@ public class FrontController extends HttpServlet {
 			 * 메서드를 호출하여 실제 요청 처리를 수행. 이 메서드는 각 커맨드 클래스마다 구현. reqeuestPro 메서드 실행 결과로 뷰 경로얻음
 			 */
 			view = com.requestPro(request, response);
-//			logger.info("requestServletPro view : {}", view);
+			logger.info("requestServletPro view : {}", view);
 			if (command.contains("json")) {
-//				return false;
+				System.out.println("json");
 			} else if (command.contains("redirect")) {
 				logger.info("redirect");
 				response.sendRedirect("/boardList.do"); // 리다이렉트 수행

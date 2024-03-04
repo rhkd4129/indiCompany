@@ -11,8 +11,8 @@
 	$(function() {
 		var boardCode = "${board.boardCode}";
 		getCommentList(boardCode)
-		let a = 'ab';
-		console.log(a);
+		
+		
 		var comment = $('<input>').attr({
 			'type' : 'text',
 			'id' : 'commentContent',

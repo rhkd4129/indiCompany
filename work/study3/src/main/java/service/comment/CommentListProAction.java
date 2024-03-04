@@ -24,12 +24,11 @@ public class CommentListProAction implements CommandProcess {
 	private static final Logger logger = LoggerFactory.getLogger(CommentListProAction.class);
 	@Override
  	public String requestPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
-		BoardDto boardDto 		= null;
 		CommentDto commentDto 	= null;
 		try {
 			int boardCode = Integer.parseInt(request.getParameter("boardCode")); 
-			BoardDao boardDao = BoardDao.getInstance();
 			CommentDao commentDao =CommentDao.getInstance();
+			commentDto = new CommentDto();
 			commentDto.setBoardCode(boardCode);
 			
 			List<CommentDto> commentList = commentDao.listComment(commentDto);

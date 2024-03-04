@@ -24,17 +24,17 @@ public class BoardList implements CommandProcess {
 	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		List<BoardDto> boardList = new ArrayList<BoardDto>();
 		dao.BoardDao boardDao = null;
-		BoardDto boardDto = null;
 		try {
+			BoardDto boardDto = new BoardDto();
 			boardDao =	BoardDao.getInstance();
 			boardList = boardDao.listBoard(boardDto);
-			System.out.println(boardList.get(1).getBoardCode());
+			System.out.println(boardList.get(0).getBoardCode());
 			
 			request.setAttribute("boardList", boardList);
 		}catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		}catch (Exception e) {
-			logger.error(" 오류 발생2 : {}", e.getMessage());
+			logger.error(" 오류 발생 : {}", e.getMessage());
 		}
 	
 		return "views/boardList.jsp";

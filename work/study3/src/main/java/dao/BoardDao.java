@@ -65,10 +65,10 @@ public class BoardDao {
 	
 	
 	public BoardDto selectBoard(BoardDto boardDto) throws SQLException {
-		String sql = "SELECT BOARD_CODE , BOARD_TITLE, BOARD_CONTENT, " + "FROM BOARD WHERE BOARD_CODE = ?";
+		String sql = "SELECT BOARD_CODE , BOARD_TITLE , BOARD_CONTENT FROM BOARD WHERE BOARD_CODE = ?";
 		return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
 			BoardDto boardResultDto = mapResultSetToBoardDto(rs);
-			return boardDto;
+			return boardResultDto;
 		}, boardDto.getBoardCode());
 	}
 
@@ -83,7 +83,7 @@ public class BoardDao {
 				boardList.add(boardResultDto);
 			}
 			return boardList;
-		}, boardDto.getBoardCode());
+		});
 	}
 
 }
