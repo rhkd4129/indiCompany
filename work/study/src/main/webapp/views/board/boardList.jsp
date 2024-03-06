@@ -25,7 +25,7 @@
 	                    <td>${board.num}</td>
 	                    <td><a href="/view/boardContent.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>
 	                    <td>${board.boardContent}</td>
-	                </tr>
+	                </tr>	
 	            </c:forEach>
 	        </table>
 	    </c:otherwise>

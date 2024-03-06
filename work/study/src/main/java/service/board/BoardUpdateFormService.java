@@ -1,16 +1,16 @@
-package controller.board;
+package service.board;
 
 import java.sql.SQLException;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import controller.Controller;
-import controller.ModelView;
+
 import dao.BoardDao;
 import dto.BoardDto;
 
-public class BoardUpdateFormController implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateFormController.class);
+public class BoardUpdateFormService implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateFormService.class);
 
 
 	@Override

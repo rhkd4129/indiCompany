@@ -1,4 +1,4 @@
-package controller.comment;
+package service.comment;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -6,15 +6,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import controller.Controller;
-import controller.ModelView;
+
 import dao.CommentDao;
 import dto.CommentDto;
 import dto.JsonDto;
 
 
-public class CommentListController implements Controller {
+public class CommentListService implements Controller {
 
-	private static final Logger logger = LoggerFactory.getLogger(CommentListController.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommentListService.class);
 
 
 	@Override
@@ -32,8 +32,7 @@ public class CommentListController implements Controller {
 			
 			comment.setBoardCode(boardCode);
 			List<CommentDto> commentList = commentDao.listComment(comment);
-			jsonObject.setListObject(commentList);
-			model.put("jsonObject", jsonObject);
+			model.put("commentList", commentList);
 		}catch (NumberFormatException e) {
 	    	logger.error("댓글작성 중 오류 : {}",e.getMessage());
 	    	//정수로 변환할 수 없는 문자열이 파라미터로 전달된 경우

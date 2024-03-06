@@ -1,51 +1,43 @@
-package controller.board;
+package service.board;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import controller.Controller;
-import controller.ModelView;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import dao.BoardDao;
 import dto.BoardDto;
+import dto.JsonDto;
+
+public class BoardDeleteService implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardDeleteService.class);
 
 
-public class BoardInsertController implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardInsertController.class);
 
 	@Override
 	public String process(Map<String, String> paramMap, Map<String, Object> model) {
-		String title, content = null;
+		Integer result , boardCode = null;
 		BoardDao boardDao = null;
 		BoardDto boardDto = null;
-		Integer result = null;
-
+		
 		try {
 			boardDao = BoardDao.getInstance();
 			boardDto = new BoardDto();
-			title = paramMap.get("title");
-			content = paramMap.get("content");
-
-			boardDto.setBoardTitle(title);
-			boardDto.setBoardContent(content);
-
-			result = boardDao.insertBoard(boardDto);
+			
+			boardCode =   Integer.parseInt(paramMap.get("boardCode"));
+			boardDto.setBoardCode(boardCode);
+			result = boardDao.deleteBoard(boardDto);
 			model.put("result", result);
-
-		} catch (SQLException e) {
+		}catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());
-		} catch (Exception e) {
+		}catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}
-		return "";
+		return "null";
 	}
 
 }

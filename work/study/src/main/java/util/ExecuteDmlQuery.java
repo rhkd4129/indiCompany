@@ -19,59 +19,71 @@ public class ExecuteDmlQuery {
 	private static final Logger logger = LoggerFactory.getLogger(BoardDao.class);
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
-	public static Integer executeDmlQuery(String sql, Object... params) throws SQLException,Exception {
+	public static Integer executeDmlQuery(String sql, Object... params) {
 		Integer result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		
+
 		try {
 			conn = connectionPool.getConnection();
+			conn.setAutoCommit(false); // 트랜잭션 시작
 			pstmt = conn.prepareStatement(sql);
 
 			if (params != null && params.length > 0) {
 				for (int i = 0; i < params.length; i++) {
-					if (params[i] == null) continue;
+					if (params[i] == null)
+						continue;
 					pstmt.setObject(i + 1, params[i]);
 				}
-				result = pstmt.executeUpdate();
-				if(result >= 0) {
-					logger.info("{} 행 {}",result , sql.substring(0,7));
-				}else {
-					logger.info("??? 알 수 없는  오류");
-				}
 			}
+			result = pstmt.executeUpdate();
+			if (result >= 0) {
+				logger.info("{} 행 {}", result, sql.substring(0, 7));
+			} else {
+				logger.info("??? 알 수 없는  오류");
+			}
+			conn.commit(); // 트랜잭션 커밋
+		} catch (SQLException e) {
+			try {
+				conn.rollback(); // SQLException 발생 시 롤백
+			} catch (SQLException rollbackException) {
+				logger.error("롤백중 에러 :{}", e.getMessage());
+			}
+			logger.error("SQL 예외 발생: " + e.getMessage());
 		} finally {
 			ObjectClose.iudDbClose(conn, pstmt);
 		}
 		return result;
-
 	}
-	
-	public static  <T> T executeSelectQuery(String sql, ExceuteSelectQuery<T> exceuteSelectQuery, Object... params) throws SQLException ,Exception{
-        T result = null;
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = connectionPool.getConnection();
-            pstmt = conn.prepareStatement(sql);
-            System.out.println(params);
-            if (params != null && params.length > 0) {
+
+	public static <T> T executeSelectQuery(String sql, ExceuteSelectQuery<T> exceuteSelectQuery, Object... params)
+			throws SQLException, Exception {
+		T result = null;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			conn = connectionPool.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			System.out.println(params);
+			if (params != null && params.length > 0) {
 				for (int i = 0; i < params.length; i++) {
-					if (params[i] == null) continue;
+					if (params[i] == null)
+						continue;
 					pstmt.setObject(i + 1, params[i]);
 				}
-            }
+			}
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    result = exceuteSelectQuery.SelectRow(rs);
-                }
-            }
-        } finally {
-			ObjectClose.iudDbClose(conn, pstmt);;
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					result = exceuteSelectQuery.SelectRow(rs);
+				}
+			}
+		} finally {
+			ObjectClose.iudDbClose(conn, pstmt);
+			;
 		}
-        return result;
-    }
-	
+		return result;
+	}
+
 }

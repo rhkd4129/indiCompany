@@ -1,17 +1,17 @@
-package controller.comment;
+package service.comment;
 
 import java.sql.SQLException;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import controller.Controller;
-import controller.ModelView;
+
 import dao.CommentDao;
 import dto.CommentDto;
 import dto.JsonDto;
 
-public class CommentInsertController implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(CommentInsertController.class);
+public class CommentInsertServise implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(CommentInsertServise.class);
 
 	@Override
 	public String process(Map<String, String> paramMap, Map<String, Object> model) {
@@ -23,9 +23,7 @@ public class CommentInsertController implements Controller {
 		try {
 			commentDao = CommentDao.getInstance();
 			comment = new CommentDto();
-			JsonDto jsonObject = new JsonDto();
-			
-
+		
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			content = paramMap.get("commentContent");
 

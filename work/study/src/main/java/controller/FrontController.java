@@ -23,6 +23,7 @@ import util.LoadConfig;
  *   프론트 컨트롤러가 요청에 맞는 컨트롤러를 찾아서 호출 
  *   프론트 컨트롤러를 제외한 나머지 컨트롤러는 서블릿을 사용하지 않아도 됨 
  * */
+import util.MyView;
 
 
 //@WebServlet(name = "FrontController", urlPatterns = "*.do", initParams = {
@@ -35,15 +36,15 @@ public class FrontController extends HttpServlet {
 	private Map<String, Object> CommandMap = new HashMap<>();
 
 	public FrontController() {
-	    CommandMap.put("/view/boardList.do", new controller.board.BoardListController());
-	    CommandMap.put("/view/boardContent.do", new controller.board.BoardContentController());
-	    CommandMap.put("/view/boardInsertForm.do", new controller.board.BoardInsertFormController());
-	    CommandMap.put("/redirect/boardInsertPro.do", new controller.board.BoardInsertController());
-	    CommandMap.put("/view/boardUpdateForm.do", new controller.board.BoardUpdateFormController());
-	    CommandMap.put("/redirect/boardUpdatePro.do", new controller.board.BoardUpdateController());
-	    CommandMap.put("/redirect/boardDeletePro.do", new controller.board.BoardDeleteController());
-	    CommandMap.put("/json/commentInsertPro.do", new controller.comment.CommentInsertController());
-	    CommandMap.put("/json/commentListPro.do", new controller.comment.CommentListController());
+	    CommandMap.put("/view/boardList.do", new service.board.BoardListService());
+	    CommandMap.put("/view/boardContent.do", new service.board.BoardContentService());
+	    CommandMap.put("/view/boardInsertForm.do", new service.board.BoardInsertFormService());
+	    CommandMap.put("/redirect/boardInsertPro.do", new service.board.BoardInsertService());
+	    CommandMap.put("/view/boardUpdateForm.do", new service.board.BoardUpdateFormService());
+	    CommandMap.put("/redirect/boardUpdatePro.do", new service.board.BoardUpdateService());
+	    CommandMap.put("/redirect/boardDeletePro.do", new service.board.BoardDeleteService());
+	    CommandMap.put("/json/commentInsertPro.do", new service.comment.CommentInsertServise());
+	    CommandMap.put("/json/commentListPro.do", new service.comment.CommentListService());
 	}
 
 //	public void init(ServletConfig config) throws ServletException {
@@ -65,7 +66,7 @@ public class FrontController extends HttpServlet {
 		Controller controller = null;
 		
 		request.setCharacterEncoding("UTF-8");
-		
+		response.setCharacterEncoding("UTF-8");
 		try {
 
 			method = request.getMethod();
@@ -98,7 +99,6 @@ public class FrontController extends HttpServlet {
 			
 			Map<String, String> paramMap = CreateParamMap.createParamMap(request);
 			Map<String , Object> model = new HashMap<String, Object>();
-			JsonDto jsonDto = new JsonDto();
 		
 			String  viewName = controller.process(paramMap,model);
 			MyView view = viewResolver(viewName);
@@ -106,10 +106,8 @@ public class FrontController extends HttpServlet {
 //			String viewName = mv.getViewName();			
 			if ("redirect".equalsIgnoreCase(comMethed)) {
 				logger.info("redirect");
-				response.setCharacterEncoding("UTF-8");
 				response.sendRedirect("/view/boardList.do"); 
 			}
-			// 리다이렉트 수행
 			if ("json".equalsIgnoreCase(comMethed)) {
 				logger.info("json");
 				response.setContentType("application/json");

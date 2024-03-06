@@ -5,13 +5,8 @@
 <!DOCTYPE html>
 <html  lang="ko">
 <head>
-
-	
- 
-	<script src="views/static/js/jquery.js"></script>
-	<link rel="stylesheet" type="text/css" href="views/static/css/layout.css"> 
-	
-
+	<script src="/views/static/js/jquery.js"></script>
+	<link rel="stylesheet" type="text/css" href="/views/static/css/layout.css"> 
     <meta charset="UTF-8">
 </head>
 

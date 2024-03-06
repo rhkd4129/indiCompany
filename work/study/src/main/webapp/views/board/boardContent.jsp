@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ include file="/views/layout/header.jsp"%>
+<style>
+</style>
 <head>
 <script type="text/javascript">
 	$(function() {
@@ -48,12 +50,14 @@
 			$.ajax({
 				type : "GET",
 				url : "/json/commentListPro.do",
+				dataType : 'json',
 				data : {
 					boardCode : boardCode
 				},
 				success : function(response) {
+					console.log(response);
 					console.log("댓글목록 불러오기 성공");
-					console.log(response.listObject);
+
 					drawBoard(response.listObject);
 				},
 				error : function(xhr, status, error) {
@@ -83,6 +87,27 @@
 			commentListDiv.append(table);
 		}
 	});
+	
+	function boardDelete(boardCode) {
+		console.log("boardDelete");
+		if (!boardCode) {
+			alert("삭제 오류");
+			return false;
+		}
+		$.ajax({
+			type : "POST",
+			url : "/redirect/boardDeletePro.do",
+			data : {
+				boardCode : boardCode
+			},
+			success : function(result) {
+				console.log(result);
+			},
+			error : function(xhr, status, error) {
+				console.error("삭제 오류");
+			}
+		});
+	}
 </script>
 </head>
 <body>
@@ -108,12 +133,10 @@
 			<input type="button" value="수정"
 				onclick="location.href='/view/boardUpdateForm.do?boardCode=${board.boardCode}'">
 
-			<input type="button" value="삭제"
-				onclick="location.href='redirect/boardDeletePro.do?boardCode=${board.boardCode}'">
-
-
-			<input type="button" value="목록"
-				onclick="location.href='/view/boardList.do'">
+			<input type="button" value="삭제" onclick="boardDelete(${board.boardCode})">
+				
+				
+			<input type="button" value="목록" onclick="location.href='/view/boardList.do'">
 		</div>
 	</div>
 	<div class="board">

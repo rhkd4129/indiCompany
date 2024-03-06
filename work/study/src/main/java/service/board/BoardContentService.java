@@ -1,4 +1,4 @@
-package controller.board;
+package service.board;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -9,13 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import controller.Controller;
-import controller.ModelView;
+
 import dao.BoardDao;
 import dto.BoardDto;
 import dto.CommentDto;
 
-public class BoardContentController implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardContentController.class);
+public class BoardContentService implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardContentService.class);
 
 	
 	@Override
