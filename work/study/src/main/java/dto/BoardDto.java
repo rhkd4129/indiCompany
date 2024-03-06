@@ -1,11 +1,22 @@
 package dto;
 
+import java.sql.Timestamp;
+
 public class BoardDto {
 	private int boardCode;
 	private String boardTitle;
 	private String boardContent;
 	private String useYn;
+	private Timestamp boardCreateAt;
 	private int num;
+
+	public Timestamp getBoardCreateAt() {
+		return boardCreateAt;
+	}
+
+	public void setBoardCreateAt(Timestamp boardCreateAt) {
+		this.boardCreateAt = boardCreateAt;
+	}
 
 	public BoardDto() {}
 

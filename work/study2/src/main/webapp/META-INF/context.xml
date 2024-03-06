@@ -10,7 +10,6 @@
 		factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
 		url="jdbc:mysql://127.0.0.1:3306/study"
 		
-		
 	
 	/>
 	

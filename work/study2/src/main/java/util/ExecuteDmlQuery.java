@@ -19,7 +19,7 @@ public class ExecuteDmlQuery {
 	private static final Logger logger = LoggerFactory.getLogger(BoardDao.class);
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
-	public static Integer executeDmlQuery(String sql, Object... params) throws SQLException {
+	public static Integer executeDmlQuery(String sql, Object... params) throws SQLException,Exception {
 		Integer result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -47,18 +47,20 @@ public class ExecuteDmlQuery {
 
 	}
 	
-	public static  <T> T executeSelectQuery(String sql, ExceuteSelectQuery<T> exceuteSelectQuery, Object... params) throws SQLException {
+	public static  <T> T executeSelectQuery(String sql, ExceuteSelectQuery<T> exceuteSelectQuery, Object... params) throws SQLException ,Exception{
         T result = null;
         Connection conn = null;
         PreparedStatement pstmt = null;
+        
         try {
             conn = connectionPool.getConnection();
             pstmt = conn.prepareStatement(sql);
-       
-            if (params != null) {
-                for (int i = 0; i < params.length; i++) {
-                    pstmt.setObject(i + 1, params[i]);
-                }
+            System.out.println(params);
+            if (params != null && params.length > 0) {
+				for (int i = 0; i < params.length; i++) {
+					if (params[i] == null) continue;
+					pstmt.setObject(i + 1, params[i]);
+				}
             }
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -66,8 +68,6 @@ public class ExecuteDmlQuery {
                     result = exceuteSelectQuery.SelectRow(rs);
                 }
             }
-        } catch (Exception e) {
-            logger.error("Error executing query", e);
         } finally {
 			ObjectClose.iudDbClose(conn, pstmt);;
 		}
