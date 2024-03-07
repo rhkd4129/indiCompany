@@ -4,10 +4,10 @@ import java.sql.SQLException;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import controller.Controller;
 
 import dao.BoardDao;
 import dto.BoardDto;
+import service.Controller;
 
 public class BoardUpdateFormService implements Controller {
 	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateFormService.class);

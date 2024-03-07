@@ -7,15 +7,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import controller.Controller;
-
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.BoardDao;
 import dto.BoardDto;
+import service.Controller;
 
 
 public class BoardInsertService implements Controller {

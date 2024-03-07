@@ -1,8 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ include file="/views/layout/header.jsp"%>
-<style>
-</style>
+
 <head>
 <script type="text/javascript">
 	$(function() {
@@ -57,8 +56,7 @@
 				success : function(response) {
 					console.log(response);
 					console.log("댓글목록 불러오기 성공");
-
-					drawBoard(response.listObject);
+					drawBoard(response.commentList);
 				},
 				error : function(xhr, status, error) {
 					console.error("댓글 목록 불러오기 실패");
@@ -115,7 +113,7 @@
 		<h2>게시판 상세보기</h2>
 		<table border="1">
 			<tr>
-				<th>게시물 번호</th>
+				<th>글 번호</th>
 				<th>제목</th>
 				<th>내용</th>
 				<th>셍성시간</th>
@@ -124,8 +122,7 @@
 				<td>${board.boardCode}</td>
 				<td>${board.boardTitle}</td>
 				<td>${board.boardContent}</td>
-				<td><fmt:formatDate value="${board.boardCreateAt}"
-						pattern="yyyy-MM-dd HH:mm" /></td>
+				<td><fmt:formatDate value="${board.boardCreateAt}" pattern="yyyy-MM-dd HH:mm" /></td>
 			</tr>
 		</table>
 

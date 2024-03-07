@@ -1,0 +1,11 @@
+{
+    "/view/boardList.do": "service.board.BoardList",
+    "/view/boardContent.do": "service.board.BoardContentAction",
+    "/view/boardInsertForm.do": "service.board.BoardInsertFormAction",
+    "/redirect/boardInsertPro.do": "service.board.BoardInsertProAction",
+    "/view/boardUpdateForm.do": "service.board.BoardUpdateFormAction",
+    "/redirect/boardUpdatePro.do": "service.board.BoardUpdateProAction",
+    "/redirect/boardDeletePro.do": "service.board.BoardDeleteProAction",
+    "/json/commentInsertPro.do": "service.comment.CommentInsertProAction",
+    "/json/commentListPro.do": "service.comment.CommentListProAction"
+}

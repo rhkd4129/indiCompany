@@ -31,8 +31,6 @@ public class MyView {
 
 	public void render(Map<String, Object> model, HttpServletResponse response)throws ServletException, IOException {
 		 ObjectMapper objectMapper = new ObjectMapper();
-		 List<CommentDto> a = (List<CommentDto>) model.get("commentList");
-		 System.out.println(a);
 		 String jsonResponse = objectMapper.writeValueAsString(model); // 모델을 JSON 문자열로 변환
 		 response.getWriter().write(jsonResponse);
 		

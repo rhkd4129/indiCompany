@@ -6,12 +6,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import controller.Controller;
-
 import javax.servlet.ServletException;
 import dao.BoardDao;
 import dto.BoardDto;
 import dto.JsonDto;
+import service.Controller;
 
 public class BoardDeleteService implements Controller {
 	private static final Logger logger = LoggerFactory.getLogger(BoardDeleteService.class);
@@ -37,7 +36,7 @@ public class BoardDeleteService implements Controller {
 		}catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}
-		return "null";
+		 return "redirect:/view/boardList.do";
 	}
 
 }

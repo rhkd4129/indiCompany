@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import controller.Controller;
 
 import dao.CommentDao;
+import dto.BoardDto;
 import dto.CommentDto;
 import dto.JsonDto;
+import service.Controller;
 
 
 public class CommentListService implements Controller {
@@ -26,10 +27,7 @@ public class CommentListService implements Controller {
 		try {
 			commentDao =  CommentDao.getInstance();
 			comment  = new CommentDto();
-			JsonDto jsonObject = new JsonDto();
-			
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
-			
 			comment.setBoardCode(boardCode);
 			List<CommentDto> commentList = commentDao.listComment(comment);
 			model.put("commentList", commentList);

@@ -8,9 +8,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import controller.Controller;
 import dao.BoardDao;
 import dto.BoardDto;
+import service.Controller;
 
 public class BoardListService implements Controller {
 
@@ -27,6 +27,8 @@ public class BoardListService implements Controller {
 		try {
 			boardDao = BoardDao.getInstance();
 			boardList = boardDao.listBoard(boardDto);
+			System.out.println("ddd");
+			System.out.println(boardList.get(0).getBoardContent());
 			model.put("boardList", boardList);
 		} catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());

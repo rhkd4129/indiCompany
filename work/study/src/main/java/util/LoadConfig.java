@@ -1,5 +1,6 @@
 package util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,7 +14,10 @@ import javax.servlet.ServletConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import controller.Controller;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import service.Controller;
 
 public class LoadConfig {
 	private static final Logger logger = LoggerFactory.getLogger(LoadConfig.class);
@@ -92,5 +96,22 @@ public class LoadConfig {
 		}
 		return CommandMap;
 	}
+	
+	public static Map<String, Object> loadCommandsFromJson(ServletConfig config) {
+		String props = config.getInitParameter("config");
+		String configFilePath = config.getServletContext().getRealPath(props);
+		logger.info("configFilePath : {}", configFilePath);
+		ObjectMapper objectMapper = new ObjectMapper();
+		   try {
+	            // JSON 파일을 읽어서 Map으로 변환합니다.
+	            Map<String, Object> commandMap = objectMapper.readValue(new File(configFilePath), new TypeReference<HashMap<String,Object>>(){});
+	            
+	            return commandMap;
+	        } catch (IOException e) {
+	        	return null;
+	            
+	        }
+		   
+    }
 
 }

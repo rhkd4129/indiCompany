@@ -4,11 +4,11 @@ import java.sql.SQLException;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import controller.Controller;
 
 import dao.CommentDao;
 import dto.CommentDto;
 import dto.JsonDto;
+import service.Controller;
 
 public class CommentInsertServise implements Controller {
 	private static final Logger logger = LoggerFactory.getLogger(CommentInsertServise.class);

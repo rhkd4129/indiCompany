@@ -73,8 +73,7 @@ public class BoardDao {
 
 	
 	public List<BoardDto> listBoard(BoardDto boardDto) throws SQLException,Exception {
-		String sql = "SELECT b.*, (@row_number := @row_number + 1) AS NUM "
-				+ "FROM (SELECT @row_number := 0) AS init, BOARD AS b " + "WHERE USE_YN = 'Y'";
+		String sql = "SELECT BOARD_CODE , BOARD_TITLE, BOARD_CONTENT FROM BOARD WHERE USE_YN = 'Y'";
 		List<BoardDto> boardList = new ArrayList<>();
 		return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
 			while (rs.next()) {
@@ -82,7 +81,6 @@ public class BoardDao {
 				boardResultDto.setBoardCode(rs.getInt("BOARD_CODE"));
 				boardResultDto.setBoardTitle(rs.getString("BOARD_TITLE"));
 				boardResultDto.setBoardContent(rs.getString("BOARD_CONTENT"));
-				boardResultDto.setNum(rs.getInt("NUM"));
 				boardList.add(boardResultDto);
 			}
 			return boardList;

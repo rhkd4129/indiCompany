@@ -25,6 +25,7 @@ public class ExecuteDmlQuery {
 		PreparedStatement pstmt = null;
 
 		try {
+	
 			conn = connectionPool.getConnection();
 			conn.setAutoCommit(false); // 트랜잭션 시작
 			pstmt = conn.prepareStatement(sql);
@@ -51,7 +52,13 @@ public class ExecuteDmlQuery {
 			}
 			logger.error("SQL 예외 발생: " + e.getMessage());
 		} finally {
+			try {
+				conn.setAutoCommit(true);
+			} catch (SQLException e) {
+				logger.error("롤백중 에러 :{}", e.getMessage());
+			}
 			ObjectClose.iudDbClose(conn, pstmt);
+			
 		}
 		return result;
 	}
@@ -65,11 +72,10 @@ public class ExecuteDmlQuery {
 		try {
 			conn = connectionPool.getConnection();
 			pstmt = conn.prepareStatement(sql);
-			System.out.println(params);
+	
 			if (params != null && params.length > 0) {
 				for (int i = 0; i < params.length; i++) {
-					if (params[i] == null)
-						continue;
+					if (params[i] == null)continue;
 					pstmt.setObject(i + 1, params[i]);
 				}
 			}
@@ -81,7 +87,6 @@ public class ExecuteDmlQuery {
 			}
 		} finally {
 			ObjectClose.iudDbClose(conn, pstmt);
-			;
 		}
 		return result;
 	}

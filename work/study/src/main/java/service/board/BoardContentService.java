@@ -8,11 +8,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import controller.Controller;
-
 import dao.BoardDao;
 import dto.BoardDto;
 import dto.CommentDto;
+import service.Controller;
 
 public class BoardContentService implements Controller {
 	private static final Logger logger = LoggerFactory.getLogger(BoardContentService.class);

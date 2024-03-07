@@ -1,7 +1,8 @@
 package service.board;
 
 import java.util.Map;
-import controller.Controller;
+
+import service.Controller;
 
 public class BoardInsertFormService implements Controller {
 
