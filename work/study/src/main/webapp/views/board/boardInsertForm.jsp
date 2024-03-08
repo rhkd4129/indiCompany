@@ -4,7 +4,7 @@
 <body>
 	<div class="board">
 			<h2>등록하기</h2>
-		<form action="/redirect/boardInsertPro.do" method="post">
+		<form action="/redirect/board/insert.do" method="post">
 	
 			
 			<div>
@@ -21,7 +21,7 @@
 		</form>
 		
 		<input type="button" value="목록"
-						onclick="location.href='/view/boardList.do'">
+						onclick="location.href='/view/board/list.do'">
 	
 	
 	</div>

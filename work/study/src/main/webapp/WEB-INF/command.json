@@ -1,11 +1,40 @@
 {
-    "/view/boardList.do": "service.board.BoardList",
-    "/view/boardContent.do": "service.board.BoardContentAction",
-    "/view/boardInsertForm.do": "service.board.BoardInsertFormAction",
-    "/redirect/boardInsertPro.do": "service.board.BoardInsertProAction",
-    "/view/boardUpdateForm.do": "service.board.BoardUpdateFormAction",
-    "/redirect/boardUpdatePro.do": "service.board.BoardUpdateProAction",
-    "/redirect/boardDeletePro.do": "service.board.BoardDeleteProAction",
-    "/json/commentInsertPro.do": "service.comment.CommentInsertProAction",
-    "/json/commentListPro.do": "service.comment.CommentListProAction"
+	"/view/board/list.do": {
+		"execute": "service.board.BoardList",
+		"viewName": "/board/boardList"
+	},
+	"/view/board/content.do": {
+		"execute": "service.board.BoardContent",
+		"viewName": "/board/boardContent"
+	},
+	"/view/board/insertForm.do": {
+		"execute": "null",
+		"viewName": "/board/boardInsertForm"
+	},
+	"/redirect/board/insert.do": {
+		"execute": "service.board.BoardInsert",
+		"viewName": "null"
+	},
+	"/view/board/updateForm.do": {
+		"execute": "null",
+		"viewName": "/board/boardUpdateForm"
+	},
+	"/redirect/board/update.do": {
+		"execute": "service.board.BoardUpdate",
+		"viewName": "null"
+	},
+	"/json/comment/list.do": {
+		"execute": "service.comment.CommentList",
+		"viewName": "null"
+	},
+	"/json/comment/insert.do": {
+		"execute": "service.comment.CommentInsert",
+		"viewName": "null"
+	},
+	"view/error/error.do": {
+		"execute": "null",
+		"viewName": "error"
+	}
+	
+	
 }

@@ -10,11 +10,11 @@ import dto.CommentDto;
 import dto.JsonDto;
 import service.Controller;
 
-public class CommentInsertServise implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(CommentInsertServise.class);
+public class CommentInsert implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(CommentInsert.class);
 
 	@Override
-	public String process(Map<String, String> paramMap, Map<String, Object> model) {
+	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		CommentDao commentDao = null;
 		CommentDto comment = null;
 		Integer boardCode, result = null;
@@ -41,6 +41,6 @@ public class CommentInsertServise implements Controller {
 		} catch (Exception e) {
 			logger.error("댓글작성 중 오류 : {}", e.getMessage());
 		}
-		return null;
+		
 	}
 }

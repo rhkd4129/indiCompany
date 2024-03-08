@@ -1,13 +1,14 @@
-package service;
+package service.board;
 
 import java.util.Map;
 
-public class ErrorService implements Controller{
+import service.Controller;
+
+public class BoardInsertForm implements Controller {
 
 	@Override
 	public void process(Map<String, String> paramMap, Map<String, Object> model) {
-	
+		
 	}
-	
 
 }

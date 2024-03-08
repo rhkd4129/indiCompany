@@ -13,12 +13,12 @@ import dto.BoardDto;
 import dto.CommentDto;
 import service.Controller;
 
-public class BoardContentService implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardContentService.class);
+public class BoardContent implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardContent.class);
 
 	
 	@Override
-	public String process(Map<String, String> paramMap, Map<String, Object> model) {
+	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		BoardDao boardDao = null;
 		BoardDto boardDto = null;
 		BoardDto resultBoardDto = null;
@@ -39,7 +39,7 @@ public class BoardContentService implements Controller {
 		} catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}
-		return "board/boardContent";
+		
 	}
 
 }

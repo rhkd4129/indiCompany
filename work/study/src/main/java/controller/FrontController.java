@@ -17,32 +17,24 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import service.Controller;
 import util.CreateParamMap;
 import util.LoadConfig;
 import util.MyView;
+import util.ControllerInvoker;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /*
- * 
  *   프론트 컨트롤러가 요청에 맞는 컨트롤러를 찾아서 호출 
  *   프론트 컨트롤러를 제외한 나머지 컨트롤러는 서블릿을 사용하지 않아도 됨 
- * */
-
-
-
-
-
-//
+*/
 
 //@WebServlet(name = "FrontController")
 @WebServlet(name = "FrontController", urlPatterns = "*.do", initParams = { 
@@ -50,91 +42,74 @@ import java.lang.reflect.InvocationTargetException;
 public class FrontController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(FrontController.class);
-	private Map<String, Object> CommandMap = new HashMap<>();
-
+	Map<String, Map<String, String>> commandMap = new HashMap<String, Map<String,String>>(); 
 	public FrontController() {
 //		scanController();
 //		CommandMap.put("/view/boardList.do", new service.board.BoardListService());
 //		CommandMap.put("/view/boardContent.do", new service.board.BoardContentService());
-//		CommandMap.put("/view/boardInsertForm.do", new service.board.BoardInsertFormService());
-//		CommandMap.put("/redirect/boardInsertPro.do", new service.board.BoardInsertService());
-//		CommandMap.put("/view/boardUpdateForm.do", new service.board.BoardUpdateFormService());
-//		CommandMap.put("/redirect/boardUpdatePro.do", new service.board.BoardUpdateService());
-//		CommandMap.put("/redirect/boardDeletePro.do", new service.board.BoardDeleteService());
-//		CommandMap.put("/json/commentInsertPro.do", new service.comment.CommentInsertServise());
-//		CommandMap.put("/json/commentListPro.do", new service.comment.CommentListService());
-//		CommandMap.put("/error/error.do", new service.ErrorService());
-
+//		........
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-		CommandMap = LoadConfig.loadCommandsFromJson(config);
-		System.out.println(CommandMap);
-	}
-//		Properties pr = LoadConfig.loadProperties(config);
-//		 Map<String, Object> commandMap = LoadConfig.loadCommandsFromJson("/path/to/command.json");
-//		if (pr != null) {
-//			CommandMap = LoadConfig.loadCommands(pr);
-//			System.out.println(CommandMap);
-//			
-//		}
-
-
-	private MyView viewResolver(String viewName) {
-		return new MyView("/views/" + viewName + ".jsp");
+		commandMap = LoadConfig.loadCommandsFromJson(config);
 	}
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String method = null;
-		Controller controller = null;
+		String method, className = null;
+		Map<String, String> paramMap = CreateParamMap.createParamMap(request);
+		Map<String, Object> model = new HashMap<String, Object>();
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+		
+		
 		try {
-
 			method = request.getMethod();
 			if (!(method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("POST"))) {
 				response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			}
-
 			String requestURI = request.getRequestURI();
-			logger.info("requestURI : {}", requestURI);
-
+			logger.info("[CHECK_1]requestURI : {}", requestURI);
 			String command = requestURI.substring(request.getContextPath().length());
-			logger.info("[CHECK] command : {}", command.toString());
+			logger.info("[CHECK_2] command : {}", command.toString());
 
-			String[] comArr = requestURI.split("/");
-			logger.info("[CHECK] comArr : {}", comArr.length);
-			if (comArr == null || comArr.length != 3) {
+			String[] comArr = command.split("/");
+			if (comArr == null || comArr.length != 4) {
 				logger.error("유효하지 않는  url : {}", command);
 				response.sendRedirect("/errer/errer.do");
 			}
-
 			String comMethed = comArr[1];
-			logger.info("[CHECK] comMethed : {}", comMethed.toString());
-			controller = (Controller) CommandMap.get(command);
-			logger.info("controller : {}", controller);
-
-			Map<String, String> paramMap = CreateParamMap.createParamMap(request);
-			Map<String, Object> model = new HashMap<String, Object>();
-
-			String viewName = controller.process(paramMap, model);
-			MyView view = viewResolver(viewName);
-			;
+			String comObject = comArr[2];
+			String comAction = comArr[3];
+		
+//			
 			if ("redirect".equalsIgnoreCase(comMethed)) {
 				logger.info("redirect");
-				response.sendRedirect("/view/boardList.do");
-			}
-			if ("json".equalsIgnoreCase(comMethed)) {
-				logger.info("json");
-				view.render(model, response);
+				response.sendRedirect("/view/board/list.do");
 			}
 
+			className = commandMap.get(command).get("execute");
+			logger.info("[CHECK_3] className : {}", className);
+			
+			
+			if(className != null || className!="null") {
+				ControllerInvoker.invokeController(className, paramMap,model);
+			
+			}
+			String viewName = commandMap.get(command).get("viewName");
+			
+			
+			if ("json".equalsIgnoreCase(comMethed)) {
+				logger.info("json");
+				MyView.render(model, response);
+			}
+			
+			String viewPath = "/views"+viewName+".jsp";
+			logger.info("[CHECK_3] viewPath : {}", viewPath);
 			if ("view".equalsIgnoreCase(comMethed)) {
 				logger.info("forward");
-//				view.render(mv.getModel(), request, response);
-				view.render(model, request, response);
+				MyView.render(viewPath, model, request, response);
 			}
 //			logger.info("error");
 //			response.sendRedirect("/error/error.do");

@@ -16,11 +16,11 @@ import dto.BoardDto;
 import service.Controller;
 
 
-public class BoardInsertService implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardInsertService.class);
+public class BoardInsert implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardInsert.class);
 
 	@Override
-	public String process(Map<String, String> paramMap, Map<String, Object> model) {
+	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		String title, content = null;
 		BoardDao boardDao = null;
 		BoardDto boardDto = null;
@@ -43,7 +43,7 @@ public class BoardInsertService implements Controller {
 		} catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}
-		return "";
+		
 	}
 
 }

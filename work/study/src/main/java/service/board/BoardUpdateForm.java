@@ -9,12 +9,12 @@ import dao.BoardDao;
 import dto.BoardDto;
 import service.Controller;
 
-public class BoardUpdateFormService implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateFormService.class);
+public class BoardUpdateForm implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateForm.class);
 
 
 	@Override
-	public String process(Map<String, String> paramMap, Map<String, Object> model) {
+	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		
 		BoardDao boardDao = null;
 		BoardDto reusltBoardDto, boardDto = null;
@@ -37,7 +37,7 @@ public class BoardUpdateFormService implements Controller {
 		} catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}
-		return "board/boardUpdateForm";
+//		paramMap.get("viewName");			
 	}
 
 }

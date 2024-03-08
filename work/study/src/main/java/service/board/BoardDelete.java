@@ -12,13 +12,13 @@ import dto.BoardDto;
 import dto.JsonDto;
 import service.Controller;
 
-public class BoardDeleteService implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardDeleteService.class);
+public class BoardDelete implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardDelete.class);
 
 
 
 	@Override
-	public String process(Map<String, String> paramMap, Map<String, Object> model) {
+	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		Integer result , boardCode = null;
 		BoardDao boardDao = null;
 		BoardDto boardDto = null;
@@ -36,7 +36,6 @@ public class BoardDeleteService implements Controller {
 		}catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}
-		 return "redirect:/view/boardList.do";
 	}
 
 }

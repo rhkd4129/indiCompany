@@ -26,7 +26,7 @@
 					console.log(commentContent);
 					$.ajax({
 						type : "POST",
-						url : "/json/commentInsertPro.do",
+						url : "/json/comment/insert.do",
 						data : {
 							boardCode : boardCode,
 							commentContent : commentContent
@@ -48,7 +48,7 @@
 		function getCommentList(boardCode) {
 			$.ajax({
 				type : "GET",
-				url : "/json/commentListPro.do",
+				url : "/json/comment/list.do",
 				dataType : 'json',
 				data : {
 					boardCode : boardCode
@@ -94,7 +94,7 @@
 		}
 		$.ajax({
 			type : "POST",
-			url : "/redirect/boardDeletePro.do",
+			url : "/redirect/board/delete.do",
 			data : {
 				boardCode : boardCode
 			},
@@ -128,12 +128,11 @@
 
 		<div class="btn_group">
 			<input type="button" value="수정"
-				onclick="location.href='/view/boardUpdateForm.do?boardCode=${board.boardCode}'">
+				onclick="location.href='/view/board/updateForm.do?boardCode=${board.boardCode}'">
 
-			<input type="button" value="삭제" onclick="boardDelete(${board.boardCode})">
+			<input type="button" value="삭제" onclick="board/delete(${board.boardCode})">	
 				
-				
-			<input type="button" value="목록" onclick="location.href='/view/boardList.do'">
+			<input type="button" value="목록" onclick="location.href='/view/board/list.do'">
 		</div>
 	</div>
 	<div class="board">

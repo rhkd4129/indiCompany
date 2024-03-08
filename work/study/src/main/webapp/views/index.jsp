@@ -6,6 +6,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<% response.sendRedirect("/view/boardList.do");%>
+	<% response.sendRedirect("/view/board/list.do");%>
 </body>
 </html>

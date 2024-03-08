@@ -21,7 +21,24 @@ import service.Controller;
 
 public class LoadConfig {
 	private static final Logger logger = LoggerFactory.getLogger(LoadConfig.class);
+	
+	public static 	Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config) {
+		String props = config.getInitParameter("config");
+		String configFilePath = config.getServletContext().getRealPath(props);
+		logger.info("configFilePath : {}", configFilePath);
+		ObjectMapper objectMapper = new ObjectMapper();
+		   try {
+			   Map<String, Map<String, String>> map  = objectMapper.readValue(new File(configFilePath), new TypeReference<HashMap<String,Map<String, String>>>(){});
+			   
+	            return map;
+	        } catch (IOException e) {
+	        	return null;	            
+	        }		   
+    }
 
+	
+	////////////////////////////////////////////////////////
+	
 	public static Properties loadProperties(ServletConfig config) {
 		String props = config.getInitParameter("config");
 		Properties pr = new Properties();
@@ -97,21 +114,5 @@ public class LoadConfig {
 		return CommandMap;
 	}
 	
-	public static Map<String, Object> loadCommandsFromJson(ServletConfig config) {
-		String props = config.getInitParameter("config");
-		String configFilePath = config.getServletContext().getRealPath(props);
-		logger.info("configFilePath : {}", configFilePath);
-		ObjectMapper objectMapper = new ObjectMapper();
-		   try {
-	            // JSON 파일을 읽어서 Map으로 변환합니다.
-	            Map<String, Object> commandMap = objectMapper.readValue(new File(configFilePath), new TypeReference<HashMap<String,Object>>(){});
-	            
-	            return commandMap;
-	        } catch (IOException e) {
-	        	return null;
-	            
-	        }
-		   
-    }
 
 }

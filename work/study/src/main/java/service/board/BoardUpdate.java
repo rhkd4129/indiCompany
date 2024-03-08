@@ -10,11 +10,11 @@ import dao.BoardDao;
 import dto.BoardDto;
 import service.Controller;
 
-public class BoardUpdateService implements Controller {
-	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateService.class);
+public class BoardUpdate implements Controller {
+	private static final Logger logger = LoggerFactory.getLogger(BoardUpdate.class);
 
 	@Override
-	public String process(Map<String, String> paramMap, Map<String, Object> model) {
+	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		
 		BoardDao boardDao = null;
 		Integer boardCode, result = null;
@@ -39,7 +39,7 @@ public class BoardUpdateService implements Controller {
 		} catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}
-		return "";
+		
 	}
 
 }

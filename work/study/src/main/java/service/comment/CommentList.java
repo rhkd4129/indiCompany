@@ -13,13 +13,13 @@ import dto.JsonDto;
 import service.Controller;
 
 
-public class CommentListService implements Controller {
+public class CommentList implements Controller {
 
-	private static final Logger logger = LoggerFactory.getLogger(CommentListService.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommentList.class);
 
 
 	@Override
-	public String process(Map<String, String> paramMap, Map<String, Object> model) {
+	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		CommentDao commentDao = null;
 		Integer boardCode = null;
 		CommentDto comment = null;
@@ -40,6 +40,6 @@ public class CommentListService implements Controller {
 		}catch (Exception e) {
 			logger.error("댓글작성 중 오류 : {}",e.getMessage());
 		}
-		return null;
+	
 	}
 }

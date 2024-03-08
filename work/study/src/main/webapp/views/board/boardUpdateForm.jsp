@@ -5,7 +5,7 @@
 </head>
 <body>
 	<div class="board">
-		<form action="/redirect/boardUpdatePro.do" method="post">
+		<form action="/redirect/board/update.do" method="post">
 
 			<h2>게시물 수정</h2>
 			<label for="boardCode">글번호</label>: ${board.boardCode} <input

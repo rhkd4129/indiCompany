@@ -6,7 +6,7 @@
 <body>
 <div class ="board">
 	<h2>게시판</h2>
-	<a href="/view/boardInsertForm.do">새글 등록</a><br>
+	<a href="/view/board/insertForm.do">새글 등록</a><br>
 	<a href="/nonexistent-page.jsp">error page</a>
 	
 	<c:choose>
@@ -23,7 +23,7 @@
 	            <c:forEach var="board" items="${boardList}">
 	                <tr>
 	                    <td>${board.boardCode}</td>
-	                    <td><a href="/view/boardContent.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>
+	                    <td><a href="/view/board/content.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>
 	                    <td>${board.boardContent}</td>
 	                </tr>	
 	            </c:forEach>
