@@ -7,8 +7,6 @@
 	$(function() {
 		var boardCode = "${board.boardCode}";
 		getCommentList(boardCode)
-		let a = 'ab';
-		console.log(a);
 		var comment = $('<input>').attr({
 			'type' : 'text',
 			'id' : 'commentContent',
@@ -94,12 +92,28 @@
 		}
 		$.ajax({
 			type : "POST",
-			url : "/redirect/board/delete.do",
+			url : "/json/board/delete.do",
 			data : {
 				boardCode : boardCode
 			},
-			success : function(result) {
-				console.log(result);
+			success : function(response) {
+				
+				let result = JSON.parse(response).result;
+				
+				if(result>=1){
+				
+// 					alert("삭제완료");
+					 setTimeout(function() { 
+						
+						 window.location.href = "/view/board/list.do";
+						 alert("삭제 완료");
+						 },  1000);
+					
+					
+				}				
+				else{
+					alert("알 수 없는 오류");
+				}
 			},
 			error : function(xhr, status, error) {
 				console.error("삭제 오류");
@@ -122,7 +136,8 @@
 				<td>${board.boardCode}</td>
 				<td>${board.boardTitle}</td>
 				<td>${board.boardContent}</td>
-				<td><fmt:formatDate value="${board.boardCreateAt}" pattern="yyyy-MM-dd HH:mm" /></td>
+				<td><fmt:formatDate value="${board.boardCreateAt}"
+						pattern="yyyy-MM-dd HH:mm" /></td>
 			</tr>
 		</table>
 
@@ -130,9 +145,10 @@
 			<input type="button" value="수정"
 				onclick="location.href='/view/board/updateForm.do?boardCode=${board.boardCode}'">
 
-			<input type="button" value="삭제" onclick="board/delete(${board.boardCode})">	
-				
-			<input type="button" value="목록" onclick="location.href='/view/board/list.do'">
+			<input type="button" value="삭제"
+				onclick="boardDelete(${board.boardCode})"> <input
+				type="button" value="목록"
+				onclick="location.href='/view/board/list.do'">
 		</div>
 	</div>
 	<div class="board">

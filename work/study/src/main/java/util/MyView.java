@@ -16,15 +16,13 @@ import dto.JsonDto;
 
 public class MyView {
 
-	public static void render(String viewPath, Map<String, Object> model, HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	public static void render(String viewPath, Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		model.forEach((key, value) -> request.setAttribute(key, value));
 		RequestDispatcher dispatcher = request.getRequestDispatcher(viewPath);
 		dispatcher.forward(request, response);
 	}
 
-	public static void render(Map<String, Object> model, HttpServletResponse response)
-			throws ServletException, IOException {
+	public static void render(Map<String, Object> model, HttpServletResponse response) throws ServletException, IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		String jsonResponse = objectMapper.writeValueAsString(model); // 모델을 JSON 문자열로 변환
 		response.getWriter().write(jsonResponse);

@@ -7,7 +7,12 @@ public class CommentDto {
     
 	public CommentDto() {}
 
- 
+	public CommentDto(int boardCode ,String commentContent) { 
+		boardCode = this.boardCode;
+		commentContent = this.commentContent;
+	}
+	
+	
     public int getCommentCode() {
         return commentCode;
     }

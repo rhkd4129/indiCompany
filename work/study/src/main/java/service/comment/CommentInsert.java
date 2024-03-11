@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import dao.CommentDao;
 import dto.CommentDto;
 import dto.JsonDto;
-import service.Controller;
+import service.ServiceInterface;
 
-public class CommentInsert implements Controller {
+public class CommentInsert implements ServiceInterface {
 	private static final Logger logger = LoggerFactory.getLogger(CommentInsert.class);
 
 	@Override

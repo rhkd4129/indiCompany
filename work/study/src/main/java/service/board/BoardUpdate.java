@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import dao.BoardDao;
 import dto.BoardDto;
-import service.Controller;
+import service.ServiceInterface;
 
-public class BoardUpdate implements Controller {
+public class BoardUpdate implements ServiceInterface {
 	private static final Logger logger = LoggerFactory.getLogger(BoardUpdate.class);
 
 	@Override
@@ -23,14 +23,14 @@ public class BoardUpdate implements Controller {
 
 		try {
 			boardDao = BoardDao.getInstance();
-			boardDto = new BoardDto();
+			
+			
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			title = paramMap.get("title");
 			content = paramMap.get("content");
-
-			boardDto.setBoardContent(content);
-			boardDto.setBoardTitle(title);
-			boardDto.setBoardCode(boardCode);
+			
+			
+			boardDto = new BoardDto(boardCode,title,content);
 			result = boardDao.updateBoard(boardDto);
 			model.put("result", result);
 

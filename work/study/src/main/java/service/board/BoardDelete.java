@@ -10,9 +10,9 @@ import javax.servlet.ServletException;
 import dao.BoardDao;
 import dto.BoardDto;
 import dto.JsonDto;
-import service.Controller;
+import service.ServiceInterface;
 
-public class BoardDelete implements Controller {
+public class BoardDelete implements ServiceInterface {
 	private static final Logger logger = LoggerFactory.getLogger(BoardDelete.class);
 
 
@@ -30,7 +30,9 @@ public class BoardDelete implements Controller {
 			boardCode =   Integer.parseInt(paramMap.get("boardCode"));
 			boardDto.setBoardCode(boardCode);
 			result = boardDao.deleteBoard(boardDto);
-			model.put("result", result);
+//			model.put("status", result <= 1 ? true : false);
+			model.put("result", result);	
+			
 		}catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		}catch (Exception e) {

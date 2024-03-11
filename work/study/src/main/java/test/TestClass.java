@@ -10,7 +10,8 @@ public class TestClass {
     }
 	
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-		String url="/view/boardList.do";
-		UrlMapping.urlMapping(url);
+		String url="/view/board/content.do";
+		System.out.println(UrlTest.urlP(url)); 
+		
 	}
 }

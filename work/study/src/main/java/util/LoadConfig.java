@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import service.Controller;
+import service.ServiceInterface;
 
 public class LoadConfig {
 	private static final Logger logger = LoggerFactory.getLogger(LoadConfig.class);
@@ -85,7 +85,7 @@ public class LoadConfig {
 				logger.info("loadCommands className : {}", className);
 				// service.ListAction가 클래스로 변함
 				Class<?> commClass = Class.forName(className);
-				Controller commandInstance = (Controller) commClass.getDeclaredConstructor().newInstance();
+				ServiceInterface commandInstance = (ServiceInterface) commClass.getDeclaredConstructor().newInstance();
 				// onstructor<?> constructor = commClass.getDeclaredConstructor(int.class,
 				// String.class);
 				// service.ListAction가 인스턴스로 변신

@@ -8,8 +8,23 @@ public class BoardDto {
 	private String boardContent;
 	private String useYn;
 	private Timestamp boardCreateAt;
-	private int num;
+	private int	countReuslt;
+	public int getCountReuslt() {
+		return countReuslt;
+	}
 
+	public void setCountReuslt(int countReuslt) {
+		this.countReuslt = countReuslt;
+	}
+
+	public BoardDto() {}
+	
+	public BoardDto(int boardCode , String boardTitle,String boardContent) {
+		this.boardCode = boardCode;
+		this.boardTitle  = boardTitle;
+		this.boardContent = boardContent;
+	}
+	
 	public Timestamp getBoardCreateAt() {
 		return boardCreateAt;
 	}
@@ -17,9 +32,7 @@ public class BoardDto {
 	public void setBoardCreateAt(Timestamp boardCreateAt) {
 		this.boardCreateAt = boardCreateAt;
 	}
-
-	public BoardDto() {}
-
+	
 	public int getBoardCode() {
 		return boardCode;
 	}
@@ -52,13 +65,6 @@ public class BoardDto {
 		this.useYn = useUYn;
 	}
 
-	public int getNum() {
-		return num;
-	}
-
-	public void setNum(int num) {
-		this.num = num;
-	}
 
 	
 }

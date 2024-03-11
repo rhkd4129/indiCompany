@@ -1,40 +1,32 @@
 {
 	"/view/board/list.do": {
-		"execute": "service.board.BoardList",
 		"viewName": "/board/boardList"
 	},
 	"/view/board/content.do": {
-		"execute": "service.board.BoardContent",
 		"viewName": "/board/boardContent"
 	},
 	"/view/board/insertForm.do": {
-		"execute": "null",
 		"viewName": "/board/boardInsertForm"
 	},
 	"/redirect/board/insert.do": {
-		"execute": "service.board.BoardInsert",
 		"viewName": "null"
 	},
 	"/view/board/updateForm.do": {
-		"execute": "null",
 		"viewName": "/board/boardUpdateForm"
 	},
 	"/redirect/board/update.do": {
-		"execute": "service.board.BoardUpdate",
-		"viewName": "null"
+		"viewName": ""
+	},
+	"/json/board/delete.do": {
+		"viewName": ""
 	},
 	"/json/comment/list.do": {
-		"execute": "service.comment.CommentList",
-		"viewName": "null"
+		"viewName": ""
 	},
 	"/json/comment/insert.do": {
-		"execute": "service.comment.CommentInsert",
 		"viewName": "null"
 	},
-	"view/error/error.do": {
-		"execute": "null",
-		"viewName": "error"
+	"/view/error/error.do": {
+		"viewName": "/error/errorPage"
 	}
-	
-	
 }

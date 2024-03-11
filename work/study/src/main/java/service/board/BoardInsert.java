@@ -13,10 +13,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.BoardDao;
 import dto.BoardDto;
-import service.Controller;
+import service.ServiceInterface;
 
 
-public class BoardInsert implements Controller {
+public class BoardInsert implements ServiceInterface {
 	private static final Logger logger = LoggerFactory.getLogger(BoardInsert.class);
 
 	@Override

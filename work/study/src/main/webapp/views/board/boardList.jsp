@@ -3,11 +3,15 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+   <head>
+   
+   	
+   </head>
 <body>
 <div class ="board">
-	<h2>게시판</h2>
+	<h2>게시판</h2>
 	<a href="/view/board/insertForm.do">새글 등록</a><br>
-	<a href="/nonexistent-page.jsp">error page</a>
+	<a href="/view/error/error.do">에러페이지</a><br>
 	
 	<c:choose>
 	    <c:when test="${empty boardList}">

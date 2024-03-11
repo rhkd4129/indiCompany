@@ -10,10 +10,10 @@ import dao.CommentDao;
 import dto.BoardDto;
 import dto.CommentDto;
 import dto.JsonDto;
-import service.Controller;
+import service.ServiceInterface;
 
 
-public class CommentList implements Controller {
+public class CommentList implements ServiceInterface {
 
 	private static final Logger logger = LoggerFactory.getLogger(CommentList.class);
 
@@ -30,7 +30,13 @@ public class CommentList implements Controller {
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			comment.setBoardCode(boardCode);
 			List<CommentDto> commentList = commentDao.listComment(comment);
+			for(CommentDto a : commentList) {
+				System.out.println("start");
+				System.out.println(a.getCommentCode());
+				System.out.println(a.getCommentContent());
+			}
 			model.put("commentList", commentList);
+			
 		}catch (NumberFormatException e) {
 	    	logger.error("댓글작성 중 오류 : {}",e.getMessage());
 	    	//정수로 변환할 수 없는 문자열이 파라미터로 전달된 경우

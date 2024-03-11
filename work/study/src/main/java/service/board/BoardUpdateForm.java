@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import dao.BoardDao;
 import dto.BoardDto;
-import service.Controller;
+import service.ServiceInterface;
 
-public class BoardUpdateForm implements Controller {
+public class BoardUpdateForm implements ServiceInterface {
 	private static final Logger logger = LoggerFactory.getLogger(BoardUpdateForm.class);
 
 
@@ -23,8 +23,6 @@ public class BoardUpdateForm implements Controller {
 		try {
 			boardDao = BoardDao.getInstance();
 			boardDto = new BoardDto();
-	
-
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			boardDto.setBoardCode(boardCode);
 			reusltBoardDto = boardDao.selectBoard(boardDto);
@@ -36,8 +34,7 @@ public class BoardUpdateForm implements Controller {
 			logger.error("오류 발생 : {}", e.getMessage());
 		} catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
-		}
-//		paramMap.get("viewName");			
+		}			
 	}
 
 }
