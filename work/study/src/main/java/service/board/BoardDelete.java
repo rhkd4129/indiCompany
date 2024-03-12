@@ -30,7 +30,6 @@ public class BoardDelete implements ServiceInterface {
 			boardCode =   Integer.parseInt(paramMap.get("boardCode"));
 			boardDto.setBoardCode(boardCode);
 			result = boardDao.deleteBoard(boardDto);
-//			model.put("status", result <= 1 ? true : false);
 			model.put("result", result);	
 			
 		}catch (SQLException e) {

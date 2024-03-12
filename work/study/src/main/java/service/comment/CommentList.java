@@ -30,11 +30,6 @@ public class CommentList implements ServiceInterface {
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			comment.setBoardCode(boardCode);
 			List<CommentDto> commentList = commentDao.listComment(comment);
-			for(CommentDto a : commentList) {
-				System.out.println("start");
-				System.out.println(a.getCommentCode());
-				System.out.println(a.getCommentContent());
-			}
 			model.put("commentList", commentList);
 			
 		}catch (NumberFormatException e) {

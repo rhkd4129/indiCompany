@@ -14,11 +14,16 @@ public class ControllerInvoker {
 
 	
 	public static void invokeController(String command,Map<String, String> paramMap,Map<String, Object> model) throws Exception{
-	    Class<?> clazz = Class.forName(command);
-	    Object instance = clazz.newInstance();
-	    Class<?>[] parameterTypes = {Map.class,Map.class};
-        Method method = clazz.getMethod("process", parameterTypes);
-	    method.invoke(instance,paramMap,model);
-	}
-   	
+		  try {
+		        Class<?> clazz = Class.forName(command);
+		        Object instance = clazz.newInstance();
+		        Class<?>[] parameterTypes = {Map.class, Map.class};
+		        Method method = clazz.getMethod("process", parameterTypes);
+		        method.invoke(instance, paramMap, model);
+		    } catch (ClassNotFoundException e) {
+		        logger.info("Class not found for command: " + command, e);
+		        return;
+		    
+		}	
+	}  	
 }

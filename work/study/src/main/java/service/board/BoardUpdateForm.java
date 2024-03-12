@@ -17,21 +17,29 @@ public class BoardUpdateForm implements ServiceInterface {
 	public void process(Map<String, String> paramMap, Map<String, Object> model) {
 		
 		BoardDao boardDao = null;
-		BoardDto reusltBoardDto, boardDto = null;
-		Integer boardCode = null;
-
+		BoardDto resultBoardDto, boardDto = null;
+		Integer boardCode,result = null;
+			
+		
 		try {
 			boardDao = BoardDao.getInstance();
 			boardDto = new BoardDto();
-			boardCode = Integer.parseInt(paramMap.get("boardCode"));
+			
+			boardCode = Integer.parseInt((paramMap.get("boardCode")));
 			boardDto.setBoardCode(boardCode);
-			reusltBoardDto = boardDao.selectBoard(boardDto);
-			model.put("board", reusltBoardDto);
-
+			
+			result = boardDao.checkBoardExists(boardDto).getCountReuslt();
+			
+			if(result == 1) {
+				resultBoardDto = boardDao.selectBoard(boardDto);
+				model.put("board", resultBoardDto);
+			}
+			model.put("result", result);
+			
 		} catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		} catch (NullPointerException e) {
-			logger.error("오류 발생 : {}", e.getMessage());
+			logger.error("NullPointerException 오류 발생 : {}", e.getMessage());
 		} catch (Exception e) {
 			logger.error("오류 발생 : {}", e.getMessage());
 		}			

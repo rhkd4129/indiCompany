@@ -9,7 +9,7 @@
 		"viewName": "/board/boardInsertForm"
 	},
 	"/redirect/board/insert.do": {
-		"viewName": "null"
+		"viewName": ""
 	},
 	"/view/board/updateForm.do": {
 		"viewName": "/board/boardUpdateForm"
@@ -24,7 +24,7 @@
 		"viewName": ""
 	},
 	"/json/comment/insert.do": {
-		"viewName": "null"
+		"viewName": ""
 	},
 	"/view/error/error.do": {
 		"viewName": "/error/errorPage"

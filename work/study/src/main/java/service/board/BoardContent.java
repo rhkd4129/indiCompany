@@ -23,26 +23,20 @@ public class BoardContent implements ServiceInterface {
 		BoardDao boardDao = null;
 		BoardDto boardDto = null;
 		BoardDto resultBoardDto = null;
-		Integer boardCode = null;
-		Integer result = null;
+		Integer boardCode,result = null;
 		
 		try {
 			boardDao = BoardDao.getInstance();
 			boardDto = new BoardDto();
-			
-			
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			boardDto.setBoardCode(boardCode);
-			
 			result = boardDao.checkBoardExists(boardDto).getCountReuslt();
-			System.out.println(result);
+			
 			if(result == 1) {
 				resultBoardDto = boardDao.selectBoard(boardDto);
 				model.put("board", resultBoardDto);
 			}
-			if(result == 0) {
-				throw new Exception("게시물이 존재하지 않습니다.");
-			}
+			model.put("result",result);
 		} catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		} catch (Exception e) {

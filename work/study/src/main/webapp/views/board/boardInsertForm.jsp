@@ -1,6 +1,7 @@
 <%@ include file="/views/layout/header.jsp" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <body>
 	<div class="board">
 			<h2>등록하기</h2>

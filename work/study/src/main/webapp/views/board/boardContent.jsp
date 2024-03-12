@@ -6,6 +6,13 @@
 <script type="text/javascript">
 	$(function() {
 		var boardCode = "${board.boardCode}";
+		var result = "${result}";
+		console.log(boardCode, result);
+		if(!boardCode || !result || result ===0){
+			window.location.href = "/view/error/error.do";
+			return;
+		}
+		
 		getCommentList(boardCode)
 		var comment = $('<input>').attr({
 			'type' : 'text',
@@ -97,19 +104,12 @@
 				boardCode : boardCode
 			},
 			success : function(response) {
-				
-				let result = JSON.parse(response).result;
-				
+				let result = response.result;
 				if(result>=1){
-				
-// 					alert("삭제완료");
 					 setTimeout(function() { 
-						
 						 window.location.href = "/view/board/list.do";
 						 alert("삭제 완료");
 						 },  1000);
-					
-					
 				}				
 				else{
 					alert("알 수 없는 오류");
@@ -142,13 +142,13 @@
 		</table>
 
 		<div class="btn_group">
+			<!--  <input type="button" value="수정json" onclick="boardUpdate(${board.boardCode})"> -->
+
 			<input type="button" value="수정"
 				onclick="location.href='/view/board/updateForm.do?boardCode=${board.boardCode}'">
 
-			<input type="button" value="삭제"
-				onclick="boardDelete(${board.boardCode})"> <input
-				type="button" value="목록"
-				onclick="location.href='/view/board/list.do'">
+			<input type="button" value="삭제"  onclick="boardDelete(${board.boardCode})"> 
+			<input type="button" value="목록"  onclick="location.href='/view/board/list.do'">
 		</div>
 	</div>
 	<div class="board">
@@ -160,5 +160,6 @@
 	</div>
 
 </body>
-
 </html>
+
+
