@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import dao.BoardDao;
 import dto.BoardDto;
 import service.ServiceInterface;
+import util.DataTransferObject;
+
 
 
 public class BoardInsert implements ServiceInterface {
@@ -36,6 +38,8 @@ public class BoardInsert implements ServiceInterface {
 			boardDto.setBoardContent(content);
 
 			result = boardDao.insertBoard(boardDto);
+//			JdbcUtils jdbcUtils = new JdbcUtils();
+	       // jdbcUtils.insert("board",  (DataTransferObject) boardDto);
 			model.put("result", result);
 
 		} catch (SQLException e) {

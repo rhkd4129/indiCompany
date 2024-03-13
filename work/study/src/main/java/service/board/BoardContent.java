@@ -30,13 +30,13 @@ public class BoardContent implements ServiceInterface {
 			boardDto = new BoardDto();
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			boardDto.setBoardCode(boardCode);
-			result = boardDao.checkBoardExists(boardDto).getCountReuslt();
 			
-			if(result == 1) {
-				resultBoardDto = boardDao.selectBoard(boardDto);
-				model.put("board", resultBoardDto);
-			}
-			model.put("result",result);
+			
+			
+			resultBoardDto = boardDao.selectBoard(boardDto);
+			model.put("board", resultBoardDto);
+			
+			
 		} catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		} catch (Exception e) {

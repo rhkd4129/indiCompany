@@ -2,7 +2,10 @@ package dto;
 
 import java.sql.Timestamp;
 
-public class BoardDto {
+import test.jdbcTest.DataTransferObject;
+
+public class BoardDto implements DataTransferObject {
+	
 	private int boardCode;
 	private String boardTitle;
 	private String boardContent;
@@ -65,6 +68,9 @@ public class BoardDto {
 		this.useYn = useUYn;
 	}
 
-
+	  @Override
+	    public Object getData() {
+	        return this; // BoardDto 객체 자체를 반환합니다.
+	    }
 	
 }

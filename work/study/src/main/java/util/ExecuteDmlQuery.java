@@ -18,7 +18,11 @@ import dto.BoardDto;
 public class ExecuteDmlQuery {
 	private static final Logger logger = LoggerFactory.getLogger(BoardDao.class);
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
-
+	
+	
+	
+	
+	
 	public static Integer executeDmlQuery(String sql, Object... params) {
 		Integer result = null;
 		Connection conn = null;

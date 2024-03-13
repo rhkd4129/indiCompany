@@ -5,17 +5,16 @@
 
 <head>
 <script type="text/javascript">
-	
 	$(function() {
-		var boardCode = "${board.boardCode}";
-		var result = "${result}";
-		if (!boardCode || !result || result === 0) {
+		var jsonData = "${board}" || null;
+		boardCode = "${board.boardCode}";
+		
+		if(jsonData === null){	
+			alert("정보가 없습니다,");
 			window.location.href = "/view/error/error.do";
 			return;
 		}
 	});
-	
-
 </script>
 
 

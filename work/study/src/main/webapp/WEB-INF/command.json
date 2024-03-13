@@ -9,13 +9,13 @@
 		"viewName": "/board/boardInsertForm"
 	},
 	"/redirect/board/insert.do": {
-		"viewName": ""
+		"viewName": "/view/board/list.do"
 	},
 	"/view/board/updateForm.do": {
 		"viewName": "/board/boardUpdateForm"
 	},
 	"/redirect/board/update.do": {
-		"viewName": ""
+		"viewName": "/view/board/list.do"
 	},
 	"/json/board/delete.do": {
 		"viewName": ""

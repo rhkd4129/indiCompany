@@ -27,14 +27,9 @@ public class BoardUpdateForm implements ServiceInterface {
 			
 			boardCode = Integer.parseInt((paramMap.get("boardCode")));
 			boardDto.setBoardCode(boardCode);
+			resultBoardDto = boardDao.selectBoard(boardDto);
+			model.put("board", resultBoardDto);
 			
-			result = boardDao.checkBoardExists(boardDto).getCountReuslt();
-			
-			if(result == 1) {
-				resultBoardDto = boardDao.selectBoard(boardDto);
-				model.put("board", resultBoardDto);
-			}
-			model.put("result", result);
 			
 		} catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());

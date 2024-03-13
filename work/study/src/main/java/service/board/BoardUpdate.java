@@ -28,8 +28,7 @@ public class BoardUpdate implements ServiceInterface {
 			boardCode = Integer.parseInt(paramMap.get("boardCode"));
 			title = paramMap.get("title");
 			content = paramMap.get("content");
-			System.out.println("----------");
-			System.out.println(boardCode);
+			
 			
 			boardDto = new BoardDto(boardCode,title,content);
 			result = boardDao.updateBoard(boardDto);

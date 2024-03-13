@@ -15,7 +15,7 @@
 				    window.location.href = "/view/board/content.do?boardCode="+boardCode;
 				},
 				error : function(xhr, status, error) {
-					console.error("게시판 상세보기 불러오기 실패");
+					alert("게시판 상세보기 불러오기 실패")
 				}
 			});
 		}
@@ -25,7 +25,6 @@
 <div class ="board">
 	<h2>게시판</h2>
 	<a href="/view/board/insertForm.do">새글 등록</a><br>
-	<a href="/view/error/error.do">에러페이지</a><br>
 	
 	<c:choose>
 	    <c:when test="${empty boardList}">
@@ -41,8 +40,8 @@
 	            <c:forEach var="board" items="${boardList}">
 	                <tr>
 	                    <td>${board.boardCode}</td>
-<!--                      <td><a href="/view/board/content.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>-->	
-						  <td onclick="boardContent(${board.boardCode})">${board.boardTitle}</td>
+                      <td><a href="/view/board/content.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>
+						<!--    <td onclick="boardContent(${board.boardCode})">${board.boardTitle}</td>-->
 	                    <td>${board.boardContent}</td>
 	                </tr>	
 	            </c:forEach>

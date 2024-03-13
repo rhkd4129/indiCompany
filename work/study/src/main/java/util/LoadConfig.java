@@ -14,7 +14,9 @@ import javax.servlet.ServletConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import service.ServiceInterface;
@@ -22,18 +24,15 @@ import service.ServiceInterface;
 public class LoadConfig {
 	private static final Logger logger = LoggerFactory.getLogger(LoadConfig.class);
 	
-	public static 	Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config) {
+	public static 	Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config) throws StreamReadException, DatabindException, IOException  {
 		String props = config.getInitParameter("config");
 		String configFilePath = config.getServletContext().getRealPath(props);
+		 Map<String, Map<String, String>> map = new HashMap<>();;
 		logger.info("configFilePath : {}", configFilePath);
 		ObjectMapper objectMapper = new ObjectMapper();
-		   try {
-			   Map<String, Map<String, String>> map  = objectMapper.readValue(new File(configFilePath), new TypeReference<HashMap<String,Map<String, String>>>(){});
-			   
-	            return map;
-	        } catch (IOException e) {
-	        	return null;	            
-	        }		   
+		map  = objectMapper.readValue(new File(configFilePath), new TypeReference<Map<String, Map<String, String>>>(){});
+		return map;
+	        	   
     }
 
 	

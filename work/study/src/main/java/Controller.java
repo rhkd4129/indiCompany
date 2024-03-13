@@ -41,7 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 public class Controller extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
-	Map<String, Map<String, String>> commandMap = new HashMap<String, Map<String, String>>();
+	 Map<String, Map<String, String>> commandMap = new HashMap<>();;
 
 	public Controller() {
 //		scanController();
@@ -51,8 +51,18 @@ public class Controller extends HttpServlet {
 	}
 
 	public void init(ServletConfig config) throws ServletException {
-		commandMap = LoadConfig.loadCommandsFromJson(config);
-	}
+		 try {
+		        commandMap = LoadConfig.loadCommandsFromJson(config);
+		        if (commandMap == null ) {
+		            throw new Exception("Command map 이 null입니다.");
+		        }
+		    } catch (Exception e) {
+		        logger.error("commands map 읽기 실패 : {}", e.getMessage());
+		     
+		    }
+		}
+		
+		
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -77,44 +87,34 @@ public class Controller extends HttpServlet {
 			String[] comArr = command.split("/");
 			if (comArr == null || comArr.length != 4) {
 				logger.error("유효하지 않는  url : {}", command);
-				response.sendRedirect("/view/error/error.do"); // 에러 페이지로 리다이렉트
-				return; // 리다이렉트 후에는 리턴하여 이후 코드 실행을 막습니다.
+//				response.sendRedirect("/view/error/error.do"); // 에러 페이지로 리다이렉트
+				throw new Exception();
 			}
 			
 			String comMethed = comArr[1];
 			String comObject = comArr[2];
 			String comAction = comArr[3];
 			String packagePath = "service.";
-			String action = comAction.substring(0, 1).toUpperCase() + comAction.substring(1, comAction.length() - 3);
-
-			if (comObject.equals("board")) {
-				className = packagePath + "board.Board" + action;
-			}
-			if (comObject.equals("comment")) {
-				className = packagePath + "comment.Comment" + action;
-			}
-			if (comObject.equals("error")) {
-				className = packagePath + "error.error" + action;
-			}
+			className = packagePath + comObject + "." +
+			comObject.substring(0, 1).toUpperCase() + comObject.substring(1)+
+			comAction.substring(0, 1).toUpperCase() + comAction.substring(1, comAction.length() - 3);
 			logger.info("[CHECK_3] className : {}", className);
 			///////////////////////////////////////////////////////
 			
-			
-			if ("redirect".equalsIgnoreCase(comMethed)) {
-				logger.info("redirect");
-				response.sendRedirect("/view/board/list.do");
-			}
-			Map<String, String> paramMap = new HashMap<String, String>();
-			Map<String, Object> model = new HashMap<String, Object>();
-			paramMap = CreateParamMap.createParamMap(request);
-
-			if (!className.equals("")) {
-				ControllerInvoker.invokeController(className, paramMap, model);
-			}
-
 			String viewName = commandMap.get(command).get("viewName");
 			logger.info("[CHECK_4] viewName : {}", viewName);
 
+			if ("redirect".equalsIgnoreCase(comMethed)) {
+				logger.info("redirect");
+				response.sendRedirect(viewName);
+			}
+			
+			Map<String, String> paramMap = new HashMap<String, String>();
+			Map<String, Object> model = new HashMap<String, Object>();
+			paramMap = CreateParamMap.createParamMap(request);
+			
+			ControllerInvoker.invokeController(className, paramMap, model);
+		
 			if ("json".equalsIgnoreCase(comMethed)) {
 				logger.info("json");
 				MyView.render(model, response);
@@ -124,11 +124,10 @@ public class Controller extends HttpServlet {
 				logger.info("forward");
 				String viewPath = "/views" + viewName + ".jsp";
 				logger.info("[CHECK_3] viewPath : {}", viewPath);
-				MyView.render(viewPath, model, request, response);
+				MyView.render(  model , response,  viewPath,request);
 			}
 			//////////////////////////////////////////////////////////////////
 		} catch (Exception e) {
-			System.out.println("여기로 와야 해 ");
 			ExceptionHandler.handlerExcepion(e, response);
 		}
 
