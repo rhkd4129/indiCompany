@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class ExceptionHandler {
 	private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 	public static void handlerExcepion(Exception e, HttpServletResponse response) throws IOException {
-
+		logger.info("error function ");
 		if (e instanceof ClassNotFoundException || e instanceof InstantiationException
 				|| e instanceof IllegalAccessException || e instanceof IllegalArgumentException
 				|| e instanceof InvocationTargetException || e instanceof NoSuchMethodException
