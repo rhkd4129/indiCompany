@@ -21,10 +21,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import util.CreateParamMap;
+import service.BoardService;
+import service.CommentService;
 import util.ExceptionHandler;
-import util.LoadConfig;
-import util.MyView;
+import util.servletUtils.CreateParamMap;
+import util.servletUtils.LoadConfig;
+import util.servletUtils.MyView;
 import util.ControllerInvoker;
 
 import java.lang.reflect.Constructor;
@@ -35,13 +37,15 @@ import java.lang.reflect.InvocationTargetException;
  *   프론트 컨트롤러를 제외한 나머지 컨트롤러는 서블릿을 사용하지 않아도 됨 
 */
 
-//@WebServlet(name = "FrontController")
 @WebServlet(name = "FrontController", urlPatterns = "*.do", initParams = {
 		@WebInitParam(name = "config", value = "/WEB-INF/command.json") })
 public class Controller extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
-	 Map<String, Map<String, String>> commandMap = new HashMap<>();;
+    //private BoardService boardService;
+    //private CommentService commentService; 
+	
+	 Map<String, Map<String, String>> commandMap = new HashMap<>();
 
 	public Controller() {
 //		scanController();
@@ -52,6 +56,8 @@ public class Controller extends HttpServlet {
 
 	public void init(ServletConfig config) throws ServletException {
 		 try {
+			 	//this.boardService = new BoardService();
+			 //	this.commentService = new CommentService();
 		        commandMap = LoadConfig.loadCommandsFromJson(config);
 		        if (commandMap == null ) {
 		            throw new Exception("Command map 이 null입니다.");
@@ -88,17 +94,18 @@ public class Controller extends HttpServlet {
 			if (comArr == null || comArr.length != 4) {
 				logger.error("유효하지 않는  url : {}", command);
 //				response.sendRedirect("/view/error/error.do"); // 에러 페이지로 리다이렉트
-				throw new Exception();
+				throw new Exception("유효하지 않는  url ");
 			}
 			
 			String comMethed = comArr[1];
 			String comObject = comArr[2];
 			String comAction = comArr[3];
-			String packagePath = "service.";
-			className = packagePath + comObject + "." +
-			comObject.substring(0, 1).toUpperCase() + comObject.substring(1)+
-			comAction.substring(0, 1).toUpperCase() + comAction.substring(1, comAction.length() - 3);
-			logger.info("[CHECK_3] className : {}", className);
+			String classNames = "service."+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1)+"Service";
+			String methodName   =  comAction.substring(0, comAction.length()-3)
+			+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1);
+			
+			logger.info("[CHECK_3] className : {}", classNames);
+			logger.info("[CHECK_3] methodName : {}", methodName);
 			///////////////////////////////////////////////////////
 			
 			String viewName = commandMap.get(command).get("viewName");
@@ -112,8 +119,7 @@ public class Controller extends HttpServlet {
 			Map<String, String> paramMap = new HashMap<String, String>();
 			Map<String, Object> model = new HashMap<String, Object>();
 			paramMap = CreateParamMap.createParamMap(request);
-			
-			ControllerInvoker.invokeController(className, paramMap, model);
+			ControllerInvoker.invokeController(classNames, methodName,paramMap, model);
 		
 			if ("json".equalsIgnoreCase(comMethed)) {
 				logger.info("json");
@@ -129,7 +135,7 @@ public class Controller extends HttpServlet {
 			//////////////////////////////////////////////////////////////////
 		} catch (Exception e) {
 			
-			ExceptionHandler.handlerExcepion(e, response);
+			ExceptionHandler.handleException(e, response);
 		}
 
 	}

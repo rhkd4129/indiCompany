@@ -1,4 +1,4 @@
-package util;
+package util.servletUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,6 +29,7 @@ public class LoadConfig {
 		String configFilePath = config.getServletContext().getRealPath(props);
 		 Map<String, Map<String, String>> map = new HashMap<>();;
 		logger.info("configFilePath : {}", configFilePath);
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		map  = objectMapper.readValue(new File(configFilePath), new TypeReference<Map<String, Map<String, String>>>(){});
 		return map;

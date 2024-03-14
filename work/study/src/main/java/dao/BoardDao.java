@@ -2,9 +2,8 @@ package dao;
 
 import java.sql.SQLException;
 import dto.BoardDto;
-import util.ObjectClose;
-import util.ExecuteDmlQuery;
-
+import util.jdbcUtils.ExecuteDmlQuery;
+import util.jdbcUtils.ObjectClose;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -30,12 +29,7 @@ public class BoardDao {
 		return instance;
 	}
 	
-	
-	public void insertV2Board(BoardDto boardDto) {
-		String sql =  "INSERT INTO BOARD (BOARD_TITLE, BOARD_CONTENT) VALUES (?, ?)";
-//		JdbcUtils jdbcUtils = new JdbcUtils();
-		
-	}
+
 
 	public int insertBoard(BoardDto boardDto) throws SQLException, Exception {
 		String sql = "INSERT INTO BOARD (BOARD_TITLE, BOARD_CONTENT) VALUES (?, ?)";

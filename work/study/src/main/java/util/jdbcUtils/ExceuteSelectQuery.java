@@ -1,4 +1,4 @@
-package util;
+package util.jdbcUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package util;
+package util.servletUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dto.CommentDto;
-import dto.JsonDto;
+
 
 public class MyView {
 

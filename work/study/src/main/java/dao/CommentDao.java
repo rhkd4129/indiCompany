@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import dto.BoardDto;
 import dto.CommentDto;
-import util.ObjectClose;
-import util.ExecuteDmlQuery;
+import util.jdbcUtils.ExecuteDmlQuery;
+import util.jdbcUtils.ObjectClose;
 
 public class CommentDao {
 	private static final Logger logger = LoggerFactory.getLogger(CommentDao.class);
