@@ -9,14 +9,14 @@
 	
 			
 			<div>
-				<label for="title" >제목</label>
-		        <input type="text" name="title">
+				<label for="boardTitle" >제목</label>
+		        <input type="text" name="boardTitle">
 			</div>
 			
 			
 			<div>
-				<label for="content" >내용</label>
-		        <input type="text" name="content">
+				<label for="boardContent" >내용</label>
+		        <input type="text" name="boardContent">
 			</div>
 			<input type="submit" value="저장">
 		</form>

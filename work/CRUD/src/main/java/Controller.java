@@ -43,11 +43,10 @@ public class Controller extends HttpServlet {
 	 * 요청은 모두 다 이 서블릿으로 매핑 Front Controller 적용 이 서블릿에 다 거쳐감 서블릿 초기 파라미터 읽고
 	 * 외부파일(프로터타파일 로딩) 서블릿 초기화시 로딩 각 url에 대응하는 커맨드 객체를 생성하고 이를 commandMap저장
 	 **/
-
+    // servlet init
 	public void init(ServletConfig config) throws ServletException {
 		Properties pr = LoadProperties.loadProperties(config);
 		System.out.println(pr);
-		System.out.println("Hello");
 		if (pr != null) {
 			loadCommands(pr);
 		}
@@ -78,10 +77,6 @@ public class Controller extends HttpServlet {
 				 * ListAction 인스턴스, "/view": ViewAction 인스턴스
 				 */
 			}
-			
-			for (Map.Entry<String, Object> entry : CommandMap.entrySet()) {
-	            System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-	        }
 		} catch (ClassNotFoundException e) {
 			logger.error(" 오류발생: {}", e.getMessage());
 			// 클래스륾 못찾는 경우
@@ -102,7 +97,6 @@ public class Controller extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String method = null;
-		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		method = request.getMethod();
@@ -111,13 +105,6 @@ public class Controller extends HttpServlet {
 		}
 		requestServletPro(request, response);
 	}
-
-	/*
-	 * requestServletPro 메서드는 FrontController 클래스 내에서 클라이언트의 모든 요청을 처리하는 핵심 메서드. 이
-	 * 메서드는 GET 또는 POST 요청이 발생했을 때 호출되며, 실제로 클라이언트의 요청을 처리하고 응답을 생성. 요청 URI에서 컨텍스트
-	 * 경로제외하고 실제 커맨드 값 을통해 해당 커맨드 객체 MAP에 가져온후 requestPro를 호출하여 실제 처리 실행
-	 */
-
 	protected void requestServletPro(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 		String view = null;
 		CommandProcess com = null;
@@ -134,30 +121,6 @@ public class Controller extends HttpServlet {
 
 			logger.info("requestServletPro :comeand : {}", command);
 			logger.info("requestServletPro :com : {}", com);
-			
-//			Map<String, Object> cfgData = new HashMap<>();
-//			
-//			Enumeration<String> params = request.getParameterNames();
-//			System.out.println(params);
-//
-//			cfgData.put("req", request);
-//			cfgData.put("res", response);
-//			while (params.hasMoreElements()) {
-//				String name = params.nextElement();
-//				String value = request.getParameter(name);
-//				
-//				if (name == null) continue;
-//				cfgData.put(name, value);
-//			}
-		        
-		        
-			
-//			cfgData.put("params", request.getParameterValues(command));
-			
-			/*          
-			 * CommandMap에서 앞서 파싱한 커맨드에 해당하는 커맨드 클래스의 인스턴스를 가져옴 해당 커맨드 인스턴스의 reqeuestPro
-			 * 메서드를 호출하여 실제 요청 처리를 수행. 이 메서드는 각 커맨드 클래스마다 구현. reqeuestPro 메서드 실행 결과로 뷰 경로얻음
-			 */
 			view = com.requestPro(request, response);
 //			logger.info("requestServletPro view : {}", view);
 			if (command.contains("json")) {
@@ -170,7 +133,6 @@ public class Controller extends HttpServlet {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(view);
 				dispatcher.forward(request, response);
 			}
-			
 			// 에러 페이지
 		} catch (ClassCastException e) {
 			logger.error("(ClassCast 오류발생: {}", e.getMessage());

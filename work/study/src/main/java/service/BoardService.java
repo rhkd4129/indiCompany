@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import dao.BoardDao;
 import dto.BoardDto;
-import util.servletUtils.CreateParamMap;
+import util.servletUtils.ServletRequestMapper;
 
 public class BoardService {
     private static final BoardService instance = new BoardService();
@@ -32,12 +32,9 @@ public class BoardService {
     public void contentBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
             BoardDao boardDao = BoardDao.getInstance();
             
-            
-            BoardDto boardDto = new BoardDto();
-            int boardCode = Integer.parseInt(paramMap.get("boardCode"));
-            boardDto.setBoardCode(boardCode);
-
+            BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
             BoardDto resultBoardDto = boardDao.selectBoard(boardDto);
+            System.out.println(resultBoardDto.getBoardContent());
             model.put("board", resultBoardDto);
     }
 
@@ -47,12 +44,10 @@ public class BoardService {
 
     
     public void insertBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
-    		System.out.println(paramMap);  //여기 값은 존재 
+    		
             BoardDao boardDao = BoardDao.getInstance();
-//            BoardDto boardDto = new BoardDto();
-//            boardDto.setBoardTitle(paramMap.get("title"));
-//            boardDto.setBoardContent(paramMap.get("content"));
-            BoardDto boardDto = CreateParamMap.mapParamsToDto(paramMap, BoardDto.class);
+            BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
+            System.out.println(boardDto.getBoardTitle()); //여기서 안나옴
             System.out.println(boardDto.getBoardContent()); //여기서 안나옴
 
             int result = boardDao.insertBoard(boardDto);
@@ -62,17 +57,18 @@ public class BoardService {
     public void updateFormBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 
             BoardDao boardDao = BoardDao.getInstance();
-            BoardDto boardDto = new BoardDto();
-            int boardCode = Integer.parseInt(paramMap.get("boardCode"));
-            boardDto.setBoardCode(boardCode);
+            BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
             BoardDto resultBoardDto = boardDao.selectBoard(boardDto);
+            
+     
             model.put("board", resultBoardDto);
     }
 
     public void updateBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 
             BoardDao boardDao = BoardDao.getInstance();
-            BoardDto boardDto = new BoardDto(Integer.parseInt(paramMap.get("boardCode")), paramMap.get("title"), paramMap.get("content"));
+            //BoardDto boardDto = new BoardDto(Integer.parseInt(paramMap.get("boardCode")), paramMap.get("title"), paramMap.get("content"));
+            BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
             int result = boardDao.updateBoard(boardDto);
             model.put("result", result);
     }
@@ -80,8 +76,9 @@ public class BoardService {
     public void deleteBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
         
             BoardDao boardDao = BoardDao.getInstance();
-            BoardDto boardDto = new BoardDto();
-            boardDto.setBoardCode(Integer.parseInt(paramMap.get("boardCode")));
+//            BoardDto boardDto = new BoardDto();
+//            boardDto.setBoardCode(Integer.parseInt(paramMap.get("boardCode")));
+            BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
             int result = boardDao.deleteBoard(boardDto);
             model.put("result", result);
       

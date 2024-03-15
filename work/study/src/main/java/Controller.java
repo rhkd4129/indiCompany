@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import service.BoardService;
 import service.CommentService;
 import util.ExceptionHandler;
-import util.servletUtils.CreateParamMap;
+import util.servletUtils.ServletRequestMapper;
 import util.servletUtils.LoadConfig;
 import util.servletUtils.MyView;
 import util.ControllerInvoker;
@@ -118,7 +118,7 @@ public class Controller extends HttpServlet {
 			
 			Map<String, String> paramMap = new HashMap<String, String>();
 			Map<String, Object> model = new HashMap<String, Object>();
-			paramMap = CreateParamMap.createParamMap(request);
+			paramMap = ServletRequestMapper.extractParametersToMap(request);
 			ControllerInvoker.invokeController(classNames, methodName,paramMap, model);
 		
 			if ("json".equalsIgnoreCase(comMethed)) {

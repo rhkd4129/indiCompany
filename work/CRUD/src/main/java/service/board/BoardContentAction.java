@@ -19,7 +19,6 @@ import util.CommandProcess;
 
 public class BoardContentAction implements CommandProcess {
 	private static final Logger logger = LoggerFactory.getLogger(BoardContentAction.class);
-
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		List<CommentDto> commentList = new ArrayList<>();
@@ -27,17 +26,13 @@ public class BoardContentAction implements CommandProcess {
 		BoardDao boardDao 		= null;
 		BoardDto boardDto 		= null;
 		CommentDto commentDto 	= null;
-	
 		try {
 			boardCode = Integer.parseInt(request.getParameter("boardCode"));
 			boardDao = BoardDao.getInstance();
 			boardDto = new BoardDto();
 		    boardDto.setBoardCode(boardCode);		    
-		    
 		    BoardDto resultBoardDto = boardDao.selectBoard(boardDto);
 			request.setAttribute("board", resultBoardDto);
-
-
 		} catch (SQLException e) {
 			logger.error("SQL 오류 발생 : {}", e.getMessage());
 		} catch (Exception e) {

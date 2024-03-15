@@ -30,12 +30,12 @@
 	
 				<div>
 					<label for="title">제목</label> 
-					<input type="text" name="title"  id="title"  value="${board.boardTitle}">
+					<input type="text" name="boardTitle"  id="boardTitle"  value="${board.boardTitle}">
 				</div>
 				
 				<div>
 					<label for="content">내용</label> 
-					<input type="text" name="content" id="content"	value="${board.boardContent}">
+					<input type="text" name="boardContent" id="boardContent"	value="${board.boardContent}">
 				</div>
 				<button type="submit">수정</button>
 			</form>

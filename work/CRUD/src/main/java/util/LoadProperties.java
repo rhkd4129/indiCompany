@@ -18,10 +18,6 @@ public class LoadProperties {
 		String props = config.getInitParameter("config");
 		Properties pr = new Properties();
 		FileInputStream f = null;
-		/**
-		 * 파라미터를 ServletConfig config로 받음 web.xml에 설정한 key 값 config에서 getInitParameter를
-		 * 사용하여 string props에는 INF/command.properties가 담기게 됨
-		 **/
 		try {
 			String configFilePath = config.getServletContext().getRealPath(props);
 			logger.info("configFilePath : {}", configFilePath);

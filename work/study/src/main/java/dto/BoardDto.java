@@ -4,21 +4,13 @@ import java.sql.Timestamp;
 
 import test.jdbcTest.DataTransferObject;
 
-public class BoardDto implements DataTransferObject {
+public class BoardDto {
 	
 	private int boardCode;
 	private String boardTitle;
 	private String boardContent;
 	private String useYn;
 	private Timestamp boardCreateAt;
-	private int	countReuslt;
-	public int getCountReuslt() {
-		return countReuslt;
-	}
-
-	public void setCountReuslt(int countReuslt) {
-		this.countReuslt = countReuslt;
-	}
 
 	public BoardDto() {}
 	
@@ -68,9 +60,6 @@ public class BoardDto implements DataTransferObject {
 		this.useYn = useUYn;
 	}
 
-	  @Override
-	    public Object getData() {
-	        return this; // BoardDto 객체 자체를 반환합니다.
-	    }
+	 
 	
 }

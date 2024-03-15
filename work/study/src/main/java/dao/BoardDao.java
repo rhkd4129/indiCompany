@@ -47,17 +47,7 @@ public class BoardDao {
 		return ExecuteDmlQuery.executeDmlQuery(sql, boardDto.getBoardCode());
 	}
 
-	public BoardDto checkBoardExists(BoardDto boardDto) throws SQLException, Exception {
-		String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS COUNT_RESULT "
-                + "FROM board "
-                + "WHERE BOARD_CODE = ? AND USE_YN='Y'";
 
-		return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
-			BoardDto boardResultDto = new BoardDto();
-			boardResultDto.setCountReuslt(rs.getInt("COUNT_RESULT"));
-			return boardResultDto;
-		}, boardDto.getBoardCode());
-	}
 
 	public BoardDto selectBoard(BoardDto boardDto) throws SQLException, Exception {
 		String sql = "SELECT BOARD_CODE , BOARD_TITLE, BOARD_CONTENT,BOARD_CREATE_AT FROM BOARD WHERE BOARD_CODE = ?";
