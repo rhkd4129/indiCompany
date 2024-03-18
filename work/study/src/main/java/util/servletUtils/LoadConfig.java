@@ -24,12 +24,12 @@ import service.ServiceInterface;
 public class LoadConfig {
 	private static final Logger logger = LoggerFactory.getLogger(LoadConfig.class);
 	
+	
+	// properties.json을 읽는 기능 
 	public static 	Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config) throws StreamReadException, DatabindException, IOException  {
 		String props = config.getInitParameter("config");
 		String configFilePath = config.getServletContext().getRealPath(props);
-		 Map<String, Map<String, String>> map = new HashMap<>();;
-		logger.info("configFilePath : {}", configFilePath);
-		
+		Map<String, Map<String, String>> map = new HashMap<>();;		
 		ObjectMapper objectMapper = new ObjectMapper();
 		map  = objectMapper.readValue(new File(configFilePath), new TypeReference<Map<String, Map<String, String>>>(){});
 		return map;
@@ -73,7 +73,6 @@ public class LoadConfig {
 	}
 	// 파일 경로를 기반으로 FileInputStream을 생성 및 파일 열고, Properties 객체에 파일 내용을 로드
 	// 파일이 존재하지 않거나 입출력 예외가 발생하면 각각에 대한 예외 처리 수행
-
 	public static  Map<String, Object> loadCommands(Properties pr) {
 		Map<String, Object> CommandMap = new HashMap<>();
 		try {
@@ -86,14 +85,14 @@ public class LoadConfig {
 				// service.ListAction가 클래스로 변함
 				Class<?> commClass = Class.forName(className);
 				ServiceInterface commandInstance = (ServiceInterface) commClass.getDeclaredConstructor().newInstance();
-				// onstructor<?> constructor = commClass.getDeclaredConstructor(int.class,
-				// String.class);
+				// onstructor<?> constructor = commClass.getDeclaredConstructor(int.class)
+		
 				// service.ListAction가 인스턴스로 변신
 				CommandMap.put(command, commandInstance);
 				/*
 				 * 프로퍼티 파일에서 읽어온 정보를 기반으로 커맨드 클래스와 매핑을 수행 Class.forName을 사용하여 문자열 클래스 이름을 클래스
-				 * 객체로 변환 이를 인스턴스화하여 CommandMap에 커맨드와 해당 인스턴스를 매핑 CommandMap = { "/list":
-				 * ListAction 인스턴스, "/view": ViewAction 인스턴스
+				 * 객체로 변환 이를 인스턴스화하여 CommandMap에 커맨드와 해당 인스턴스를 매핑
+				 *   CommandMap = { "/list": ListAction 인스턴스, "/view": ViewAction 인스턴스
 				 */
 			}
 		} catch (ClassNotFoundException e) {

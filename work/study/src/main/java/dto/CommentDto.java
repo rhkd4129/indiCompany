@@ -6,11 +6,6 @@ public class CommentDto {
     private String commentContent;
     
 	public CommentDto() {}
-
-	public CommentDto(int boardCode ,String commentContent) { 
-		boardCode = this.boardCode;
-		commentContent = this.commentContent;
-	}
 	
 	
     public int getCommentCode() {

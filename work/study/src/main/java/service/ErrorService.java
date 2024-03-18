@@ -11,10 +11,8 @@ public class ErrorService {
     
     private ErrorService() {}
     
-    public static ErrorService getInstance() {
-        return instance;
-    }
-    public void errorError(Map<String, String> paramMap, Map<String, Object> model) {
-    	
-    }
+    public static ErrorService getInstance() { return instance;}
+    
+    
+    public void errorError(Map<String, String> paramMap, Map<String, Object> model) {}
 }

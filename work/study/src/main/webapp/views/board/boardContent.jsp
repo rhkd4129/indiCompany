@@ -179,19 +179,17 @@ function boardDelete(boardCode) {
 				<td>${board.boardCode}</td>
 				<td>${board.boardTitle}</td>
 				<td>${board.boardContent}</td>
-				<td><fmt:formatDate value="${board.boardCreateAt}"
-						pattern="yyyy-MM-dd HH:mm" /></td>
+				<td><fmt:formatDate value="${board.boardCreateAt}" pattern="yyyy-MM-dd HH:mm" /></td>
 			</tr>
 		</table>
 
 		<div class="btn_group">
-			<!--  <input type="button" value="수정json" onclick="boardUpdate(${board.boardCode})"> -->
-
 			<input type="button" value="수정"  id="update-btn" >
 			<input type="button" value="삭제"  id="delete-btn" > 
 			<input type="button" value="목록"  id="list-btn">
 		</div>
 	</div>
+	
 	<div class="board">
 		<div class="comment">
 			<div class="commentInsert"></div>

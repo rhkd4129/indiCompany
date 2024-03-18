@@ -16,14 +16,17 @@ import dto.CommentDto;
 
 public class MyView {
 
+	
+	// forward인경우
 	public static void render( Map<String, Object> model,  HttpServletResponse response,String viewPath,HttpServletRequest request) throws ServletException, IOException {
 		model.forEach((key, value) -> request.setAttribute(key, value));
 		RequestDispatcher dispatcher = request.getRequestDispatcher(viewPath);
 		dispatcher.forward(request, response);
 	}
 
-	public static void render(Map<String, Object> model, HttpServletResponse response) throws ServletException, IOException {
-		
+	
+	// json인 경우 
+	public static void render(Map<String, Object> model, HttpServletResponse response) throws ServletException, IOException {	
 		response.setContentType("application/json");
 		ObjectMapper objectMapper = new ObjectMapper();
 		String jsonResponse = objectMapper.writeValueAsString(model); // 모델을 JSON 문자열로 변환

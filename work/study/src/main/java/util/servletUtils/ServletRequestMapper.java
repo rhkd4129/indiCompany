@@ -14,8 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ServletRequestMapper {
 
+	
+	// reuqest parameter를 받아서 MAP 매핑해주는 역활 
 	public static Map<String, String> extractParametersToMap(HttpServletRequest request) {
-
 		Map<String, String> paramMap = new HashMap<>();
 		Enumeration<String> parameterNames = request.getParameterNames();
 		while (parameterNames.hasMoreElements()) {
@@ -25,7 +26,10 @@ public class ServletRequestMapper {
 		}
 		return paramMap;
 	}
-
+	
+	
+	
+   // 어떤 DTO를 사용할건지, paramter 매핑된 map을 인자로 주면 자동으로 dto를 생성하여 파라미터 값을 넣어줌
 	public static <T> T convertMapToDto(Map<String, String> paramMap, Class<T> dtoClass) throws Exception {
 		T instance = dtoClass.newInstance();
 		for (Field field : dtoClass.getDeclaredFields()) {

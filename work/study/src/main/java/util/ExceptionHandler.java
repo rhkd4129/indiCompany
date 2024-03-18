@@ -2,6 +2,7 @@ package util;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +22,10 @@ public class ExceptionHandler {
         
         if (e instanceof IllegalArgumentException) {
             logger.error("잘못된 인자: {}", e.getMessage(), e);
+            response.sendRedirect("/view/error/error.do");
+        }
+        if (e instanceof SQLException) {
+            logger.error("SQL 에러 : {}", e.getMessage(), e);
             response.sendRedirect("/view/error/error.do");
         }
         

@@ -30,11 +30,11 @@ public class CommentService {
 
     public void insertComment(Map<String, String> paramMap, Map<String, Object> model) throws NumberFormatException, SQLException, Exception {
             CommentDao commentDao = CommentDao.getInstance();
-//            CommentDto comment = new CommentDto();
-//            int boardCode = Integer.parseInt(paramMap.get("boardCode"));
-//            String content = paramMap.get("commentContent");
-//            comment.setBoardCode(boardCode);
-//            comment.setCommentContent(content);
+//          CommentDto comment = new CommentDto();
+//          int boardCode = Integer.parseInt(paramMap.get("boardCode"));
+//          String content = paramMap.get("commentContent");
+//          comment.setBoardCode(boardCode);
+//          comment.setCommentContent(content);
             CommentDto comment = ServletRequestMapper.convertMapToDto(paramMap, CommentDto.class);
             
             int result = commentDao.insertCommnet(comment);

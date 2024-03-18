@@ -1,9 +1,6 @@
 package dto;
 
 import java.sql.Timestamp;
-
-import test.jdbcTest.DataTransferObject;
-
 public class BoardDto {
 	
 	private int boardCode;
@@ -13,12 +10,7 @@ public class BoardDto {
 	private Timestamp boardCreateAt;
 
 	public BoardDto() {}
-	
-	public BoardDto(int boardCode , String boardTitle,String boardContent) {
-		this.boardCode = boardCode;
-		this.boardTitle  = boardTitle;
-		this.boardContent = boardContent;
-	}
+
 	
 	public Timestamp getBoardCreateAt() {
 		return boardCreateAt;
