@@ -29,7 +29,7 @@ public class MyView {
 	public static void render(Map<String, Object> model, HttpServletResponse response) throws ServletException, IOException {	
 		response.setContentType("application/json");
 		ObjectMapper objectMapper = new ObjectMapper();
-		String jsonResponse = objectMapper.writeValueAsString(model); // 모델을 JSON 문자열로 변환
+		String jsonResponse = objectMapper.writeValueAsString(model);
 		response.getWriter().write(jsonResponse);
 	}
 }

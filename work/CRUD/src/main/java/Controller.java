@@ -52,7 +52,6 @@ public class Controller extends HttpServlet {
 		}
 
 	}
-
 // 파일 경로를 기반으로 FileInputStream을 생성 및 파일 열고, Properties 객체에 파일 내용을 로드
 // 파일이 존재하지 않거나 입출력 예외가 발생하면 각각에 대한 예외 처리 수행
 
@@ -122,9 +121,9 @@ public class Controller extends HttpServlet {
 			logger.info("requestServletPro :comeand : {}", command);
 			logger.info("requestServletPro :com : {}", com);
 			view = com.requestPro(request, response);
-//			logger.info("requestServletPro view : {}", view);
 			if (command.contains("json")) {
 //				return false;
+				logger.info("json");
 			} else if (command.contains("redirect")) {
 				logger.info("redirect");
 				response.sendRedirect("/boardList.do"); // 리다이렉트 수행

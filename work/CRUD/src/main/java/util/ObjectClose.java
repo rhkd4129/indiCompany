@@ -7,8 +7,6 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 public class ObjectClose {
 
 	private static final Logger logger = LoggerFactory.getLogger(ObjectClose.class);
@@ -23,7 +21,7 @@ public class ObjectClose {
 		close(pstmt);
 		close(rs);
 	}
-	
+
 	public static void close(ResultSet rs) {
 		if (rs != null) {
 			try {

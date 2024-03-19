@@ -56,8 +56,6 @@ public class Controller extends HttpServlet {
 
 	public void init(ServletConfig config) throws ServletException {
 		 try {
-			 	//this.boardService = new BoardService();
-			 //	this.commentService = new CommentService();
 		        commandMap = LoadConfig.loadCommandsFromJson(config);
 		        if (commandMap == null ) {
 		            throw new Exception("Command map 이 null입니다.");
@@ -89,7 +87,7 @@ public class Controller extends HttpServlet {
 			logger.info("[CHECK_2] command : {}", command.toString());
 
 			
-			
+			//URL 검증/ 파싱
 			String[] comArr = command.split("/");
 			if (comArr == null || comArr.length != 4) {
 				logger.error("유효하지 않는  url : {}", command);

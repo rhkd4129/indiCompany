@@ -29,7 +29,7 @@ public class CommentDao {
 		return instance;
 	}
 
-	public List<CommentDto> listComment(CommentDto commentDto) throws Exception {
+	public List<CommentDto> listComment(CommentDto commentDto) throws SQLException, Exception {
 		String sql = "SELECT COMMENT_CODE ,BOARD_CODE ,COMMENT_CONTENT FROM COMMENT WHERE BOARD_CODE=?";
 		List<CommentDto> commentList = new ArrayList<>();
 		return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
@@ -43,7 +43,7 @@ public class CommentDao {
 		}, commentDto.getBoardCode());
 	}
 
-	public int insertCommnet(CommentDto commentDto) throws Exception {
+	public int insertCommnet(CommentDto commentDto) throws SQLException, Exception {
 		String sql = "INSERT INTO COMMENT (BOARD_CODE,COMMENT_CONTENT) VALUES (?, ?)";
 		return ExecuteDmlQuery.executeDmlQuery(sql, commentDto.getBoardCode(), commentDto.getCommentContent());
 	}

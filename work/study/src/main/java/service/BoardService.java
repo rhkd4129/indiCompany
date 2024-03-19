@@ -22,8 +22,8 @@ public class BoardService {
         return instance;
     }
 
-    public void listBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
-        
+    
+    public void listBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {        
             BoardDao boardDao = BoardDao.getInstance();
             List<BoardDto> boardList = boardDao.listBoard(new BoardDto());
             model.put("boardList", boardList);
@@ -41,6 +41,7 @@ public class BoardService {
     public void insertFormBoard(Map<String, String> paramMap, Map<String, Object> model)  {}
 
     
+    
     public void insertBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {    		
             BoardDao boardDao = BoardDao.getInstance();
             BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
@@ -48,6 +49,7 @@ public class BoardService {
             model.put("result", result);
     }
 
+    
     public void updateFormBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
             BoardDao boardDao = BoardDao.getInstance();
             BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
@@ -55,6 +57,7 @@ public class BoardService {
             model.put("board", resultBoardDto);
     }
 
+    
     public void updateBoard(Map<String, String> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
             BoardDao boardDao = BoardDao.getInstance();
             BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);

@@ -25,12 +25,11 @@ public class ExecuteDmlQuery {
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 	
 
-	public static Integer executeDmlQuery(String sql, Object... params) throws SQLException,Exception,NamingException {
+	public static Integer executeDmlQuery(String sql, Object... params) throws SQLException , NamingException, Exception {
 	    Integer result = null;
 	    Connection conn = null;
 	    PreparedStatement pstmt = null;
 	    Savepoint savepoint = null;
-
 	    try {
 	        conn = connectionPool.getConnection();
 	        conn.setAutoCommit(false); // 트랜잭션 시작
@@ -78,12 +77,10 @@ public class ExecuteDmlQuery {
 	}
 
 
-	public static <T> T executeSelectQuery(String sql, ExceuteSelectQuery<T> exceuteSelectQuery, Object... params)
-			throws SQLException,NamingException,  Exception {
+	public static <T> T executeSelectQuery(String sql, ExceuteSelectQuery<T> exceuteSelectQuery, Object... params)  throws SQLException,NamingException,  Exception {
 		T result = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-
 		try {
 			conn = connectionPool.getConnection();
 			pstmt = conn.prepareStatement(sql);

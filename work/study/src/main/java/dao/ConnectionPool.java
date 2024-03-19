@@ -26,7 +26,7 @@ public class ConnectionPool {
     }
 
     // Modified to declare that it throws NamingException and SQLException
-    public Connection getConnection() throws NamingException, SQLException {
+    public Connection getConnection() throws NamingException, SQLException , Exception {
         if (dataSource == null) {
             Context context = new InitialContext();
             dataSource = (DataSource) context.lookup("java:comp/env/jdbc/mysql");

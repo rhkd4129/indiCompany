@@ -12,9 +12,9 @@ import dto.CommentDto;
 import util.servletUtils.ServletRequestMapper;
 
 public class CommentService {
+	
     private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
     private static final CommentService instance = new CommentService();
-    
     private CommentService() {}
     
     public static CommentService getInstance() {

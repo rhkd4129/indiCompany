@@ -4,7 +4,6 @@
 <head>
  	<script>
 		function boardContent(boardCode){
-			console.log(boardCode)
 			$.ajax({
 				type : "GET",
 				url : "/view/board/content.do?boardCode"+boardCode,
@@ -41,7 +40,6 @@
 	                <tr>
 	                    <td>${board.boardCode}</td>
                       <td><a href="/view/board/content.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>
-						<!--    <td onclick="boardContent(${board.boardCode})">${board.boardTitle}</td>-->
 	                    <td>${board.boardContent}</td>
 	                </tr>	
 	            </c:forEach>

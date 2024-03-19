@@ -43,6 +43,7 @@ public class ServletRequestMapper {
 				if (field.getType().equals(String.class)) {
 					field.set(instance, value);
 				}
+				
 			}
 		}
 		return instance;

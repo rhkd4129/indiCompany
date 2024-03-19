@@ -5,7 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ErrorService {
+public class ErrorService  {
     private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
     private static final ErrorService instance = new ErrorService();
     

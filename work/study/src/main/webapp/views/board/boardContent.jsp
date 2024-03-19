@@ -135,7 +135,7 @@ function getCommentList(boardCode) {
 
 
 function boardDelete(boardCode) {
-	console.log("boardDelete");
+	
 	if (!boardCode) {
 		alert("삭제 오류");
 		return false;
@@ -143,11 +143,13 @@ function boardDelete(boardCode) {
 	$.ajax({
 		type : "POST",
 		url : "/json/board/delete.do",
+		dataType:"json",
 		data : {
 			boardCode : boardCode
 		},
 		success : function(response) {
 			let result = response.result;
+			console.log(result);
 			if(result>=1){
 				 setTimeout(function() { 
 					 window.location.href = "/view/board/list.do";

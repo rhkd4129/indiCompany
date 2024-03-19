@@ -14,7 +14,7 @@
 	"/view/board/updateForm.do": {
 		"viewName": "/board/boardUpdateForm"
 	},
-	"/redirect/board/update.do": {
+	"/json/board/update.do": {
 		"viewName": "/view/board/list.do"
 	},
 	"/json/board/delete.do": {

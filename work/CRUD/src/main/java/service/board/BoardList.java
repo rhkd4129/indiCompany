@@ -20,6 +20,7 @@ public class BoardList implements CommandProcess {
 	private static final Logger logger = LoggerFactory.getLogger(BoardList.class);
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		List<BoardDto> boardList = new ArrayList<BoardDto>();
 		BoardDao boardDao = null;
 		BoardDto boardDto = new BoardDto();
