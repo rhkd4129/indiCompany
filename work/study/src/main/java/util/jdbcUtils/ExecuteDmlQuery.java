@@ -1,5 +1,6 @@
 package util.jdbcUtils;
 
+import java.sql.Statement;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -24,6 +25,43 @@ public class ExecuteDmlQuery {
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteDmlQuery.class);
 	private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 	
+	
+	
+	public static Integer executeInsertAndGetKey(String sql, Object... params) throws SQLException, NamingException, Exception {
+	    Integer generatedKey = null;
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    Integer result = null;
+
+	    try {
+	        conn = connectionPool.getConnection();
+	        pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+	        if (params != null) {
+	            for (int i = 0; i < params.length; i++) {
+	                pstmt.setObject(i + 1, params[i]);
+	            }
+	        }
+
+	        result = pstmt.executeUpdate();
+	      
+	        rs = pstmt.getGeneratedKeys();
+	        
+	        if (rs.next()) {
+	            generatedKey = rs.getInt(1); // PK 값을 가져옴
+	            
+	        } else {
+	            throw new SQLException("Creating user failed, no generated key obtained.");
+	        }
+	    } finally {
+	        // 자원 정리
+	        ObjectClose.iudDbClose(conn, pstmt);
+	    }
+
+	    return generatedKey;
+	}
+
 
 	public static Integer executeDmlQuery(String sql, Object... params) throws SQLException , NamingException, Exception {
 	    Integer result = null;
@@ -38,7 +76,7 @@ public class ExecuteDmlQuery {
 	        
 	        if (params != null && params.length > 0) {
 	            for (int i = 0; i < params.length; i++) {
-	                if (params[i] == null) continue;
+	            	if (params[i] == null) continue;
 	                pstmt.setObject(i + 1, params[i]);
 	            }
 	        }

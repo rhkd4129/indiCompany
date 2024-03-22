@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -39,11 +40,14 @@ import java.lang.reflect.InvocationTargetException;
 
 @WebServlet(name = "FrontController", urlPatterns = "*.do", initParams = {
 		@WebInitParam(name = "config", value = "/WEB-INF/command.json") })
+@MultipartConfig(
+	    fileSizeThreshold = 1024 * 1024 * 2, // 1 MB
+	    maxFileSize = 1024 * 1024 * 10,      // 10 MB
+	    maxRequestSize = 1024 * 1024 * 100   // 100 MB
+	)
 public class Controller extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
-    //private BoardService boardService;
-    //private CommentService commentService; 
 	
 	 Map<String, Map<String, String>> commandMap = new HashMap<>();
 
@@ -61,8 +65,7 @@ public class Controller extends HttpServlet {
 		            throw new Exception("Command map 이 null입니다.");
 		        }
 		    } catch (Exception e) {
-		        logger.error("commands map 읽기 실패 : {}", e.getMessage());
-		     
+		        logger.error("commands map 읽기 실패 : {}", e.getMessage());		     
 		    }
 		}
 		
@@ -86,27 +89,26 @@ public class Controller extends HttpServlet {
 			String command = requestURI.substring(request.getContextPath().length());
 			logger.info("[CHECK_2] command : {}", command.toString());
 
-			
 			//URL 검증/ 파싱
 			String[] comArr = command.split("/");
 			if (comArr == null || comArr.length != 4) {
 				logger.error("유효하지 않는  url : {}", command);
-//				response.sendRedirect("/view/error/error.do"); // 에러 페이지로 리다이렉트
 				throw new Exception("유효하지 않는  url ");
 			}
 			
-			String comMethed = comArr[1];
-			String comObject = comArr[2];
-			String comAction = comArr[3];
-			String classNames = "service."+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1)+"Service";
+			//ex "/view/board/list.do"
+			String comMethed = comArr[1];  // view
+			String comObject = comArr[2];  // board
+			String comAction = comArr[3];  // list.do
+			String classNames = "service."+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1)+"Service"; 
 			String methodName   =  comAction.substring(0, comAction.length()-3)
 			+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1);
 			
 			logger.info("[CHECK_3] className : {}", classNames);
 			logger.info("[CHECK_3] methodName : {}", methodName);
-			///////////////////////////////////////////////////////
 			
 			String viewName = commandMap.get(command).get("viewName");
+			
 			logger.info("[CHECK_4] viewName : {}", viewName);
 
 			if ("redirect".equalsIgnoreCase(comMethed)) {
@@ -114,9 +116,11 @@ public class Controller extends HttpServlet {
 				response.sendRedirect(viewName);
 			}
 			
-			Map<String, String> paramMap = new HashMap<String, String>();
+			Map<String, Object> paramMap = new HashMap<String, Object>();
 			Map<String, Object> model = new HashMap<String, Object>();
-			paramMap = ServletRequestMapper.extractParametersToMap(request);
+			
+			paramMap = ServletRequestMapper.extractParametersAndFiles(request);
+			System.out.println(paramMap);
 			ControllerInvoker.invokeController(classNames, methodName,paramMap, model);
 		
 			if ("json".equalsIgnoreCase(comMethed)) {
@@ -130,9 +134,7 @@ public class Controller extends HttpServlet {
 				logger.info("[CHECK_3] viewPath : {}", viewPath);
 				MyView.render(  model , response,  viewPath,request);
 			}
-			//////////////////////////////////////////////////////////////////
 		} catch (Exception e) {
-			
 			ExceptionHandler.handleException(e, response);
 		}
 

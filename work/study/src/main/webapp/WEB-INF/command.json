@@ -11,6 +11,14 @@
 	"/redirect/board/insert.do": {
 		"viewName": "/view/board/list.do"
 	},
+	
+	"/json/board/uploadFile.do": {
+		"viewName": "/view/board/list.do"
+	},
+	
+	
+	
+	
 	"/view/board/updateForm.do": {
 		"viewName": "/board/boardUpdateForm"
 	},

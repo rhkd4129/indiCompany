@@ -7,6 +7,7 @@ import util.jdbcUtils.ObjectClose;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 
 import java.util.ArrayList;
@@ -27,9 +28,11 @@ public class BoardDao {
 		}
 		return instance;
 	}
+	
+	
 	public int insertBoard(BoardDto boardDto) throws SQLException, Exception {
 		String sql = "INSERT INTO BOARD (BOARD_TITLE, BOARD_CONTENT) VALUES (?, ?)";
-		return ExecuteDmlQuery.executeDmlQuery(sql, boardDto.getBoardTitle(), boardDto.getBoardContent());
+		return ExecuteDmlQuery.executeInsertAndGetKey(sql, boardDto.getBoardTitle(), boardDto.getBoardContent());
 	}
 
 	public int updateBoard(BoardDto boardDto) throws SQLException, Exception {
@@ -44,6 +47,17 @@ public class BoardDao {
 	}
 
 
+	public Integer selectBoardMaxPk() throws SQLException, NamingException, Exception {
+		 String sql = "SELECT MAX(BOARD_CODE) AS maxPk FROM BOARD";
+		 return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
+			    Integer maxPk = null;
+		        if (rs.next()) {
+		            maxPk = rs.getInt("maxPk");
+		        }
+		    return maxPk;    
+		 });		   
+	}
+	
 
 	public BoardDto selectBoard(BoardDto boardDto) throws SQLException, Exception {
 	    String sql = "SELECT BOARD_CODE , BOARD_TITLE, BOARD_CONTENT, BOARD_CREATE_AT FROM BOARD WHERE BOARD_CODE = ?";
@@ -59,10 +73,11 @@ public class BoardDao {
 	        return boardResultDto; // 루프 밖에서 boardResultDto 반환
 	    }, boardDto.getBoardCode());
 	}
+	
 
 
 	public List<BoardDto> listBoard(BoardDto boardDto) throws SQLException, Exception {
-		String sql = "SELECT BOARD_CODE , BOARD_TITLE, BOARD_CONTENT FROM BOARD WHERE USE_YN = 'Y'";
+		String sql = "SELECT BOARD_CODE , BOARD_TITLE, BOARD_CONTENT FROM BOARD WHERE USE_YN = 'Y' ORDER BY BOARD_CODE DESC";
 		List<BoardDto> boardList = new ArrayList<>();
 		return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
 			while (rs.next()) {

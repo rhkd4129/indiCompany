@@ -192,6 +192,7 @@ function boardDelete(boardCode) {
 		</div>
 	</div>
 	
+	
 	<div class="board">
 		<div class="comment">
 			<div class="commentInsert"></div>
