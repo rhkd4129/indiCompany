@@ -22,9 +22,8 @@ public class MyView {
 		model.forEach((key, value) -> request.setAttribute(key, value));
 		RequestDispatcher dispatcher = request.getRequestDispatcher(viewPath);
 		dispatcher.forward(request, response);
-	}
-
 	
+	}
 	// json인 경우 
 	public static void render(Map<String, Object> model, HttpServletResponse response) throws ServletException, IOException {	
 		response.setContentType("application/json");

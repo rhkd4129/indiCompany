@@ -12,89 +12,104 @@ import org.slf4j.LoggerFactory;
 
 import dao.BoardDao;
 import dto.BoardDto;
-import util.FileUploadUtil;
+import util.FileUtil;
 import util.servletUtils.ServletRequestMapper;
 
 public class BoardService {
 	private static final BoardService instance = new BoardService();
 	private static final Logger logger = LoggerFactory.getLogger(BoardService.class);
-
+	private String imagePath = "C:\\uploadTest\\";
 	private BoardService() {
 	}
 
+	
+	//싱글톤 패턴
 	public static BoardService getInstance() {
 		return instance;
 	}
 
-	public void listBoard(Map<String, String> paramMap, Map<String, Object> model)
-			throws SQLException, NullPointerException, Exception {
+	
+	public  Map<String, Object>  listBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
-
 		List<BoardDto> boardList = boardDao.listBoard(new BoardDto());
-
 		model.put("boardList", boardList);
+		return model;
+		
 	}
 
-	public void contentBoard(Map<String, String> paramMap, Map<String, Object> model)
-			throws SQLException, NullPointerException, Exception {
+	public Map<String, Object>  contentBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {		
 		BoardDao boardDao = BoardDao.getInstance();
+		// 해당 DTO와 paramter가 담긴 map을 주면 자동으로 매핑되어 반환
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		BoardDto resultBoardDto = boardDao.selectBoard(boardDto);
+		//게시판 코드를 넣으면 json파일에 해당 게시판에 이미지가 있는지 검사
+		List<String> fileNames = null;
+		List<String> fileRealNames = null; 
+		fileRealNames = FileUtil.listBoardFile(resultBoardDto.getBoardCode());
+		if(fileRealNames != null  || !fileRealNames.isEmpty()) {
+			//UUID가 제거된 파일이름 (사용자게에 보여짐)
+			fileNames = FileUtil.removeUUIDFileNames(fileRealNames);
+		}
+
+		model.put("fileNames",fileNames );
+		model.put("fileRealName",fileRealNames );
 		model.put("board", resultBoardDto);
+		return model;
 	}
 
-	public void insertFormBoard(Map<String, String> paramMap, Map<String, Object> model) {
+	
+	// 상세보기에서 첨부파일을 클릭하면 다운로드 되는 기능
+	public Map<String, Object> downloadBoard(Map<String, Object> paramMap, Map<String, Object> model) {
+		Map<String, String>  parameter= (Map<String, String>) paramMap.get("paramMap");
+		
+		Integer boardCode = Integer.parseInt(parameter.get("boardCode"));
+		String fileName = parameter.get("fileName");		
+		model.put("boardCode",boardCode);
+		model.put("fileName",fileName );
+		return model;
 	}
+	
+	public  Map<String, Object> insertFormBoard(Map<String, String> paramMap, Map<String, Object> model) {return model;}
 
-	public void insertBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
+	
+	public Map<String, Object> insertBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
-		Map<String, String> a = (Map<String, String>) paramMap.get("paramMap");
-		List<String> fileNames = (List<String>) paramMap.get("fileNames");
+		List<String> fileNames = (List<String>) paramMap.get("fileNameList");
 		List<byte[]> fileDataList = (List<byte[]>) paramMap.get("fileDataList");
-
-		BoardDto boardDto = ServletRequestMapper.convertMapToDto(a, BoardDto.class);
-		int result = boardDao.insertBoard(boardDto);
-		FileUploadUtil.uploadFIle(result, fileNames);
-		model.put("result", result);
+		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
+		
+		Integer boardCode= boardDao.insertBoard(boardDto);
+		if(fileNames != null && fileDataList  != null) {			
+			FileUtil.uploadFIle(boardCode, fileNames,fileDataList);	
+		}
+		model.put("result", boardCode);
+		return model;
 	}
 
-	public void uploadFileBoard(Map<String, String> paramMap, Map<String, Object> model)
-			throws SQLException, NamingException, Exception {
-		System.out.println("업로드 서비스 시작");
-		BoardDao boardDao = BoardDao.getInstance();
-		int pk = boardDao.selectBoardMaxPk();
-
-		System.out.println(pk);
-	}
-
-	public void updateFormBoard(Map<String, String> paramMap, Map<String, Object> model)
-			throws SQLException, NullPointerException, Exception {
+	public  Map<String, Object> updateFormBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		BoardDto resultBoardDto = boardDao.selectBoard(boardDto);
 		model.put("board", resultBoardDto);
+		return model;
 	}
 
-	public void updateBoard(Map<String, String> paramMap, Map<String, Object> model)
-			throws SQLException, NullPointerException, Exception {
+	public  Map<String, Object> updateBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		int result = boardDao.updateBoard(boardDto);
 		model.put("result", result);
+		return model;
 	}
 
-	public void deleteBoard(Map<String, String> paramMap, Map<String, Object> model)
-			throws SQLException, NullPointerException, Exception {
+	public Map<String, Object>  deleteBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		int result = boardDao.deleteBoard(boardDto);
 		model.put("result", result);
+		return model;
 
 	}
 
-	public void uploadBoard(Map<String, String> paramMap, Map<String, Object> model) {
-		System.out.println("uploadBoard");
-		System.out.println(paramMap);
 
-	}
 }

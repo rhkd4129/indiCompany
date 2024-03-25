@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ControllerInvoker {
-    public static void invokeController(String className, String methodName, Map<String, Object> paramMap, Map<String, Object> model) 
+    public static Map<String, Object> invokeController(String className, String methodName, Map<String, Object> paramMap, Map<String, Object> model) 
     		throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
     			
     		// className은 클래스 명 , methoName은 호출할 메서드 
@@ -20,7 +20,12 @@ public class ControllerInvoker {
             Object instance = getInstanceMethod.invoke(null);
             Class<?>[] parameterTypes = {Map.class, Map.class};
             Method method = clazz.getMethod(methodName, parameterTypes);
-            method.invoke(instance, paramMap, model);
+            // 메서드 실행 결과를 Object 타입으로.
+            Object result = method.invoke(instance, paramMap, model);
+         
+            // 실행 결과를 Map<String, Object> 타입으로 캐스팅.
+            
+            return (Map<String, Object>) result;
      
     }
 }

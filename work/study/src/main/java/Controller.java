@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import service.BoardService;
 import service.CommentService;
 import util.ExceptionHandler;
+import util.FileUtil;
 import util.servletUtils.ServletRequestMapper;
 import util.servletUtils.LoadConfig;
 import util.servletUtils.MyView;
@@ -42,21 +43,13 @@ import java.lang.reflect.InvocationTargetException;
 		@WebInitParam(name = "config", value = "/WEB-INF/command.json") })
 @MultipartConfig(
 	    fileSizeThreshold = 1024 * 1024 * 2, // 1 MB
-	    maxFileSize = 1024 * 1024 * 10,      // 10 MB
-	    maxRequestSize = 1024 * 1024 * 100   // 100 MB
+	    maxFileSize = 1024 * 1024 * 10,      // 10 MB //업로드 할 수 있는 최대크기 
+	    maxRequestSize = 1024 * 1024 * 100   // 100 MB // 하나의 요청에서 허용되는 전체 요청의 최대크기 
 	)
 public class Controller extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
-	
 	 Map<String, Map<String, String>> commandMap = new HashMap<>();
-
-	public Controller() {
-//		scanController();
-//		CommandMap.put("/view/boardList.do", new service.board.BoardListService());
-//		CommandMap.put("/view/boardContent.do", new service.board.BoardContentService());
-//		........
-	}
 
 	public void init(ServletConfig config) throws ServletException {
 		 try {
@@ -96,16 +89,22 @@ public class Controller extends HttpServlet {
 				throw new Exception("유효하지 않는  url ");
 			}
 			
-			//ex "/view/board/list.do"
+			/* 
+			 * request된 URL를 분석하여 파싱후에 classNames변수에는 해당 서비스 
+			 * methodName에는 해당 메서드가 저장
+			   EX) "/view/board/list.do"
+			*/
 			String comMethed = comArr[1];  // view
 			String comObject = comArr[2];  // board
 			String comAction = comArr[3];  // list.do
 			String classNames = "service."+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1)+"Service"; 
 			String methodName   =  comAction.substring(0, comAction.length()-3)
 			+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1);
-			
+						
 			logger.info("[CHECK_3] className : {}", classNames);
 			logger.info("[CHECK_3] methodName : {}", methodName);
+			
+			// 서블릿 시작시 commandMap에 담긴 view호출 
 			
 			String viewName = commandMap.get(command).get("viewName");
 			
@@ -119,10 +118,13 @@ public class Controller extends HttpServlet {
 			Map<String, Object> paramMap = new HashMap<String, Object>();
 			Map<String, Object> model = new HashMap<String, Object>();
 			
+			// extractParametersAndFiles은 request안에 paramter들을 자동으로 Map<String, Object>에 넣어줌
 			paramMap = ServletRequestMapper.extractParametersAndFiles(request);
-			System.out.println(paramMap);
-			ControllerInvoker.invokeController(classNames, methodName,paramMap, model);
-		
+			logger.info("1:{}",paramMap);
+			model = ControllerInvoker.invokeController(classNames, methodName,paramMap, model);
+			logger.info("2:{}",model);
+			// request에서 파싱해서 온 클래스와 메서드 이름 파라미터를 넘겨 model을 반환
+			// 각각의 기능에 맞게 view.render호출 -> view로 forward하거나 json를 전송하는 함수 
 			if ("json".equalsIgnoreCase(comMethed)) {
 				logger.info("json");
 				MyView.render(model, response);
@@ -134,6 +136,10 @@ public class Controller extends HttpServlet {
 				logger.info("[CHECK_3] viewPath : {}", viewPath);
 				MyView.render(  model , response,  viewPath,request);
 			}
+			if ("file".equalsIgnoreCase(comMethed)) {
+				FileUtil.downloadFile(response, model);
+			}
+				
 		} catch (Exception e) {
 			ExceptionHandler.handleException(e, response);
 		}

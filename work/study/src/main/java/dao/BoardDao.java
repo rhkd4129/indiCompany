@@ -47,16 +47,16 @@ public class BoardDao {
 	}
 
 
-	public Integer selectBoardMaxPk() throws SQLException, NamingException, Exception {
-		 String sql = "SELECT MAX(BOARD_CODE) AS maxPk FROM BOARD";
-		 return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
-			    Integer maxPk = null;
-		        if (rs.next()) {
-		            maxPk = rs.getInt("maxPk");
-		        }
-		    return maxPk;    
-		 });		   
-	}
+//	public Integer selectBoardMaxPk() throws SQLException, NamingException, Exception {
+//		 String sql = "SELECT MAX(BOARD_CODE) AS maxPk FROM BOARD";
+//		 return ExecuteDmlQuery.executeSelectQuery(sql, rs -> {
+//			    Integer maxPk = null;
+//		        if (rs.next()) {
+//		            maxPk = rs.getInt("maxPk");
+//		        }
+//		    return maxPk;    
+//		 });		   
+//	}
 	
 
 	public BoardDto selectBoard(BoardDto boardDto) throws SQLException, Exception {
