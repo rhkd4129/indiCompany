@@ -40,8 +40,7 @@ public class ServletRequestMapper {
 	            //디렉토리 구분자 이후의 문자열(실제 파일 이름)을 반환.
 	            //최종적으로 example.txt 반환         
 	        }
-	    }
-	    
+	    }	    
 	    return "null";
 	}
 
@@ -85,6 +84,7 @@ public class ServletRequestMapper {
 		result.put("fileDataList", fileDataList);
 		result.put("fileNameList", fileNames);
 		result.put("paramMap", paramMap);
+		
 		return result;
 	}
 

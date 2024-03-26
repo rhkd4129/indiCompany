@@ -22,22 +22,41 @@
 			boardUpdate();
 		});
 	}
-
+	
 	//함수 
 	function boardUpdate() {
+		var formData = new FormData();
+		var files = $('#file')[0].files; // 파일 입력 필드에서 선택된 모든 파일을 가져옵니
+		
+		
 		var boardCode = $('#boardCode').val();
 		var boardTitle = $('#boardTitle').val();
 		var boardContent = $('#boardContent').val();
-
+		
+		
+		formData.append("boardCode" , boardCode);
+		formData.append("boardTitle" , boardTitle);
+		formData.append("boardContent" , boardContent);
+		var fileDeleteList = [];
+		    $('input[name="fileDeleteList"]:checked').each(function() {
+		        fileDeleteList.push($(this).val());
+		    });
+		/* if (fileDeleteList.length > 0) {
+		        formData.append("fileDeleteList", JSON.stringify(fileDeleteList));
+		    } */
+		/*   $('input[name="fileDeleteList"]:checked').each(function() {
+		        formData.append("fileDeleteList", $(this).val()); // 체크된 체크박스의 value 추가
+		    });
+ */
+ 		formData.append("fileDeleteList",fileDeleteList);
 		$.ajax({
 			type : "POST",
 			url : "/json/board/update.do",
 			dataType:'json',
-			data : {
-				boardCode : boardCode,
-				boardTitle : boardTitle,
-				boardContent : boardContent
-			},
+		    processData: false, // jQuery가 데이터를 처리하지 않도록 설정
+		    contentType: false, // 콘텐츠 타입 헤더를 설정하지 않도록 설정
+			data : formData,
+			
 			success : function(response) {
 				console.log(response);
 						
@@ -65,8 +84,30 @@
 		<div>
 			<label for="content">내용</label> <input type="text" name="boardContent" id="boardContent" value="${board.boardContent}">
 		</div>
+		
+		파일 선택: <input type="file" name="file" id="file" multiple="multiple" /></br>
+		<c:choose>
+			<c:when test="${not empty fileRealName}">
+				<c:forEach items="${fileRealName}" var="realFileName"
+					varStatus="status">
+					<c:url var="downloadUrl" value="/file/board/download.do">
+						<c:param name="boardCode" value="${board.boardCode}" />
+						<c:param name="fileName" value="${realFileName}" />
+					</c:url>
+					<a href="${downloadUrl}">${fileNames[status.index]}</a>
+					<!-- 체크박스 추가, boardCode를 값으로 설정 -->
+					<input type="checkbox" name="fileDeleteList" value="${realFileName}">
+					<br />
+				</c:forEach>
+			</c:when>
+
+			<c:otherwise>
+				<p>첨부파일이 없습니다.</p>
+				<br />
+			</c:otherwise>
+		</c:choose>
 		<button id="update-btn">수정</button>
 	</div>
 
 </body>
-</html>
+</html>		

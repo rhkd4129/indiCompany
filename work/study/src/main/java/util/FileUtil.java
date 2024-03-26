@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,52 +29,49 @@ import java.util.regex.Matcher;
 public class FileUtil {
 	public static final String jsonFilePath = "C:\\uploadTest\\board_image.json";
 
-	
 	/*
 	 * 파일 이름이 리스트로 넘어오면 파일이름_UUID.확장자 형식으로 바꿔줌
-	 * */
-	 public static List<String> addUUIDFileNames(List<String> fileNames) {
-	        List<String> modifiedFileNames = new ArrayList<>(); // 수정된 파일 이름을 저장할 리스트 생성
-
-	        for (String fileName : fileNames) {
-	            int dotIndex = fileName.lastIndexOf('.'); // 확장자 구분을 위한 마지막 점(.)의 위치 찾기
-
-	            if (dotIndex == -1) { // 파일 이름에 확장자가 없는 경우
-	                modifiedFileNames.add(fileName + "_" + UUID.randomUUID().toString());
-	            } else { // 확장자가 있는 경우
-	                String namePart = fileName.substring(0, dotIndex); // 파일 이름 부분
-	                String extensionPart = fileName.substring(dotIndex); // 확장자 부분
-	                modifiedFileNames.add(namePart + "_" + UUID.randomUUID().toString() + extensionPart); // UUID를 파일 이름에 추가
-	            }
-	        }
-
-	        return modifiedFileNames; // 수정된 파일 이름 리스트 반환
-	    }
-
-	 
-	 /*
-	  파일이름_UUID.확장자형식의 파일이름에서 UUID를 제거하는 로직 사용자게에 보여주기 위해 
 	 */
-	 public static List<String> removeUUIDFileNames(List<String> fileNamesWithUUID) {
-	        List<String> fileNames = new ArrayList<>();
-	        Pattern uuidPattern = Pattern.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
-	        for (String fileName : fileNamesWithUUID) {
-	            Matcher matcher = uuidPattern.matcher(fileName);
-	            // 파일 이름에서 UUID 부분을 제거/확장자 유지
-	            String cleanFileName = matcher.replaceFirst("$1");
-	            fileNames.add(cleanFileName);
-	        }
-	        return fileNames;
-	    }
-	 
-	 
-	 
+	public static List<String> addUUIDFileNames(List<String> fileNames) {
+		List<String> modifiedFileNames = new ArrayList<>(); // 수정된 파일 이름을 저장할 리스트 생성
+
+		for (String fileName : fileNames) {
+			int dotIndex = fileName.lastIndexOf('.'); // 확장자 구분을 위한 마지막 점(.)의 위치 찾기
+
+			if (dotIndex == -1) { // 파일 이름에 확장자가 없는 경우
+				modifiedFileNames.add(fileName + "_" + UUID.randomUUID().toString());
+			} else { // 확장자가 있는 경우
+				String namePart = fileName.substring(0, dotIndex); // 파일 이름 부분
+				String extensionPart = fileName.substring(dotIndex); // 확장자 부분
+				modifiedFileNames.add(namePart + "_" + UUID.randomUUID().toString() + extensionPart); // UUID를 파일 이름에 추가
+			}
+		}
+
+		return modifiedFileNames; // 수정된 파일 이름 리스트 반환
+	}
+
+	/*
+	 * 파일이름_UUID.확장자형식의 파일이름에서 UUID를 제거하는 로직 사용자게에 보여주기 위해
+	 */
+	public static List<String> removeUUIDFileNames(List<String> fileNamesWithUUID) {
+		List<String> fileNames = new ArrayList<>();
+		Pattern uuidPattern = Pattern
+				.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
+		for (String fileName : fileNamesWithUUID) {
+			Matcher matcher = uuidPattern.matcher(fileName);
+			// 파일 이름에서 UUID 부분을 제거/확장자 유지
+			String cleanFileName = matcher.replaceFirst("$1");
+			fileNames.add(cleanFileName);
+		}
+		return fileNames;
+	}
+
 	public static void uploadFIle(Integer boardCode, List<String> fileNames, List<byte[]> fileDataList) {
-		 
+
 		ObjectMapper mapper = new ObjectMapper();
 		File jsonFile = new File(jsonFilePath); // 파일 경로를 사용하여 File 인스턴스 생성
 		String directoryPath = jsonFile.getParent(); // JSON 파일이 위치한 디렉토리 경로 //C:\\uploadTest\\
-		List<String> fileNamesWithUUID  = addUUIDFileNames(fileNames);
+		List<String> fileNamesWithUUID = addUUIDFileNames(fileNames);
 		ObjectNode root; // JSON 구조의 루트 노드
 		try {
 			// json파일이 이미 존재하고 비어 있지 않다면 파일 내용 읽기
@@ -105,15 +104,16 @@ public class FileUtil {
 		}
 	}
 
-	
 	// 저장할 폴더의 위치 , pk , 파일의 이름, 파일의 데이터 정보
-	public static void saveFiles(String directoryPath, Integer boardCode, List<String> fileNamesWithUUID, List<byte[]> fileDataList) throws IOException {
-		String folderPath = Paths.get(directoryPath, Integer.toString(boardCode)).toString(); // C:\\uploadTest\\1 <-- 이미지의 실제 저장위치 
+	public static void saveFiles(String directoryPath, Integer boardCode, List<String> fileNamesWithUUID,
+			List<byte[]> fileDataList) throws IOException {
+		String folderPath = Paths.get(directoryPath, Integer.toString(boardCode)).toString(); // C:\\uploadTest\\1 <--
+																								// 이미지의 실제 저장위치
 		File folder = new File(folderPath);
 		if (!folder.exists()) {
 			folder.mkdirs(); // 폴더가 없으면 생성
 		}
-		//파일 저장
+		// 파일 저장
 		for (int i = 0; i < fileDataList.size(); i++) {
 			File file = new File(folder, fileNamesWithUUID.get(i));
 			try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -126,33 +126,57 @@ public class FileUtil {
 	 * 상세보기로 들어가면 Pk를 전달받아 해당 게시판에 대한 파일들을 불러옴 json파일을 먼저 찾아 인자로 받은 pk 키 가존재하면 값들을
 	 * 반환
 	 */
-	public static List<String> listBoardFile(Integer boardCode) {
+
+	public static List<String> listFilesInDirectory(Integer boardCode) throws IOException {
 		List<String> fileNames = new ArrayList<>();
-		ObjectMapper mapper = new ObjectMapper();
-		File jsonFile = new File(jsonFilePath);
+		String directoryPath = "C:\\uploadTest\\";
+		Path path = Paths.get(directoryPath, boardCode.toString());
 
-		// 파일이 존재하고 그안에 내용이 있다면
-		if (jsonFile.exists() && jsonFile.length() != 0) {
-			try {
-				// 파일 내용 읽기
-				JsonNode root = mapper.readTree(jsonFile);
-				// 주어진 키에 해당하는 배열이 존재하는지 확인
-				String key = Integer.toString(boardCode);
-				if (root.has(key)) {
-					JsonNode arrayNode = root.get(key);
-					if (arrayNode.isArray()) {
-						for (JsonNode node : arrayNode) {
-							fileNames.add(node.asText());
-
-						}
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		// 폴더가 존재하는지 확인
+		if (!Files.exists(path) || !Files.isDirectory(path)) {
+			return null; // 폴더가 존재하지 않으면 null 반환
 		}
-		return fileNames; // 찾은 파일 이름들의 리스트를 반환
+		// 폴더가 존재하면, 해당 폴더 내의 파일들의 이름을 리스트로 수집
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+			for (Path file : stream) {
+				// 디렉토리는 제외하고 파일 이름만 추가
+				if (Files.isRegularFile(file)) {
+					fileNames.add(file.getFileName().toString());
+				}
+			}
+		} catch (IOException e) {
+			throw new IOException("Error reading directory", e);
+		}
+		return fileNames;
 	}
+
+//	public static List<String> listBoardFile(Integer boardCode) {
+//		List<String> fileNames = new ArrayList<>();
+//		ObjectMapper mapper = new ObjectMapper();
+//		File jsonFile = new File(jsonFilePath);
+//
+//		// 파일이 존재하고 그안에 내용이 있다면
+//		if (jsonFile.exists() && jsonFile.length() != 0) {
+//			try {
+//				// 파일 내용 읽기
+//				JsonNode root = mapper.readTree(jsonFile);
+//				// 주어진 키에 해당하는 배열이 존재하는지 확인
+//				String key = Integer.toString(boardCode);
+//				if (root.has(key)) {
+//					JsonNode arrayNode = root.get(key);
+//					if (arrayNode.isArray()) {
+//						for (JsonNode node : arrayNode) {
+//							fileNames.add(node.asText());
+//
+//						}
+//					}
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return fileNames; // 찾은 파일 이름들의 리스트를 반환
+//	}
 
 	/*
 	 * 게시판 상세보기 페이지에서 링크를 클릭햇을시 다운로드 되는 기능
@@ -162,7 +186,7 @@ public class FileUtil {
 		System.out.println(model);
 		Integer boardCode = (Integer) model.get("boardCode");
 		String fileName = (String) model.get("fileName");
-		File file = new File("C:\\uploadTest\\" +boardCode + "\\", fileName);
+		File file = new File("C:\\uploadTest\\" + boardCode + "\\", fileName);
 
 		if (file.exists()) {
 			String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
@@ -174,5 +198,67 @@ public class FileUtil {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
+
+
+
+	    public static void deleteFiles (String fileNamesd, Integer boardCode) {
+	    	ObjectMapper mapper = new ObjectMapper();
+	    	String directoryPath = "C:\\uploadTest\\";
+			Path path = Paths.get(directoryPath, boardCode.toString());
+			String[] fileNames = fileNamesd.split(","); // 파일 이름을 쉼표로 분리
+			
+			
+
+	    	for (String fileName : fileNames) {
+	            File file = new File(directoryPath + File.separator + fileName);
+	            if (file.exists()) {
+	                boolean deleted = file.delete();
+	                if (deleted) {
+	                    System.out.println(fileName + " has been deleted successfully.");
+	                } else {
+	                    System.out.println("Failed to delete " + fileName);
+	                }
+	            } else {
+	                System.out.println(fileName + " does not exist.");
+	            }
+	        }
+	    }
+	
+
+	  public static void deleteFilesFromJson(Integer boardCode, String fileNamesToDelete) {
+			   String[] fileNames = fileNamesToDelete.split(","); // 파일 이름을 쉼표로 분리 
+			   ObjectMapper mapper = new ObjectMapper();
+		        File jsonFile = new File(jsonFilePath); // JSON 파일 경로를 사용하여 File 인스턴스 생성
+
+		        try {
+		            if (jsonFile.exists() && jsonFile.length() != 0) {
+		                ObjectNode root = (ObjectNode) mapper.readTree(jsonFile); // 파일 내용을 ObjectNode로 읽기
+
+		                if (root.has(boardCode.toString())) {
+		                    ArrayNode arrayNode = (ArrayNode) root.get(boardCode.toString());
+		                    ArrayNode newArrayNode = mapper.createArrayNode(); // 삭제할 파일 이름을 제외한 새로운 ArrayNode 생성
+
+		                    // 주어진 파일 이름들과 일치하지 않는 항목만 새로운 ArrayNode에 추가
+		                    arrayNode.forEach(node -> {
+		                        String fileName = node.asText();
+		                        if (!fileNamesToDelete.contains(fileName)) {
+		                            newArrayNode.add(fileName);
+		                        }
+		                    });
+
+		                    root.set(boardCode.toString(), newArrayNode); // 변경된 ArrayNode를 ObjectNode에 다시 설정
+		                    mapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, root); // 변경된 내용을 파일에 쓰기
+		                    System.out.println("Files have been removed from the JSON.");
+		                } else {
+		                    System.out.println("Board code " + boardCode + " not found in JSON.");
+		                }
+		            } else {
+		                System.out.println("JSON file does not exist or is empty.");
+		            }
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		            System.out.println("Error processing JSON file.");
+		        }
+		    }
 
 }

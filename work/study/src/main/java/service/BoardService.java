@@ -23,7 +23,7 @@ public class BoardService {
 	}
 
 	
-	//싱글톤 패턴
+	//싱글톤 패턴 
 	public static BoardService getInstance() {
 		return instance;
 	}
@@ -45,8 +45,9 @@ public class BoardService {
 		//게시판 코드를 넣으면 json파일에 해당 게시판에 이미지가 있는지 검사
 		List<String> fileNames = null;
 		List<String> fileRealNames = null; 
-		fileRealNames = FileUtil.listBoardFile(resultBoardDto.getBoardCode());
-		if(fileRealNames != null  || !fileRealNames.isEmpty()) {
+		
+		fileRealNames = FileUtil.listFilesInDirectory(boardDto.getBoardCode());
+		if(fileRealNames != null  && !fileRealNames.isEmpty()) {
 			//UUID가 제거된 파일이름 (사용자게에 보여짐)
 			fileNames = FileUtil.removeUUIDFileNames(fileRealNames);
 		}
@@ -90,14 +91,45 @@ public class BoardService {
 		BoardDao boardDao = BoardDao.getInstance();
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		BoardDto resultBoardDto = boardDao.selectBoard(boardDto);
+		
+		List<String> fileNames = null;
+		List<String> fileRealNames = null; 
+		
+		fileRealNames = FileUtil.listFilesInDirectory(resultBoardDto.getBoardCode());
+		if(fileRealNames != null  || !fileRealNames.isEmpty()) {
+			//UUID가 제거된 파일이름 (사용자게에 보여짐)
+			fileNames = FileUtil.removeUUIDFileNames(fileRealNames);
+		}
+		model.put("fileNames",fileNames );
+		model.put("fileRealName",fileRealNames );
 		model.put("board", resultBoardDto);
+		
+		
+		
 		return model;
 	}
 
 	public  Map<String, Object> updateBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
+		List<String> fileNames = (List<String>) paramMap.get("fileNameList");
+		List<byte[]> fileDataList = (List<byte[]>) paramMap.get("fileDataList");
+		
+		Map<String, String> innerParamMap = (Map<String, String>) paramMap.get("paramMap");
+		String  fileDeleteList =  innerParamMap.get("fileDeleteList");
+		
+		
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		int result = boardDao.updateBoard(boardDto);
+		
+		if(fileNames != null && fileDataList  != null) {			
+			FileUtil.uploadFIle(boardDto.getBoardCode(), fileNames,fileDataList);	
+		}
+		if(fileDeleteList != null && !fileDeleteList.isEmpty()) {
+			
+			FileUtil.deleteFilesFromJson(boardDto.getBoardCode(), fileDeleteList);
+			FileUtil.deleteFiles(fileDeleteList ,boardDto.getBoardCode() );
+		}
+		
 		model.put("result", result);
 		return model;
 	}
@@ -106,6 +138,7 @@ public class BoardService {
 		BoardDao boardDao = BoardDao.getInstance();
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		int result = boardDao.deleteBoard(boardDto);
+		
 		model.put("result", result);
 		return model;
 
