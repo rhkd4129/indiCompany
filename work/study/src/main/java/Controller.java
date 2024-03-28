@@ -26,6 +26,7 @@ import service.BoardService;
 import service.CommentService;
 import util.ExceptionHandler;
 import util.FileUtil;
+import util.JsopUtil;
 import util.servletUtils.ServletRequestMapper;
 import util.servletUtils.LoadConfig;
 import util.servletUtils.MyView;
@@ -54,9 +55,6 @@ public class Controller extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		 try {
 		        commandMap = LoadConfig.loadCommandsFromJson(config);
-		        if (commandMap == null ) {
-		            throw new Exception("Command map 이 null입니다.");
-		        }
 		    } catch (Exception e) {
 		        logger.error("commands map 읽기 실패 : {}", e.getMessage());		     
 		    }
@@ -72,7 +70,7 @@ public class Controller extends HttpServlet {
 		String method, className = null;
 
 		try {
-			// 우선 GET 과 post아니면 다 에러처리
+			/*우선 GET 과 post아니면 다 에러처리*/ 
 			method = request.getMethod();
 			if (!(method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("POST"))) {
 				response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
@@ -84,7 +82,8 @@ public class Controller extends HttpServlet {
 
 			//URL 검증/ 파싱
 			String[] comArr = command.split("/");
-			if (comArr == null || comArr.length != 4) {
+			if (comArr == null || comArr.length != 3) {
+				System.out.println(comArr.length);
 				logger.error("유효하지 않는  url : {}", command);
 				throw new Exception("유효하지 않는  url ");
 			}
@@ -94,9 +93,9 @@ public class Controller extends HttpServlet {
 			 * methodName에는 해당 메서드가 저장
 			   EX) "/view/board/list.do"
 			*/
-			String comMethed = comArr[1];  // view
-			String comObject = comArr[2];  // board
-			String comAction = comArr[3];  // list.do
+			
+			String comObject = comArr[1];  // board
+			String comAction = comArr[2];  // list.do
 			String classNames = "service."+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1)+"Service"; 
 			String methodName   =  comAction.substring(0, comAction.length()-3)
 			+comObject.substring(0 ,1).toUpperCase()+comObject.substring(1);
@@ -104,39 +103,41 @@ public class Controller extends HttpServlet {
 			logger.info("[CHECK_3] className : {}", classNames);
 			logger.info("[CHECK_3] methodName : {}", methodName);
 			
-			// 서블릿 시작시 commandMap에 담긴 view호출 
+			/* 서블릿 시작시 commandMap에 담긴 view호출 */ 
 			
 			String viewName = commandMap.get(command).get("viewName");
+			String type = commandMap.get(command).get("type");
 			
 			logger.info("[CHECK_4] viewName : {}", viewName);
 
-			if ("redirect".equalsIgnoreCase(comMethed)) {
+			if ("redirect".equalsIgnoreCase(type)) {
 				logger.info("redirect");
 				response.sendRedirect(viewName);
 			}
 			
-			Map<String, Object> paramMap = new HashMap<String, Object>();
-			Map<String, Object> model = new HashMap<String, Object>();
 			
 			// extractParametersAndFiles은 request안에 paramter들을 자동으로 Map<String, Object>에 넣어줌
-			paramMap = ServletRequestMapper.extractParametersAndFiles(request);
+			Map<String, Object> paramMap = ServletRequestMapper.extractParametersAndFiles(request);
+			if("jsop".equalsIgnoreCase(comObject)) {
+				paramMap = JsopUtil.a(request);
+			}
 			logger.info("1:{}",paramMap);
-			model = ControllerInvoker.invokeController(classNames, methodName,paramMap, model);
+			Map<String, Object> model = ControllerInvoker.invokeController(classNames, methodName,paramMap);
 			logger.info("2:{}",model);
-			// request에서 파싱해서 온 클래스와 메서드 이름 파라미터를 넘겨 model을 반환
-			// 각각의 기능에 맞게 view.render호출 -> view로 forward하거나 json를 전송하는 함수 
-			if ("json".equalsIgnoreCase(comMethed)) {
+			 
+			/*   request에서 파싱해서 온 클래스와 메서드 이름 파라미터를 넘겨 model을 반환
+			 *  각각의 기능에 맞게 view.render호출 -> view로 forward하거나 json를 전송하는 함수
+			 *  */ 
+			if ("json".equalsIgnoreCase(type)) {
 				logger.info("json");
 				MyView.render(model, response);
 			}
 
-			if ("view".equalsIgnoreCase(comMethed)) {
+			if ("view".equalsIgnoreCase(type)) {
 				logger.info("forward");
-				String viewPath = "/views" + viewName + ".jsp";
-				logger.info("[CHECK_3] viewPath : {}", viewPath);
-				MyView.render(  model , response,  viewPath,request);
+				MyView.render(  model , response,  viewName,request);
 			}
-			if ("file".equalsIgnoreCase(comMethed)) {
+			if ("file".equalsIgnoreCase(type)) {
 				FileUtil.downloadFile(response, model);
 			}
 				

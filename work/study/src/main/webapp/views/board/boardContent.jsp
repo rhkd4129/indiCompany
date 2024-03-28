@@ -26,7 +26,7 @@
 
 		if (jsonData === null) {
 			alert("정보가 없습니다,");
-			window.location.href = "/view/error/error.do";
+			window.location.href = "/error/error.do";
 			return;
 		}
 
@@ -49,7 +49,7 @@
 					console.log(commentContent);
 					$.ajax({
 						type : "POST",
-						url : "/json/comment/insert.do",
+						url : "/comment/insert.do",
 						data : {
 							boardCode : boardCode,
 							commentContent : commentContent
@@ -73,7 +73,7 @@
 		// 수정 버튼 클릭 이벤트 처리
 		$('#update-btn').click(
 				function() {
-					window.location.href = '/view/board/updateForm.do?boardCode='+ boardCode;});
+					window.location.href = '/board/updateForm.do?boardCode='+ boardCode;});
 
 		// 삭제 버튼 클릭 이벤트 처리
 		$('#delete-btn').click(function() {
@@ -82,7 +82,7 @@
 
 		// 목록 버튼 클릭 이벤트 처리
 		$('#list-btn').click(function() {
-			window.location.href = '/view/board/list.do';
+			window.location.href = '/board/list.do';
 		});
 	};
 
@@ -110,7 +110,7 @@
 	function getCommentList(boardCode) {
 		$.ajax({
 			type : "GET",
-			url : "/json/comment/list.do",
+			url : "/comment/list.do",
 			dataType : 'json',
 			data : {
 				boardCode : boardCode
@@ -134,7 +134,7 @@
 		}
 		$.ajax({
 			type : "POST",
-			url : "/json/board/delete.do",
+			url : "/board/delete.do",
 			dataType : "json",
 			data : {
 				boardCode : boardCode
@@ -144,7 +144,7 @@
 				console.log(result);
 				if (result >= 1) {
 					setTimeout(function() {
-						window.location.href = "/view/board/list.do";
+						window.location.href = "/board/list.do";
 						alert("삭제 완료");
 					}, 1000);
 				} else {
@@ -181,7 +181,7 @@
 			<c:when test="${not empty fileRealName}">
 				<c:forEach items="${fileRealName}" var="realFileName"
 					varStatus="status">
-					<c:url var="downloadUrl" value="/file/board/download.do">
+					<c:url var="downloadUrl" value="/board/download.do">
 						<c:param name="boardCode" value="${board.boardCode}" />
 						<c:param name="fileName" value="${realFileName}" />
 					</c:url>

@@ -13,7 +13,7 @@
 		boardCode = "${board.boardCode}";
 		if (jsonData === null) {
 			alert("정보가 없습니다,");
-			window.location.href = "/view/error/error.do";
+			window.location.href = "/error/error.do";
 			return;
 		}
 	}
@@ -26,32 +26,29 @@
 	//함수 
 	function boardUpdate() {
 		var formData = new FormData();
-		var files = $('#file')[0].files; // 파일 입력 필드에서 선택된 모든 파일을 가져옵니
-		
-		
+		var files = $('#file')[0].files;
 		var boardCode = $('#boardCode').val();
 		var boardTitle = $('#boardTitle').val();
 		var boardContent = $('#boardContent').val();
 		
-		
-		formData.append("boardCode" , boardCode);
-		formData.append("boardTitle" , boardTitle);
-		formData.append("boardContent" , boardContent);
+
 		var fileDeleteList = [];
 		    $('input[name="fileDeleteList"]:checked').each(function() {
 		        fileDeleteList.push($(this).val());
 		    });
-		/* if (fileDeleteList.length > 0) {
-		        formData.append("fileDeleteList", JSON.stringify(fileDeleteList));
-		    } */
-		/*   $('input[name="fileDeleteList"]:checked').each(function() {
-		        formData.append("fileDeleteList", $(this).val()); // 체크된 체크박스의 value 추가
-		    });
- */
+
+		for (let i = 0; i < files.length; i++) {
+			   formData.append("files[]", files[i]);
+		}
+		    
+		formData.append("boardCode" , boardCode);
+		formData.append("boardTitle" , boardTitle);
+		formData.append("boardContent" , boardContent);
  		formData.append("fileDeleteList",fileDeleteList);
+ 		
 		$.ajax({
 			type : "POST",
-			url : "/json/board/update.do",
+			url : "/board/update.do",
 			dataType:'json',
 		    processData: false, // jQuery가 데이터를 처리하지 않도록 설정
 		    contentType: false, // 콘텐츠 타입 헤더를 설정하지 않도록 설정
@@ -61,7 +58,7 @@
 				console.log(response);
 						
 				alert('게시물이 성공적으로 수정되었습니다.');
-				window.location.href = "/view/board/list.do";					
+				window.location.href = "/board/list.do";					
 				
 			},
 			error : function(xhr, status, error) {
@@ -90,13 +87,12 @@
 			<c:when test="${not empty fileRealName}">
 				<c:forEach items="${fileRealName}" var="realFileName"
 					varStatus="status">
-					<c:url var="downloadUrl" value="/file/board/download.do">
+					<c:url var="downloadUrl" value="/board/download.do">
 						<c:param name="boardCode" value="${board.boardCode}" />
 						<c:param name="fileName" value="${realFileName}" />
 					</c:url>
 					<a href="${downloadUrl}">${fileNames[status.index]}</a>
-					<!-- 체크박스 추가, boardCode를 값으로 설정 -->
-					<input type="checkbox" name="fileDeleteList" value="${realFileName}">
+					<input type="checkbox" name="fileDeleteList" value="${realFileName}">삭제
 					<br />
 				</c:forEach>
 			</c:when>

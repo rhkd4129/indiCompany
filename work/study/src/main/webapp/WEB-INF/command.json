@@ -1,38 +1,59 @@
 {
-	"/view/board/list.do": {
-		"viewName": "/board/boardList"
+	"/board/list.do": {
+		"type" : "view",
+		"viewName": "/views/board/boardList.jsp"
 	},
-	"/view/board/content.do": {
-		"viewName": "/board/boardContent"
+	"/board/content.do": {
+		"type" : "view",
+		"viewName": "/views/board/boardContent.jsp"
 	},
-	"/view/board/insertForm.do": {
-		"viewName": "/board/boardInsertForm"
+	"/board/insertForm.do": {
+		"type" : "view",
+		"viewName": "/views/board/boardInsertForm.jsp"
 	},
-	"/redirect/board/insert.do": {
-		"viewName": "/view/board/list.do"
+	"/board/insert.do": {
+		"type" : "redirect",
+		"viewName": "/views/board/list.jsp"
 	},
-	"/file/board/download.do": {
-		"viewName": "/view/board/list.do"
+	"/board/download.do": {
+		"type" : "file",
+		"viewName": "/views/board/list.jsp"
 	},
-	"/json/board/uploadFile.do": {
-		"viewName": "/view/board/list.do"
+	"/board/uploadFile.do": {
+		"type" : "json",
+		"viewName": "/views/board/list.jsp"
 	},	
-	"/view/board/updateForm.do": {
-		"viewName": "/board/boardUpdateForm"
+	"/board/updateForm.do": {
+		"type" : "view",
+		"viewName": "/views/board/boardUpdateForm.jsp"
 	},
-	"/json/board/update.do": {
-		"viewName": "/view/board/list.do"
+	"/board/update.do": {
+		"type" : "json",
+		"viewName": "/views/board/list.jsp"
 	},
-	"/json/board/delete.do": {
+	"/board/delete.do": {
+		"type" : "json",
 		"viewName": ""
 	},
-	"/json/comment/list.do": {
+	"/comment/list.do": {
+		"type" : "json",
 		"viewName": ""
 	},
-	"/json/comment/insert.do": {
+	"/comment/insert.do": {
+		"type" : "json",	
 		"viewName": ""
 	},
-	"/view/error/error.do": {
-		"viewName": "/error/errorPage"
+	"/error/error.do": {
+		"type" : "view",
+		"viewName": "/views/error/errorPage.jsp"
+	},
+	"/jsop/list.do": {
+		"type" : "view",
+		"viewName": "/views/jsop/jsopList.jsp"
+	},
+	"/jsop/listShow.do": {
+		"type" : "json",
+		"viewName": ""
 	}
+	
 }

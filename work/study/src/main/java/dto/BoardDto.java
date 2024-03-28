@@ -8,7 +8,7 @@ public class BoardDto {
 	private String boardContent;
 	private String useYn;
 	private Timestamp boardCreateAt;
-	
+
 
 
 

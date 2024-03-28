@@ -18,7 +18,7 @@ import util.servletUtils.ServletRequestMapper;
 public class BoardService {
 	private static final BoardService instance = new BoardService();
 	private static final Logger logger = LoggerFactory.getLogger(BoardService.class);
-	private String imagePath = "C:\\uploadTest\\";
+	
 	private BoardService() {
 	}
 
@@ -47,7 +47,7 @@ public class BoardService {
 		List<String> fileRealNames = null; 
 		
 		fileRealNames = FileUtil.listFilesInDirectory(boardDto.getBoardCode());
-		if(fileRealNames != null  && !fileRealNames.isEmpty()) {
+		if(!fileRealNames.isEmpty()) {
 			//UUID가 제거된 파일이름 (사용자게에 보여짐)
 			fileNames = FileUtil.removeUUIDFileNames(fileRealNames);
 		}
@@ -75,13 +75,19 @@ public class BoardService {
 	
 	public Map<String, Object> insertBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
-		List<String> fileNames = (List<String>) paramMap.get("fileNameList");
-		List<byte[]> fileDataList = (List<byte[]>) paramMap.get("fileDataList");
+		List<String> listFileName = null;
+		List<byte[]> listfileData =null;
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
-		
 		Integer boardCode= boardDao.insertBoard(boardDto);
-		if(fileNames != null && fileDataList  != null) {			
-			FileUtil.uploadFIle(boardCode, fileNames,fileDataList);	
+		
+		
+		
+		listFileName = (List<String>) paramMap.get("fileNameList");
+		listfileData = (List<byte[]>) paramMap.get("fileDataList");
+	
+		if(listFileName != null && !listFileName.isEmpty() ) {		
+			System.out.println("파일 존재");
+			FileUtil.uploadFile(boardCode, listFileName,listfileData);	
 		}
 		model.put("result", boardCode);
 		return model;
@@ -96,23 +102,23 @@ public class BoardService {
 		List<String> fileRealNames = null; 
 		
 		fileRealNames = FileUtil.listFilesInDirectory(resultBoardDto.getBoardCode());
-		if(fileRealNames != null  || !fileRealNames.isEmpty()) {
+		if(!fileRealNames.isEmpty()) {
 			//UUID가 제거된 파일이름 (사용자게에 보여짐)
 			fileNames = FileUtil.removeUUIDFileNames(fileRealNames);
 		}
 		model.put("fileNames",fileNames );
 		model.put("fileRealName",fileRealNames );
-		model.put("board", resultBoardDto);
-		
-		
-		
+		model.put("board", resultBoardDto);	
 		return model;
 	}
 
 	public  Map<String, Object> updateBoard(Map<String, Object> paramMap, Map<String, Object> model) throws SQLException, NullPointerException, Exception {
+		List<String> listFileName = null;
+		List<byte[]> listfileData =null;
 		BoardDao boardDao = BoardDao.getInstance();
-		List<String> fileNames = (List<String>) paramMap.get("fileNameList");
-		List<byte[]> fileDataList = (List<byte[]>) paramMap.get("fileDataList");
+		
+		listFileName = (List<String>) paramMap.get("fileNameList");
+		listfileData = (List<byte[]>) paramMap.get("fileDataList");
 		
 		Map<String, String> innerParamMap = (Map<String, String>) paramMap.get("paramMap");
 		String  fileDeleteList =  innerParamMap.get("fileDeleteList");
@@ -121,11 +127,15 @@ public class BoardService {
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		int result = boardDao.updateBoard(boardDto);
 		
-		if(fileNames != null && fileDataList  != null) {			
-			FileUtil.uploadFIle(boardDto.getBoardCode(), fileNames,fileDataList);	
+		
+		
+		
+		if(listFileName != null && !listFileName.isEmpty() ) {		
+			System.out.println("파일 존재");
+			FileUtil.uploadFile(boardDto.getBoardCode(), listFileName,listfileData);	
 		}
 		if(fileDeleteList != null && !fileDeleteList.isEmpty()) {
-			
+			System.out.println("삭제할 파일 존재");
 			FileUtil.deleteFilesFromJson(boardDto.getBoardCode(), fileDeleteList);
 			FileUtil.deleteFiles(fileDeleteList ,boardDto.getBoardCode() );
 		}

@@ -5,7 +5,7 @@
 <body>
 	<div class="board">
 			<h2>등록하기</h2>
-		<form action="/redirect/board/insert.do" method="post" enctype="multipart/form-data" >
+		<form action="/board/insert.do" method="post" enctype="multipart/form-data" >
 			<div>
 				<label for="boardTitle" >제목</label>
 		        <input type="text" name="boardTitle">
@@ -18,7 +18,7 @@
 			
 			<input type="submit" id ="saveButton" value="저장">
 		</form>				
-		<input type="button" value="목록"  onclick="location.href='/view/board/list.do'">    
+		<input type="button" value="목록"  onclick="location.href='/board/list.do'">    
 	</div>
 
 </body>

@@ -6,12 +6,12 @@
 		function boardContent(boardCode){
 			$.ajax({
 				type : "GET",
-				url : "/view/board/content.do?boardCode"+boardCode,
+				url : "/board/content.do?boardCode"+boardCode,
 				data : {
 					boardCode : boardCode
 				},
 				success : function(response) {
-				    window.location.href = "/view/board/content.do?boardCode="+boardCode;
+				    window.location.href = "/board/content.do?boardCode="+boardCode;
 				},
 				error : function(xhr, status, error) {
 					alert("게시판 상세보기 불러오기 실패")
@@ -23,8 +23,8 @@
 <body>
 <div class ="board">
 	<h2>게시판</h2>
-	<a href="/view/board/insertForm.do">새글 등록</a><br>
-	
+	<a href="/board/insertForm.do">새글 등록</a><br>
+	<a href="/jsop/list.do">크롤</a><br>
 	<c:choose>
 	    <c:when test="${empty boardList}">
 	        <p>현재 글이 없습니다.</p>
@@ -39,7 +39,7 @@
 	            <c:forEach var="board" items="${boardList}">
 	                <tr>
 	                    <td>${board.boardCode}</td>
-                      <td><a href="/view/board/content.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>
+                      <td><a href="/board/content.do?boardCode=${board.boardCode}">${board.boardTitle}</a></td>
 	                    <td>${board.boardContent}</td>
 	                </tr>	
 	            </c:forEach>
