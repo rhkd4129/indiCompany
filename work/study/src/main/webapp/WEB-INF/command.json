@@ -47,11 +47,11 @@
 		"type" : "view",
 		"viewName": "/views/error/errorPage.jsp"
 	},
-	"/jsop/list.do": {
+	"/weatherCrawler/main.do": {
 		"type" : "view",
-		"viewName": "/views/jsop/jsopList.jsp"
+		"viewName": "/views/weatherCrawler/main.jsp"
 	},
-	"/jsop/listShow.do": {
+	"/weatherCrawler/mainShow.do": {
 		"type" : "json",
 		"viewName": ""
 	}

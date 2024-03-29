@@ -24,7 +24,7 @@
 <div class ="board">
 	<h2>게시판</h2>
 	<a href="/board/insertForm.do">새글 등록</a><br>
-	<a href="/jsop/list.do">크롤</a><br>
+	<a href="/weatherCrawler/main.do">크롤</a><br>
 	<c:choose>
 	    <c:when test="${empty boardList}">
 	        <p>현재 글이 없습니다.</p>

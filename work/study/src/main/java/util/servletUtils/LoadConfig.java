@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import service.ServiceInterface;
+
 
 public class LoadConfig {
 	private static final Logger logger = LoggerFactory.getLogger(LoadConfig.class);
@@ -84,11 +84,11 @@ public class LoadConfig {
 				logger.info("loadCommands className : {}", className);
 				// service.ListAction가 클래스로 변함
 				Class<?> commClass = Class.forName(className);
-				ServiceInterface commandInstance = (ServiceInterface) commClass.getDeclaredConstructor().newInstance();
+				//ServiceInterface commandInstance = (ServiceInterface) commClass.getDeclaredConstructor().newInstance();
 				// onstructor<?> constructor = commClass.getDeclaredConstructor(int.class)
 		
 				// service.ListAction가 인스턴스로 변신
-				CommandMap.put(command, commandInstance);
+			//	CommandMap.put(command, commandInstance);
 				/*
 				 * 프로퍼티 파일에서 읽어온 정보를 기반으로 커맨드 클래스와 매핑을 수행 Class.forName을 사용하여 문자열 클래스 이름을 클래스
 				 * 객체로 변환 이를 인스턴스화하여 CommandMap에 커맨드와 해당 인스턴스를 매핑
@@ -98,14 +98,14 @@ public class LoadConfig {
 		} catch (ClassNotFoundException e) {
 			logger.error(" 오류발생: {}", e.getMessage());
 			// 클래스륾 못찾는 경우
-		} catch (InstantiationException e) {
-			logger.error("Instantiation 오류발생: {}", e.getMessage());
-			// 클래스를 인스턴스화 할 수 없는 경우
-		} catch (IllegalAccessException e) {
-			logger.error(" IllegalAccess 오류발생: {}", e.getMessage());
-			// 엑세스 권한이 없는 경우
-		} catch (NoSuchMethodException e) {
-			logger.error(" NoSuchMethod 오류발생: {}", e.getMessage());
+//		} catch (InstantiationException e) {
+//			logger.error("Instantiation 오류발생: {}", e.getMessage());
+//			// 클래스를 인스턴스화 할 수 없는 경우
+//		} catch (IllegalAccessException e) {
+//			logger.error(" IllegalAccess 오류발생: {}", e.getMessage());
+//			// 엑세스 권한이 없는 경우
+//		} catch (NoSuchMethodException e) {
+//			logger.error(" NoSuchMethod 오류발생: {}", e.getMessage());
 			// 생성자를 못 찾는 경우
 		} catch (Exception e) {
 			logger.error(" 오류 발생 ?? : {}", e.getMessage());

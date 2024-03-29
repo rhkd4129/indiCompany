@@ -118,9 +118,7 @@ public class Controller extends HttpServlet {
 			
 			// extractParametersAndFiles은 request안에 paramter들을 자동으로 Map<String, Object>에 넣어줌
 			Map<String, Object> paramMap = ServletRequestMapper.extractParametersAndFiles(request);
-			if("jsop".equalsIgnoreCase(comObject)) {
-				paramMap = JsopUtil.a(request);
-			}
+		
 			logger.info("1:{}",paramMap);
 			Map<String, Object> model = ControllerInvoker.invokeController(classNames, methodName,paramMap);
 			logger.info("2:{}",model);
@@ -132,7 +130,6 @@ public class Controller extends HttpServlet {
 				logger.info("json");
 				MyView.render(model, response);
 			}
-
 			if ("view".equalsIgnoreCase(type)) {
 				logger.info("forward");
 				MyView.render(  model , response,  viewName,request);
