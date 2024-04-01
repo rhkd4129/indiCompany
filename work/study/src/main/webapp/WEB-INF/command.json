@@ -54,6 +54,9 @@
 	"/weatherCrawler/mainShow.do": {
 		"type" : "json",
 		"viewName": ""
+	},
+	"/weatherCrawler/imageShow.do": {
+		"type" : "json",
+		"viewName": ""
 	}
-	
 }

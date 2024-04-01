@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import service.BoardService;
 import service.CommentService;
+import service.WeatherCrawlerService;
 import util.ExceptionHandler;
 import util.FileUtil;
 import util.JsopUtil;
@@ -137,6 +138,9 @@ public class Controller extends HttpServlet {
 			if ("file".equalsIgnoreCase(type)) {
 				FileUtil.downloadFile(response, model);
 			}
+//			if ("show".equalsIgnoreCase(type)) {
+//				WeatherCrawlerService.a(response,model);
+//			}
 				
 		} catch (Exception e) {
 			ExceptionHandler.handleException(e, response);

@@ -5,37 +5,63 @@
 <head>
 <title>이미지 크롤링 결과</title>
 <script>
+
+
+
 	$(function() {
 		initData();
 		initEvent();
+		
 		// 초기화 데이터
 	});
-
+	// KST는  한국의 표준시간대를  UTC+9 시간대에 해당
 	function initData() {
 		$('#date').val(new Date().toISOString().substring(0, 10));
 		getSelectedData();
 	}
-	function initEvent() {		
-		 $('.searchBox').on('change', 'input, select', function() {
-			 console.log("modify")
-			 getSelectedData()
-		 });
-		
+	function initEvent() {
+		$('.searchBox').on('change', 'input, select', function() {
+			console.log("modify")
+			getSelectedData()
+		});
+
 	}
 
+	//현재 선택된 날짜와 시간을 가져옴
 	function getSelectedData() {
-		var selectedDate = $('#date').val().replace(/-/g, '/');
+		var selectedDate = $('#date').val()//.replace(/-/g, '/');
 		var selectedTime = $('#searchTime').val().split(' ')[0].replace(':', '');
-		console.log(selectedDate,selectedTime)
-		getDataImage(selectedDate,selectedTime);
+		checkTodayData(selectedDate,selectedTime);
 	}
-	
 
+	
+	
+	function checkTodayData(selectedDate,selectedTime){
+		$.ajax({
+			url : '/weatherCrawler/imageShow.do',
+			type : 'GET',
+		 	data : {
+		 		selectedDate:selectedDate,
+		 		selectedTime:selectedTime
+			}, 
+			dataType : 'json',
+			success : function(data) {
+				console.log(data);
+				var imgSrc = 'data:image/png;base64,' + data.image;
+                $('#aaa').attr('src', imgSrc);
+			},
+			error : function(xhr, status, error) {
+				console.error("Error occurred: " + error);
+			}
+		});
+	}
+
+	
 	function changeImageSrc(newSrc) {
 		$('#imageContainer img').attr('src', newSrc);
 	}
 
-	function getDataImage(selectData,selectTime) {
+	function getDataImage(selectData, selectTime) {
 		$.ajax({
 			url : '/weatherCrawler/mainShow.do',
 			type : 'GET',
@@ -52,24 +78,47 @@
 			}
 		});
 	}
-	
-	
-	
 </script>
 </head>
 <body>
 	<div class="searchBox">
-		<div class="dateTime">		 
-			<input id="date" type="date">
-			 
-			<select
-				id="searchTime" class="NO-CHG-LABEL">
-				<option value="15:00 KST"  selected>15:00 KST</option>
-				<option value="14:50 KST">14:50 KST</option>
-				<option value="14:40 KST">14:40 KST</option>
+		<div class="dateTime">
+			<input id="date" type="date"> 
+				<select id="searchTime" class="searchTime">
+					<option value="05:00 KST">05:00 KST</option>
+					<option value="04:50 KST">04:50 KST</option>
+					<option value="04:40 KST">04:40 KST</option>
+					<option value="04:30 KST">04:30 KST</option>
+					<option value="04:20 KST">04:20 KST</option>
+					<option value="04:10 KST">04:10 KST</option>
+					<option value="04:00 KST">04:00 KST</option>
+					<option value="03:50 KST">03:50 KST</option>
+					<option value="03:40 KST">03:40 KST</option>
+					<option value="03:30 KST">03:30 KST</option>
+					<option value="03:20 KST">03:20 KST</option>
+					<option value="03:10 KST">03:10 KST</option>
+					<option value="03:00 KST">03:00 KST</option>
+					<option value="02:50 KST">02:50 KST</option>
+					<option value="02:40 KST">02:40 KST</option>
+					<option value="02:30 KST">02:30 KST</option>
+					<option value="02:20 KST">02:20 KST</option>
+					<option value="02:10 KST">02:10 KST</option>
+					<option value="02:00 KST">02:00 KST</option>
+					<option value="01:50 KST">01:50 KST</option>
+					<option value="01:40 KST">01:40 KST</option>
+					<option value="01:30 KST">01:30 KST</option>
+					<option value="01:20 KST">01:20 KST</option>
+					<option value="01:10 KST">01:10 KST</option>
+					<option value="01:00 KST">01:00 KST</option>
+					<option value="00:50 KST">00:50 KST</option>
+					<option value="00:40 KST">00:40 KST</option>
+					<option value="00:30 KST">00:30 KST</option>
+					<option value="00:20 KST">00:20 KST</option>
+					<option value="00:10 KST">00:10 KST</option>
+					<option value="00:00 KST">00:00 KST</option>
 			</select>
-			
-			
+
+
 			<button type="button" class="nowBtn">NOW</button>
 		</div>
 		<div class="condition">
@@ -86,8 +135,8 @@
 			</div>
 
 			<div class="menu" data-idx="1">
-				<label class="label" for="8c1ed5bb-50cc-0e57-2db9-251b991ff76f">자료레벨</label>
-				<select id="8c1ed5bb-50cc-0e57-2db9-251b991ff76f" name="level">
+				<label class="label" for="dataLevel">자료레벨</label>
+				<select id="dataLevel" name="level">
 					<option value="LE1B">기본영상</option>
 					<option value="LE2-ETC">위험기상</option>
 					<option value="LE2-ETC2">구름</option>
@@ -100,9 +149,9 @@
 			</div>
 
 			<div class="menu" data-idx="2">
-				<label class="label" for="b731b131-6b06-0b3c-e704-78cf472385bd">자료종류</label>
-				<select id="b731b131-6b06-0b3c-e704-78cf472385bd" name="type">
-					<optgroup refcode="typeGrp1" label="::::: 단일채널 :::::">
+				<label class="label" for="dataKind">자료종류</label>
+				<select id="dataKind" name="type">
+					<optgroup refcode="type1" label="::::: 단일채널 :::::">
 						<option value="VI004">가시(0.47μm):파랑</option>
 						<option value="VI005">가시(0.51μm):초록</option>
 						<option value="VI006">가시(0.64μm):빨강</option>
@@ -120,7 +169,7 @@
 						<option value="IR123">적외(12.3μm):오염된 대기창</option>
 						<option value="IR133">적외(13.3μm):이산화탄소</option>
 					</optgroup>
-					<optgroup refcode="typeGrp2" label="::::: RGB :::::">
+					<optgroup refcode="type2" label="::::: RGB :::::">
 						<option value="RGB-TRUE">RGB 천연색</option>
 						<option value="RGB-S-TRUE">RGB 천연색(AI)</option>
 						<option value="RGB-WV-1">RGB 3채널 수증기</option>
@@ -135,7 +184,7 @@
 						<option value="RGB-CLOUD">RGB 운상</option>
 						<option value="RGB-ASH">RGB 화산재</option>
 					</optgroup>
-					<optgroup refcode="typeGrp3" label="::::: 컬러강조 :::::">
+					<optgroup refcode="type3" label="::::: 컬러강조 :::::">
 						<option value="EIR-WV063">컬러수증기(6.3μm) 강조</option>
 						<option value="EIR-WV069">컬러수증기(6.9μm) 강조</option>
 						<option value="EIR-WV073">컬러수증기(7.3μm) 강조</option>
@@ -145,8 +194,8 @@
 			</div>
 
 			<div class="menu" data-idx="3">
-				<label class="label" for="1fe36cad-5441-bd9a-ef38-3f8d7ac5fc26">영역</label>
-				<select id="1fe36cad-5441-bd9a-ef38-3f8d7ac5fc26" name="area">
+				<label class="label" for="area">영역</label>
+				<select id="area" name="area">
 					<option value="EA">동아시아</option>
 					<option value="KO">한반도</option>
 				</select>
@@ -164,7 +213,7 @@
 
 
 	<div id="imageContainer" class="imageContainer">
-		<img  src="">
+		<img id ="aaa" src="">
 	</div>
 </body>
 </html>
