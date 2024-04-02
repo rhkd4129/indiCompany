@@ -149,6 +149,7 @@
 
       <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true">
 
+		<Context docBase="C:/cr" path="/IMG" reloadable="true" />
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
         <!--

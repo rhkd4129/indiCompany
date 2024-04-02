@@ -51,7 +51,7 @@
 		"type" : "view",
 		"viewName": "/views/weatherCrawler/main.jsp"
 	},
-	"/weatherCrawler/mainShow.do": {
+	"/weatherCrawler/movieShow.do": {
 		"type" : "json",
 		"viewName": ""
 	},

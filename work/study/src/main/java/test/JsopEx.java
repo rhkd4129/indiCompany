@@ -4,6 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jsoup.nodes.Document;
@@ -13,37 +20,44 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import util.JsopUtil;
+import util.URLGeneratorUtil;
 
 public class JsopEx {
-	public static final String filePath = "C:\\cr\\";
-	public static void main(String[] args) throws IOException {
-		
-		
-		
-		System.out.println(checkImage("2024-04-01","gk2a_ami_le1b_rgb-s-true_ea020lc_202403311950.srv"));
-		
-	}
-		
-	public static String checkImage(String data, String time) {
-        Path path = Paths.get(filePath, data);
-        if (!Files.exists(path) || !Files.isDirectory(path)) {
-            return "n"; // 폴더가 존재하지 않으면 null 반환
-        }
-
-        try (Stream<Path> files = Files.list(path)) {
-            // 디렉토리 내의 파일들을 순회하며 파일 이름이 time과 일치하는지 확인
-            return files.filter(Files::isRegularFile)
-                        .map(Path::getFileName)
-                        .map(Path::toString)
-                        .filter(fileName -> fileName.contains(time))
-                        .findFirst()
-                        .orElse("n"); // 일치하는 파일이 없으면 null 반환
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null; // 예외 발생 시 null 반환
-        }
-    }
-		
 
 	
+	public static void main(String[] args) {
+		 int startTime = 1230; // 시작 시간 예: 12시 30분
+	        List<String> timeList = new ArrayList<>();
+	        int hour = startTime / 100;
+	        int minute = startTime % 100;
+	        while (!(hour == 0 && minute == 0)) {
+	            // 현재 시간을 리스트에 추가
+	            timeList.add(String.format("%02d%02d", hour, minute));
+	            
+	            // 10분 감소
+	            if (minute >= 10) {
+	                minute -= 10;
+	            } else {
+	                minute = 50;
+	                if (hour == 0) {
+	                    hour = 23;
+	                } else {
+	                    hour -= 1;
+	                }
+	            }
+	        }
+	        // 마지막으로 0000 추가
+	        timeList.add("0000");
+	        timeList.remove("0940");
+			//Collections.reverse(timeList);
+	        // 결과 출력
+	        for (String time : timeList) {
+	            System.out.println(time);
+	        }
+	
+	}
+			
+
+
+
 }
