@@ -32,7 +32,7 @@
 	}
 
 	function showMovie(date, time) {
-	     $.ajax({
+	    $.ajax({
 	        url: '/weatherCrawler/movieShow.do',
 	        type: 'GET',
 	        data: {
@@ -41,20 +41,30 @@
 	        },
 	        dataType: 'json',
 	        success: function(images) {
-	            console.log(images);
 	            let index = 0;
-	            setInterval(function() {
-	                var imageUrl = images.images[index++];
-	                changeImageSrc(imageUrl)
-	            }, 1000); // 1초마다 이미지 변경
-
-	            // 저장된 intervalId를 사용해 필요한 경우 인터벌을 멈출 수 있습니다.
+	            var intervalId = setInterval(function() {
+	                // 이미지 변경 로직 실행
+	                var imageUrl = "http://localhost:8080/IMG/" + date.replace(/-/g, "") + "/" + images.fileNameList[index];
+	                console.log(imageUrl);
+	                changeImageSrc(imageUrl);
+	                
+	                // 인덱스 증가
+	                index++;
+	                
+	                // fileNameList의 길이를 넘어서면 인터벌을 정지하고 마지막 이미지 유지
+	                if (index >= images.fileNameList.length) {
+	                    clearInterval(intervalId);
+	                    // 마지막 이미지로 설정하기 위해 인덱스를 마지막 요소로 설정
+	                    // 이미 위에서 마지막 이미지를 설정했으므로 여기서 추가로 설정할 필요는 없음
+	                }
+	            }, 500); // 0.5초마다 이미지 변경
 	        },
 	        error: function(xhr, status, error) {
 	            console.error("Error occurred: " + error);
 	        }
 	    }); 
 	}
+
 
 	//현재 선택된 날짜/시간 GET
 	function getSelectedData() {
@@ -91,70 +101,18 @@
 	function changeImageSrc(newSrc) {
 		$('#imageContainer img').attr('src', newSrc);
 	}
-
-	/* function getDataImage(selectData, selectTime) {
-		$.ajax({
-			url : '/weatherCrawler/mainShow.do',
-			type : 'GET',
-			data : {
-				selectData : selectData,
-				selectTime : selectTime
-			},
-			dataType : 'json',
-			success : function(data) {
-				changeImageSrc(data.json);
-			},
-			error : function(xhr, status, error) {
-				console.error("Error occurred: " + error);
-			}
-		});
-	} */
 </script>
 </head>
 <body>
+	<div class="btn_group">
+		<input type="button" value="목록"  onclick="location.href='/board/list.do'">
+	</div>
 	<div class="searchBox">
 		<div class="dateTime">
-			<input id="date" type="date"> <select id="searchTime"
-				class="searchTime">
+			<input id="date" type="date"> 
+			<select id="searchTime"  class="searchTime">
 				<!-- 	<option value="23:50 KST">23:50 KST</option>
-				<option value="23:40 KST">23:40 KST</option>
-				<option value="23:30 KST">23:30 KST</option>
-				<option value="23:20 KST">23:20 KST</option>
-				<option value="23:10 KST">23:10 KST</option>
-				<option value="23:00 KST">23:00 KST</option>
-				<option value="22:50 KST">22:50 KST</option>
-				<option value="22:40 KST">22:40 KST</option>
-				<option value="22:30 KST">22:30 KST</option>
-				<option value="22:20 KST">22:20 KST</option>
-				<option value="22:10 KST">22:10 KST</option>
-				<option value="22:00 KST">22:00 KST</option>
-				<option value="21:50 KST">21:50 KST</option>
-				<option value="21:40 KST">21:40 KST</option>
-				<option value="21:30 KST">21:30 KST</option>
-				<option value="21:20 KST">21:20 KST</option>
-				<option value="21:10 KST">21:10 KST</option>
-				<option value="21:00 KST">21:00 KST</option>
-				<option value="20:50 KST">20:50 KST</option>
-				<option value="20:40 KST">20:40 KST</option>
-				<option value="20:30 KST">20:30 KST</option>
-				<option value="20:20 KST">20:20 KST</option>
-				<option value="20:10 KST">20:10 KST</option>
-				<option value="20:00 KST">20:00 KST</option>
-				<option value="19:50 KST">19:50 KST</option>
-				<option value="19:40 KST">19:40 KST</option>
-				<option value="19:30 KST">19:30 KST</option>
-				<option value="19:20 KST">19:20 KST</option>
-				<option value="19:10 KST">19:10 KST</option>
-				<option value="19:00 KST">19:00 KST</option>
-				<option value="18:50 KST">18:50 KST</option>
-				<option value="18:40 KST">18:40 KST</option>
-				<option value="18:30 KST">18:30 KST</option>
-				<option value="18:20 KST">18:20 KST</option>
-				<option value="18:10 KST">18:10 KST</option>
-				<option value="18:00 KST">18:00 KST</option>
-				<option value="17:50 KST">17:50 KST</option>
-				<option value="17:40 KST">17:40 KST</option>
-				<option value="17:30 KST">17:30 KST</option>
+
 				<option value="17:20 KST">17:20 KST</option>
 				<option value="17:10 KST">17:10 KST</option>
 				<option value="17:00 KST">17:00 KST</option>

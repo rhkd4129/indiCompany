@@ -193,32 +193,42 @@ public class FileUtil {
 	}
 
 	/**
-	 * 지정된 게시판 코드에 해당하는 디렉토리 내 모든 파일 이름 List 반환. 디렉토리가 존재하지 않거나, 파일이 없는 경우 빈 리스트를
+	 * 인지로 넘긴 폴더명으로 디렉토리 내 모든 파일 이름 List 반환. 디렉토리가 존재하지 않거나, 파일이 없는 경우 빈 리스트를
 	 * 반환.
 	 * 
-	 * @param boardCode 게시판 PK .
+	 * @param object
 	 * @return 디렉토리 내 모든 파일 이름 리스트를 반환. 디렉토리가 존재하지 않거나, 파일이 없는 경우 빈 List 반환
 	 */
-	public static List<String> listFilesInDirectory(Integer boardCode) throws IOException {
-		List<String> fileNames = new ArrayList<>();
-		Path path = Paths.get(filePath, boardCode.toString());
+	public static List<String> listFilesInDirectory(Object identifier) throws IOException {
+		List<String> fileNameList = new ArrayList<>();
+		Path path;
 
-		// 폴더가 존재하는지 확인
-		if (!Files.exists(path) || !Files.isDirectory(path)) {
-			return fileNames;
+		if (identifier instanceof Integer) {
+			path = Paths.get(filePath, identifier.toString());
+		} else if (identifier instanceof String) {
+			path = Paths.get(filePath, (String) identifier);
+		} else {
+			// 지원되지 않는 타입인 경우
+			throw new IllegalArgumentException("Unsupported identifier type");
 		}
-		// 폴더가 존재하면, 해당 폴더 내의 파일들의 이름을 리스트로 수집
+
+		// 폴더 존재 여부 확인
+		if (!Files.exists(path) || !Files.isDirectory(path)) {
+			return fileNameList; // 빈 목록 반환
+		}
+
+		// 폴더 내 파일 목록 조회
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
 			for (Path file : stream) {
-				// 디렉토리는 제외하고 파일 이름만 추가
 				if (Files.isRegularFile(file)) {
-					fileNames.add(file.getFileName().toString());
+					fileNameList.add(file.getFileName().toString());
 				}
 			}
 		} catch (IOException e) {
-			throw new IOException("파일읽는 중 오류발생");
+			throw new IOException("파일 읽는 중 오류 발생", e);
 		}
-		return fileNames;
+
+		return fileNameList;
 	}
 
 	/**
@@ -226,9 +236,9 @@ public class FileUtil {
 	 * 
 	 * @param response 클라이언트에게 파일 전송 위한 HttpServletResponse 객체.
 	 * @param model    파일 다운로드에 필요 정보(게시판 코드와 파일 이름)를 포함하고 있는 맵.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	// 
+	//
 	public static void downloadFile(HttpServletResponse response, Map<String, Object> model) throws IOException {
 		// 파일의 실제 경로를 구성
 

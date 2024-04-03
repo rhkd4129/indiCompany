@@ -66,6 +66,8 @@ public class JsopUtil {
 				directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
 			}
 
+			// https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/%Y%m/%d/%Y%m%d%H%M%S.png
+			// python (glob+ datetime)
 			// URL 생성에 사용될 날짜와 시간의 구성 요소 추출
 			String year = utcDate.substring(0, 4);
 			String month = utcDate.substring(4, 6);
@@ -199,5 +201,24 @@ public class JsopUtil {
 		timeList.remove("0940"); // 리스트에서 "0940" 제거
 		return timeList; // 최종 시간 목록 반환
 	}
+	
+	////////
+	
+	/* 
+	 * backGround 함수
+	 * view   실제 시간 
+	 * 00 :   15
+	 * 10 :   25
+	 * 20 :	  35
+	 * 30 :	  45
+	 * 40 :	  55
+	 * 
+	 * 1. 내가 선택한 날짜 폴더가 없으면 현재시간부터 00:00까지 이미지 다운 
+	 * 2. 실제시간마다 url파싱하여 이미지 다운로드
+	 * 3. 파일탐색후 해당 시간대에 대해 이미지가 잇으면 view - select option추가 
+	 * 
+	 * */
+	
+	
 
 }

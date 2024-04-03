@@ -8,7 +8,7 @@ body {
     gap: 10px; /* 요소들 사이의 간격 */
     padding: 20px; /* 조금 더 여유 있는 레이아웃을 위한 패딩 */
 }
-#date, .searchBox, .condition, .conf {
+#date, .searchBox, .condition, .conf, .btn_group{
     flex: 1;
     min-width: 120px; /* 최소 너비 설정 */
     text-align: center; /* 텍스트 중앙 정렬 */

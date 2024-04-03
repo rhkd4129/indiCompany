@@ -61,10 +61,10 @@ public class BoardService {
 	
 	// 상세보기에서 첨부파일을 클릭하면 다운로드 되는 기능
 	public Map<String, Object> downloadBoard(Map<String, Object> paramMap, Map<String, Object> model) {
-		Map<String, String>  parameter= (Map<String, String>) paramMap.get("paramMap");
 		
-		Integer boardCode = Integer.parseInt(parameter.get("boardCode"));
-		String fileName = parameter.get("fileName");		
+		
+		Integer boardCode = Integer.parseInt((String) paramMap.get("boardCode"));
+		String fileName = (String) paramMap.get("fileName");		
 		model.put("boardCode",boardCode);
 		model.put("fileName",fileName );
 		return model;
