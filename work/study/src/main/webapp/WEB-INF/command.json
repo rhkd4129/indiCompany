@@ -13,15 +13,15 @@
 	},
 	"/board/insert.do": {
 		"type" : "redirect",
-		"viewName": "/views/board/list.jsp"
+		"viewName": "/views/board/boardList.jsp"
 	},
 	"/board/download.do": {
 		"type" : "file",
-		"viewName": "/views/board/list.jsp"
+		"viewName": "/views/board/boardList.jsp"
 	},
 	"/board/uploadFile.do": {
 		"type" : "json",
-		"viewName": "/views/board/list.jsp"
+		"viewName": "/views/board/boardList.jsp"
 	},	
 	"/board/updateForm.do": {
 		"type" : "view",
@@ -29,7 +29,7 @@
 	},
 	"/board/update.do": {
 		"type" : "json",
-		"viewName": "/views/board/list.jsp"
+		"viewName": "/views/board/boardList.jsp"
 	},
 	"/board/delete.do": {
 		"type" : "json",

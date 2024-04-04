@@ -2,11 +2,13 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import util.ImageDownloaderTask;
+import commonUtils.ImageDownloaderTask;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+
 @WebListener
 public class AppContextListener implements ServletContextListener {
 

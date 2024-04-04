@@ -1,10 +1,12 @@
-package util.servletUtils;
+package servletUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -18,7 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.FileUtil;
+
+import commonUtils.FileUtil;
 
 public class ServletRequestMapper {
 
@@ -29,7 +32,7 @@ public class ServletRequestMapper {
 	/**
 	 * HTTP 멀티파트 폼 데이터의 'Content-Disposition' 헤더 문자열에서 파일 이름을 추출.
 	 * ex), 헤더 값이 "Content-Disposition: form-data; name=\"fileField\"; filename=\"example.txt\""인 경우,
-	 * 결과적으로 "example.txt"를 반환합니다.
+	 * 결과적으로 "example.txt"를 반환
 	
 	 * 1. 헤더 문자열을 ";"로 분할하여 각 부분을 반복 처리.
 	 * 2. 각 부분이 "filename"으로 시작하는지 확인.
@@ -159,5 +162,27 @@ public class ServletRequestMapper {
 	    }
 	    return instance; // 생성 및 설정된 DTO 인스턴스 반환
 	}
-
+	
+	public static Map<String, Object> invokeController(String className, String methodName, Map<String, Object> paramMap) 
+    		throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    			
+    		// className은 클래스 명 , methoName은 호출할 메서드 
+    		// parmaMap은 requset에서 얻은 paramter정보들  
+    	    // model은 view보여줄 model 정보 
+    	
+    	
+    	  	Map<String, Object> model = new HashMap<>();
+            Class<?> clazz = Class.forName(className);
+            Method getInstanceMethod = clazz.getMethod("getInstance");
+            Object instance = getInstanceMethod.invoke(null);
+            Class<?>[] parameterTypes = {Map.class, Map.class};
+            Method method = clazz.getMethod(methodName, parameterTypes);
+            // 메서드 실행 결과를 Object 타입으로.
+            Object result = method.invoke(instance, paramMap, model);
+         
+            // 실행 결과를 Map<String, Object> 타입으로 캐스팅.
+            
+            return (Map<String, Object>) result;
+     
+    }
 }

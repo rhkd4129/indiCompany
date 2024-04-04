@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import dao.CommentDao;
 import dto.CommentDto;
-import util.servletUtils.ServletRequestMapper;
+import servletUtils.ServletRequestMapper;
 
 public class CommentService {
 	
@@ -21,7 +21,7 @@ public class CommentService {
         return instance;
     }
 
-    public Map<String, Object> listComment(Map<String, Object> paramMap, Map<String, Object> model) throws NumberFormatException, SQLException, Exception {
+    public Map<String, Object> list(Map<String, Object> paramMap, Map<String, Object> model) throws NumberFormatException, SQLException, Exception {
     		CommentDao commentDao = CommentDao.getInstance();
             CommentDto comment = ServletRequestMapper.convertMapToDto(paramMap,CommentDto.class);
             List<CommentDto> commentList = commentDao.listComment(comment);
@@ -29,7 +29,7 @@ public class CommentService {
             return model;
     }
 
-    public Map<String, Object> insertComment(Map<String, Object> paramMap, Map<String, Object> model) throws NumberFormatException, SQLException, Exception {
+    public Map<String, Object> insert(Map<String, Object> paramMap, Map<String, Object> model) throws NumberFormatException, SQLException, Exception {
             CommentDao commentDao = CommentDao.getInstance();           
             CommentDto comment = ServletRequestMapper.convertMapToDto(paramMap, CommentDto.class);            
             int result = commentDao.insertCommnet(comment);

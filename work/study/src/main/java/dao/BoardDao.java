@@ -2,8 +2,8 @@ package dao;
 
 import java.sql.SQLException;
 import dto.BoardDto;
-import util.jdbcUtils.ExecuteDmlQuery;
-import util.jdbcUtils.ObjectClose;
+import jdbcUtils.ExecuteDmlQuery;
+import jdbcUtils.ObjectClose;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;

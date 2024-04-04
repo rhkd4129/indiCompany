@@ -1,4 +1,4 @@
-package util;
+package commonUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

@@ -1,6 +1,6 @@
 package service;
 
-import java.net.URL;
+
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,23 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import java.io.*;
-import java.util.Base64;
-import javax.servlet.http.HttpServletResponse;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import util.FileUtil;
-import util.JsopUtil;
+
+import commonUtils.FileUtil;
+import commonUtils.JsopUtil;
 
 
 public class WeatherCrawlerService {
 	private static final WeatherCrawlerService instance = new WeatherCrawlerService();
 	public static final String filePath = "C:\\cr\\";
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+	 
+	
 	private WeatherCrawlerService() {}
 
 	public static WeatherCrawlerService getInstance() {
@@ -34,23 +37,25 @@ public class WeatherCrawlerService {
 	
 	
 
-	public Map<String, Object> mainWeatherCrawler(Map<String, Object> paramMap, Map<String, Object> model)
+	public Map<String, Object> main(Map<String, Object> paramMap, Map<String, Object> model)
 			throws SQLException, NullPointerException, Exception {
 		return model;
 	}
-	public Map<String, Object> movieShowWeatherCrawler(Map<String, Object> paramMap, Map<String, Object> model) throws IOException {
+	public Map<String, Object> movieShow(Map<String, Object> paramMap, Map<String, Object> model) throws IOException {
 	    String kstData = (String) paramMap.get("selectedDate");	    
 	    String modifiedString = kstData.replace("-", "");
-	    List<String> fileNameList = A(modifiedString);
+	   // List<String> fileNameList = FileUtil.listFilesInDirectory(modifiedString);
+	    List<String> fileNameList = questFile(modifiedString);
 	    model.put("fileNameList", fileNameList);
+	    
 
 	    return model;
 	}
 	
-	public static List<String> A (String folderName) throws IOException {
+	public static List<String> questFile (String folderName) throws IOException {
 		List<String> fileNameList = new ArrayList<>();
 		Path path = Paths.get(filePath, folderName);
-
+		System.out.println(path);
 		// 폴더가 존재하는지 확인
 		if (!Files.exists(path) || !Files.isDirectory(path)) {
 			return fileNameList;
@@ -72,13 +77,15 @@ public class WeatherCrawlerService {
 
 
 
-	public Map<String, Object> imageShowWeatherCrawler(Map<String, Object> paramMap, Map<String, Object> model)
+	public Map<String, Object> imageShow(Map<String, Object> paramMap, Map<String, Object> model)
 			throws IOException {
 
 		// VIEW에서 선택한 값 날짜와 시간
 		String kstData = (String) paramMap.get("selectedDate");
 		String kstTime = (String) paramMap.get("selectedTime");
 
+		
+		
 		List<String> timeList = JsopUtil.generateTimeList(kstTime);
 		List<String> convertUtcDate = JsopUtil.convertKstTimesToUtc(kstData, timeList);
 

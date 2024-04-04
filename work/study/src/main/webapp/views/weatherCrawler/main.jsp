@@ -47,10 +47,7 @@
 	                var imageUrl = "http://localhost:8080/IMG/" + date.replace(/-/g, "") + "/" + images.fileNameList[index];
 	                console.log(imageUrl);
 	                changeImageSrc(imageUrl);
-	                
-	                // 인덱스 증가
-	                index++;
-	                
+	                index++;	                
 	                // fileNameList의 길이를 넘어서면 인터벌을 정지하고 마지막 이미지 유지
 	                if (index >= images.fileNameList.length) {
 	                    clearInterval(intervalId);

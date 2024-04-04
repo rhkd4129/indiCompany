@@ -1,4 +1,4 @@
-package util;
+package commonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,52 +52,6 @@ public class JsopUtil {
 
 	}
 
-	/**
-	 * 주어진 UTC 날짜/시간에 해당하는 이미지 다운, 파일 저장.
-	 *
-	 * @param utcDate 이미지 검색하기 위한 UTC 날짜. 형식 "yyyyMMdd"
-	 * @param utcTime 이미지 검색하기 위한 UTC 시간. 형식 "HHmm"
-	 */
-	public static void downloadImage(String utcDate, String utcTime) {
-		try {
-			// 파일 저장을 위한 디렉토리 경로 생성
-			String destinationPath = filePath + File.separator + utcDate;
-			File directory = new File(destinationPath);
-			if (!directory.exists()) {
-				directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
-			}
-
-			// https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/%Y%m/%d/%Y%m%d%H%M%S.png
-			// python (glob+ datetime)
-			// URL 생성에 사용될 날짜와 시간의 구성 요소 추출
-			String year = utcDate.substring(0, 4);
-			String month = utcDate.substring(4, 6);
-			String day = utcDate.substring(6, 8);
-			String hour = utcTime.substring(0, 2);
-
-			// 이미지 파일의 URL 구성
-			String url = "https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/" + year + month + "/" + day + "/"
-					+ hour + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + utcDate + utcTime + ".srv.png";
-
-			// 다운로드할 이미지의 파일명 추출 및 최종 저장 경로 결정
-			String fileName = url.substring(url.lastIndexOf('/') + 1);
-			String destinationFile = destinationPath + File.separator + fileName;
-
-			// 이미지 다운로드 및 파일 시스템에 저장
-			try (InputStream in = new URL(url).openStream(); OutputStream out = new FileOutputStream(destinationFile)) {
-				byte[] buffer = new byte[4096]; // 읽기/쓰기를 위한 버퍼
-				int bytesRead; // 실제로 읽은 바이트 수
-				while ((bytesRead = in.read(buffer)) != -1) {
-					out.write(buffer, 0, bytesRead);
-				}
-
-				logger.info("이미지 다운 성공 :{}", destinationFile);
-
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static List<String> extractSubstringFromList(List<String> list, int start, int end) {
 		List<String> resultList = new ArrayList<>();
@@ -198,12 +153,89 @@ public class JsopUtil {
 			}
 		}
 		timeList.add("0000"); // 리스트에 0000 추가
-		timeList.remove("0940"); // 리스트에서 "0940" 제거
 		return timeList; // 최종 시간 목록 반환
 	}
 	
-	////////
+
+	/**
+	 * 주어진 UTC 날짜/시간에 해당하는 이미지 다운, 파일 저장.
+	 *
+	 * @param utcDate 이미지 검색하기 위한 UTC 날짜. 형식 "yyyyMMdd"
+	 * @param utcTime 이미지 검색하기 위한 UTC 시간. 형식 "HHmm"
+	 */
+	public static void downloadImage(String utcDate, String utcTime) {
+		try {
+			// 파일 저장을 위한 디렉토리 경로 생성
+			String destinationPath = filePath + File.separator + utcDate;
+			File directory = new File(destinationPath);
+			if (!directory.exists()) {
+				directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
+			}
+			// https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/%Y%m/%d/%Y%m%d%H%M%S.png
+			// python (glob+ datetime)
+			// URL 생성에 사용될 날짜와 시간의 구성 요소 추출
+			String year = utcDate.substring(0, 4);
+			String month = utcDate.substring(4, 6);
+			String day = utcDate.substring(6, 8);
+			String hour = utcTime.substring(0, 2);
+
+			// 이미지 파일의 URL 구성
+			String url = "https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/" + year + month + "/" + day + "/"
+					+ hour + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + utcDate + utcTime + ".srv.png";
+
+			// 다운로드할 이미지의 파일명 추출 및 최종 저장 경로 결정
+			String fileName = url.substring(url.lastIndexOf('/') + 1);
+			String destinationFile = destinationPath + File.separator + fileName;
+
+			// 이미지 다운로드 및 파일 시스템에 저장
+			try (InputStream in = new URL(url).openStream(); OutputStream out = new FileOutputStream(destinationFile)) {
+				byte[] buffer = new byte[4096]; // 읽기/쓰기를 위한 버퍼
+				int bytesRead; // 실제로 읽은 바이트 수
+				while ((bytesRead = in.read(buffer)) != -1) {
+					out.write(buffer, 0, bytesRead);
+				}
+
+				logger.info("이미지 다운 성공 :{}", destinationFile);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
+	private void checkAndDownloadImages() {
+	    // 현재 시간을 Calendar 객체로 가져옴
+	    Calendar now = Calendar.getInstance();
+	    int hour = now.get(Calendar.HOUR_OF_DAY); // 24시간 형식으로 시간 가져오기
+	    int minute = now.get(Calendar.MINUTE);
+	    // 현재 시간을 UTC로 변환한다음 그 시각 기준 이전 데이터가 있는지 없는지 검사 파일로 검사
+	    // 파일이잇다면 아래 로직을 실행 
+	    
+	    // 없다면 마지막 시간 기준으로 현재 시간까지 이미지 다운로드  
+	    
+	   
+	    
+	    
+	    
+	    
+	    
+	    // 현재 분이 15, 25, 35, 45, 55 중 하나인지 확인
+	    if (minute == 15 || minute == 25 || minute == 35 || minute == 45 || minute == 55) {
+	        // 현재 시간과 분을 "HH:mm" 형식의 문자열로 변환
+	        String currentTime = String.format("%02d:%02d", hour, minute);
+
+	        // 변환된 시간 문자열을 인자로 downloadImage 메소드 호출
+	       // downloadImage(currentTime);
+	    }
+
+	    // 누락된 시간 데이터에 대한 처리는 이 부분에 구현합니다. (여기서는 생략)
+	}
+	
+	public void scheduleFileDownload(String minute, String excludeTime) {
+		
+		
+		
+	} 
 	/* 
 	 * backGround 함수
 	 * view   실제 시간 
