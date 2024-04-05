@@ -1,9 +1,6 @@
 package commonUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -12,37 +9,56 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import service.BoardService;
-
+import FrontCotroller.Controller;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class FileUtil {
-	public static final String jsonFilePath = "C:\\uploadTest\\board_image.json";
-	public static final String filePath = "C:\\uploadTest\\";
+
 	private static final Pattern UUID_PATTERN = Pattern
 			.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+	private static String boardFilePath="C:\\uploadTest\\";
+	static {
+		//initConfig();
+		}
 
-	private FileUtil() {
+	private FileUtil() {}
+
+	/*
+	 * private static void initConfig() { boardFilePath =
+	 * Controller.getConfigValue("Path", "boardFile"); if (boardFilePath == null) {
+	 * logger.info("Board File Path is not configured.");
+	 * System.out.println("Dnnn"); } System.out.println("Dddd");
+	 * logger.info(boardFilePath);
+	 * 
+	 * }
+	 * 
+	 */	public static Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config, String key)
+			throws StreamReadException, DatabindException, IOException {
+		String props = config.getInitParameter(key);
+		String configFilePath = config.getServletContext().getRealPath(props);
+		Map<String, Map<String, String>> map = new HashMap<>();
+	
+		ObjectMapper objectMapper = new ObjectMapper();
+		map = objectMapper.readValue(new File(configFilePath), new TypeReference<Map<String, Map<String, String>>>() {
+		});
+		return map;
+
 	}
 
 	/**
@@ -95,8 +111,10 @@ public class FileUtil {
 	 * @param fileNamesWithUUID 저장할 파일의 이름 목록.
 	 * @param fileDataList      저장할 파일의 데이터를 담고 있는 byte 배열의 목록.
 	 */
-	public static void saveFiles(Integer boardCode, List<String> fileNamesWithUUID, List<byte[]> fileDataList) throws IOException {
-		String folderPath = Paths.get(filePath, Integer.toString(boardCode))
+	public static void saveFiles(Integer boardCode, List<String> fileNamesWithUUID, List<byte[]> fileDataList)
+			throws IOException {
+
+		String folderPath = Paths.get(boardFilePath, Integer.toString(boardCode))
 				.toString(); /* C:\\uploadTest\\1 <-- 이미지의 실제 저장위치 */
 		File folder = new File(folderPath);
 		if (!folder.exists()) {
@@ -121,7 +139,7 @@ public class FileUtil {
 	public static void deleteFiles(List<String> deleteFileList, Integer boardCode) {
 		try {
 			/* 파일이 위치할 디렉토리 경로 구성 */
-			Path path = Paths.get(filePath, boardCode.toString());
+			Path path = Paths.get(boardFilePath, boardCode.toString());
 			/* 파일 이름 목록 처리 */
 			for (String fileName : deleteFileList) {
 				/* 각 파일에 대한 전체 경로 생성 */
@@ -150,11 +168,10 @@ public class FileUtil {
 		Path path;
 
 		if (identifier instanceof Integer) {
-			path = Paths.get(filePath, identifier.toString());
+			path = Paths.get(boardFilePath, identifier.toString());
 		} else if (identifier instanceof String) {
-			path = Paths.get(filePath, (String) identifier);
+			path = Paths.get(boardFilePath, (String) identifier);
 			System.out.println(path);
-			System.out.println("ddd");
 		} else {
 			// 지원되지 않는 타입인 경우
 			throw new IllegalArgumentException("Unsupported identifier type");
@@ -193,7 +210,7 @@ public class FileUtil {
 
 		Integer boardCode = (Integer) model.get("boardCode");
 		String fileName = (String) model.get("fileName");
-		File file = new File(filePath + boardCode + "\\", fileName);
+		File file = new File(boardFilePath + boardCode + "\\", fileName);
 
 		if (file.exists()) {
 			String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");

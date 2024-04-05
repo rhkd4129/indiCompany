@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import javax.naming.NamingException;
@@ -13,6 +14,7 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import FrontCotroller.Controller;
 import commonUtils.FileUtil;
 import dao.BoardDao;
 import dto.BoardDto;
@@ -21,13 +23,11 @@ import servletUtils.ServletRequestMapper;
 public class BoardService {
 	private static final BoardService instance = new BoardService();
 	private static final Logger logger = LoggerFactory.getLogger(BoardService.class);
-
+	
 	private BoardService() {}
-
+	
 	// 싱글톤 패턴
-	public static BoardService getInstance() {
-		return instance;
-	}
+	public static BoardService getInstance() {	return instance;}
 
 	public Map<String, Object> list(Map<String, Object> paramMap, Map<String, Object> model)  throws SQLException, NullPointerException, Exception {
 		BoardDao boardDao = BoardDao.getInstance();
@@ -89,10 +89,8 @@ public class BoardService {
 		BoardDto boardDto = ServletRequestMapper.convertMapToDto(paramMap, BoardDto.class);
 		Integer boardCode = boardDao.insertBoard(boardDto);
 
-		
 
 		if (fileNameList != null && !fileNameList.isEmpty()) {
-			System.out.println("파일 존재");
 			List<String> fileNamesWithUUID = FileUtil.addUUIDFileNames(fileNameList);
 			FileUtil.saveFiles(boardCode, fileNamesWithUUID, fileDataList);
 

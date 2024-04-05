@@ -1,0 +1,9 @@
+{
+	"Path": {
+		"boardFile":"C:\\uploadTest\\",
+		"weather":"C:\\cr\\"
+	},
+	"PATTERN": {
+		"UUID":"_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$"
+	}
+}

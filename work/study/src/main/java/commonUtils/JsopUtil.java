@@ -230,7 +230,27 @@ public class JsopUtil {
 
 	    // 누락된 시간 데이터에 대한 처리는 이 부분에 구현합니다. (여기서는 생략)
 	}
-	
+    private static List<String> convertKstToUtcTimeList(String kstDate) {
+        List<String> utcTimes = new ArrayList<>();
+        // KST와 UTC 타임존 정의
+        ZoneId kstZoneId = ZoneId.of("Asia/Seoul");
+        ZoneId utcZoneId = ZoneId.of("UTC");        
+        // 시작 시간과 종료 시간 설정 (KST 기준 날짜의 00:00부터 23:59까지)
+        ZonedDateTime start = ZonedDateTime.of(Integer.parseInt(kstDate.substring(0, 4)),
+                                               Integer.parseInt(kstDate.substring(5, 7)),
+                                               Integer.parseInt(kstDate.substring(8, 10)),
+                                               0, 0, 0, 0, kstZoneId);
+        ZonedDateTime end = start.plusDays(1).minusMinutes(1);        
+        // 10분 간격으로 UTC 시간 리스트 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        while (start.isBefore(end)) {
+            ZonedDateTime utcTime = start.withZoneSameInstant(utcZoneId);
+            utcTimes.add(utcTime.format(formatter));
+            start = start.plusMinutes(10);
+        }
+
+        return utcTimes;
+    }
 	public void scheduleFileDownload(String minute, String excludeTime) {
 		
 		

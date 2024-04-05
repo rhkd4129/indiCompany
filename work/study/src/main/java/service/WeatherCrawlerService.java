@@ -18,8 +18,7 @@ import java.io.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
+import FrontCotroller.Controller;
 import commonUtils.FileUtil;
 import commonUtils.JsopUtil;
 
@@ -28,7 +27,7 @@ public class WeatherCrawlerService {
 	private static final WeatherCrawlerService instance = new WeatherCrawlerService();
 	public static final String filePath = "C:\\cr\\";
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
-	 
+	
 	
 	private WeatherCrawlerService() {}
 
@@ -42,7 +41,8 @@ public class WeatherCrawlerService {
 		return model;
 	}
 	public Map<String, Object> movieShow(Map<String, Object> paramMap, Map<String, Object> model) throws IOException {
-	    String kstData = (String) paramMap.get("selectedDate");	    
+	    
+		String kstData = (String) paramMap.get("selectedDate");	    
 	    String modifiedString = kstData.replace("-", "");
 	   // List<String> fileNameList = FileUtil.listFilesInDirectory(modifiedString);
 	    List<String> fileNameList = questFile(modifiedString);
@@ -79,7 +79,7 @@ public class WeatherCrawlerService {
 
 	public Map<String, Object> imageShow(Map<String, Object> paramMap, Map<String, Object> model)
 			throws IOException {
-
+		
 		// VIEW에서 선택한 값 날짜와 시간
 		String kstData = (String) paramMap.get("selectedDate");
 		String kstTime = (String) paramMap.get("selectedTime");
