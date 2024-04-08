@@ -32,12 +32,13 @@ public class FileUtil {
 	private static final Pattern UUID_PATTERN = Pattern
 			.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
-	private static String boardFilePath="C:\\uploadTest\\";
+	private static String boardFilePath = "C:\\uploadTest\\";
 	static {
-		//initConfig();
-		}
+		// initConfig();
+	}
 
-	private FileUtil() {}
+	private FileUtil() {
+	}
 
 	/*
 	 * private static void initConfig() { boardFilePath =
@@ -47,13 +48,14 @@ public class FileUtil {
 	 * logger.info(boardFilePath);
 	 * 
 	 * }
-	 * 
-	 */	public static Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config, String key)
+	 */
+
+	public static Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config, String key)
 			throws StreamReadException, DatabindException, IOException {
 		String props = config.getInitParameter(key);
 		String configFilePath = config.getServletContext().getRealPath(props);
 		Map<String, Map<String, String>> map = new HashMap<>();
-	
+
 		ObjectMapper objectMapper = new ObjectMapper();
 		map = objectMapper.readValue(new File(configFilePath), new TypeReference<Map<String, Map<String, String>>>() {
 		});
@@ -222,4 +224,8 @@ public class FileUtil {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
+	
+	
+	
+	
 }

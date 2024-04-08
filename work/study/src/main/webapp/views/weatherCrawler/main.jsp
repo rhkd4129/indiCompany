@@ -8,28 +8,93 @@
 	$(function() {
 		initData();
 		initEvent();
-
-		// 초기화 데이터
 	});
 	// KST는  한국의 표준시간대를  UTC+9 시간대에 해당
 	function initData() {
 		$('#date').val(new Date().toISOString().substring(0, 10));
-		var selectData = getSelectedData()
-
-		checkTodayData(selectData.date, selectData.time)
-	}
-	function initEvent() {
-		$('.searchBox').on('change', 'input, select', function() {
-			console.log("modify")
-			var selectData = getSelectedData()
-			checkTodayData(selectData.date, selectData.time)
+		drawSelectBox(function() {
+			// 콜백 함수 내에서 시간 선택 값 읽기
+			var selectedDate = $('#date').val(); // 날짜 가져오기
+			var selectedTime = $('#searchTime').val().split(' ')[1].replace(
+					':', ''); // 시간 가져오
+			console.log(selectedDate, selectedTime);
+			checkTodayData(selectedDate, selectedTime);
 		});
+	}
+
+	function initEvent() {
+		$('.searchBox').on(
+				'change',
+				'input, select',
+				function() {
+					console.log("modify");
+					var selectedDate = $('#date').val(); // 날짜 가져오기
+					var selectedTime = $('#searchTime').val().split(' ')[1]
+							.replace(':', '');
+					checkTodayData(selectedDate, selectedTime);
+				});
 
 		$('.movie').on('click', function() {
 			var selectData = getSelectedData()
 			showMovie(selectData.date, selectData.time)
 		});
 
+	}
+
+	function drawSelectBox(callback) {
+		var selectedDate = $('#date').val(); // 날짜 가져오기
+		$.ajax({
+			url : '/weatherCrawler/drawSelectBox.do',
+			type : 'GET',
+			data : {
+				selectedDate : selectedDate,
+			},
+			dataType : 'json',
+			success : function(data) {
+				$('#searchTime').empty();
+				data.kstTimeList.reverse();
+				console.log(data);
+				$.each(data.kstTimeList, function(index, value) {
+					var time = value.split(" ")[1];
+					$('#searchTime').append($('<option>', {
+						value : value,
+						text : time + " KST"
+					}));
+				});
+				$('#searchTime option:first').prop('selected', true);
+				// 콜백 함수가 제공되면 실행
+				if (callback && typeof (callback) === "function") {
+					callback();
+				}
+			},
+			error : function(xhr, status, error) {
+				console.error("Error occurred: " + error);
+			}
+		});
+	}
+
+	function checkTodayData(selectedDate, selectedTime) {
+		$.ajax({
+			url : '/weatherCrawler/imageShow.do',
+			type : 'GET',
+			data : {
+				selectedDate : selectedDate,
+				selectedTime : selectedTime
+			},
+			dataType : 'json',
+			success : function(data) {
+				console.log(data);
+				var imgSrc = 'data:image/png;base64,' + data.image;
+				changeImageSrc(imgSrc);
+			},
+			error : function(xhr, status, error) {
+				console.error("Error occurred: " + error);
+			}
+		});
+	}
+
+	function changeImageSrc(newSrc) {
+		$('#imageContainer img').attr('src', newSrc);
 	}
 
 	function showMovie(date, time) {
@@ -64,43 +129,6 @@
 			}
 		});
 	}
-
-	//현재 선택된 날짜/시간 GET
-	function getSelectedData() {
-		var selectedDate = $('#date').val(); // 날짜 가져오기
-		var selectedTime = $('#searchTime').val().split(' ')[0]
-				.replace(':', ''); // 시간 가져오기
-		// 객체로 묶어 반환
-		console.log(selectedDate, selectedTime);
-		return {
-			date : selectedDate,
-			time : selectedTime
-		};
-	}
-
-	function checkTodayData(selectedDate, selectedTime) {
-		$.ajax({
-			url : '/weatherCrawler/imageShow.do',
-			type : 'GET',
-			data : {
-				selectedDate : selectedDate,
-				selectedTime : selectedTime
-			},
-			dataType : 'json',
-			success : function(data) {
-				console.log(data);
-				var imgSrc = 'data:image/png;base64,' + data.image;
-				changeImageSrc(imgSrc);
-			},
-			error : function(xhr, status, error) {
-				console.error("Error occurred: " + error);
-			}
-		});
-	}
-
-	function changeImageSrc(newSrc) {
-		$('#imageContainer img').attr('src', newSrc);
-	}
 </script>
 </head>
 <body>
@@ -110,153 +138,13 @@
 	</div>
 	<div class="searchBox">
 		<div class="dateTime">
-			<input id="date" type="date">
-			 <select id="searchTime" class="searchTime">
-				<option value="23:50 KST">23:50 KST</option>
-					<option value="23:40 KST">23:40 KST</option>
-					<option value="23:30 KST">23:30 KST</option>
-					<option value="23:20 KST">23:20 KST</option>
-					<option value="23:10 KST">23:10 KST</option>
-					<option value="23:00 KST">23:00 KST</option>
-					<option value="22:50 KST">22:50 KST</option>
-					<option value="22:40 KST">22:40 KST</option>
-					<option value="22:30 KST">22:30 KST</option>
-					<option value="22:20 KST">22:20 KST</option>
-					<option value="22:10 KST">22:10 KST</option>
-					<option value="22:00 KST">22:00 KST</option>
-					<option value="21:50 KST">21:50 KST</option>
-					<option value="21:40 KST">21:40 KST</option>
-					<option value="21:30 KST">21:30 KST</option>
-					<option value="21:20 KST">21:20 KST</option>
-					<option value="21:10 KST">21:10 KST</option>
-					<option value="21:00 KST">21:00 KST</option>
-					<option value="20:50 KST">20:50 KST</option>
-					<option value="20:40 KST">20:40 KST</option>
-					<option value="20:30 KST">20:30 KST</option>
-					<option value="20:20 KST">20:20 KST</option>
-					<option value="20:10 KST">20:10 KST</option>
-					<option value="20:00 KST">20:00 KST</option>
-					<option value="19:50 KST">19:50 KST</option>
-					<option value="19:40 KST">19:40 KST</option>
-					<option value="19:30 KST">19:30 KST</option>
-					<option value="19:20 KST">19:20 KST</option>
-					<option value="19:10 KST">19:10 KST</option>
-					<option value="19:00 KST">19:00 KST</option>
-					<option value="18:50 KST">18:50 KST</option>
-					<option value="18:40 KST">18:40 KST</option>
-					<option value="18:30 KST">18:30 KST</option>
-					<option value="18:20 KST">18:20 KST</option>
-					<option value="18:10 KST">18:10 KST</option>
-					<option value="18:00 KST">18:00 KST</option>
-					<option value="17:50 KST">17:50 KST</option>
-					<option value="17:40 KST">17:40 KST</option>
-					<option value="17:30 KST">17:30 KST</option>
-					<option value="17:20 KST">17:20 KST</option>
-					<option value="17:10 KST">17:10 KST</option>
-					<option value="17:00 KST">17:00 KST</option>
-					<option value="16:50 KST">16:50 KST</option>
-					<option value="16:40 KST">16:40 KST</option>
-					<option value="16:30 KST">16:30 KST</option>
-					<option value="16:20 KST">16:20 KST</option>
-					<option value="16:10 KST">16:10 KST</option>
-					<option value="16:00 KST">16:00 KST</option>
-					<option value="15:50 KST">15:50 KST</option>
-					<option value="15:40 KST">15:40 KST</option>
-					<option value="15:30 KST">15:30 KST</option>
-					<option value="15:20 KST">15:20 KST</option>
-					<option value="15:10 KST">15:10 KST</option>
-					<option value="15:00 KST">15:00 KST</option>
-					<option value="14:50 KST">14:50 KST</option>
-					<option value="14:40 KST">14:40 KST</option>
-					<option value="14:30 KST">14:30 KST</option>
-					<option value="14:20 KST">14:20 KST</option>
-					<option value="14:10 KST">14:10 KST</option>
-					<option value="14:00 KST">14:00 KST</option>
-					<option value="13:50 KST">13:50 KST</option>
-					<option value="13:40 KST">13:40 KST</option>
-					<option value="13:30 KST">13:30 KST</option>
-					<option value="13:20 KST">13:20 KST</option>
-					<option value="13:10 KST">13:10 KST</option>
-					<option value="13:00 KST">13:00 KST</option>
-					<option value="12:50 KST">12:50 KST</option>
-					<option value="12:40 KST">12:40 KST</option>
-					<option value="12:30 KST">12:30 KST</option>
-					<option value="12:20 KST">12:20 KST</option>
-					<option value="12:10 KST">12:10 KST</option>
-					<option value="12:00 KST">12:00 KST</option>
-					<option value="11:50 KST">11:50 KST</option>
-					<option value="11:40 KST">11:40 KST</option>
-					<option value="11:30 KST">11:30 KST</option>
-					<option value="11:20 KST">11:20 KST</option>
-					<option value="11:10 KST">11:10 KST</option>
-					<option value="11:00 KST">11:00 KST</option>
-					<option value="10:50 KST">10:50 KST</option>
-					<option value="10:40 KST">10:40 KST</option>
-					<option value="10:30 KST">10:30 KST</option>
-					<option value="10:20 KST">10:20 KST</option>
-					<option value="10:10 KST">10:10 KST</option>
-					<option value="10:00 KST">10:00 KST</option>
-					<option value="09:50 KST">09:50 KST</option>
-					<option value="09:30 KST">09:30 KST</option>
-					<option value="09:20 KST">09:20 KST</option>
-					<option value="09:10 KST">09:10 KST</option>
-					<option value="09:00 KST">09:00 KST</option>
-					<option value="08:50 KST">08:50 KST</option>
-					<option value="08:40 KST">08:40 KST</option>
-					<option value="08:30 KST">08:30 KST</option>
-					<option value="08:20 KST">08:20 KST</option>
-					<option value="08:10 KST">08:10 KST</option>
-					<option value="08:00 KST">08:00 KST</option>
-					<option value="07:50 KST">07:50 KST</option>
-					<option value="07:40 KST">07:40 KST</option>
-					<option value="07:30 KST">07:30 KST</option>
-					<option value="07:20 KST">07:20 KST</option>
-					<option value="07:10 KST">07:10 KST</option>
-					<option value="07:00 KST">07:00 KST</option>
-					<option value="06:50 KST">06:50 KST</option>
-					<option value="06:40 KST">06:40 KST</option>
-					<option value="06:30 KST">06:30 KST</option>
-					<option value="06:20 KST">06:20 KST</option>
-					<option value="06:10 KST">06:10 KST</option>
-					<option value="06:00 KST">06:00 KST</option>
-					<option value="05:50 KST">05:50 KST</option>
-					<option value="05:40 KST">05:40 KST</option>
-					<option value="05:30 KST">05:30 KST</option>
-					<option value="05:20 KST">05:20 KST</option>
-					<option value="05:10 KST">05:10 KST</option>
-					<option value="05:00 KST">05:00 KST</option>
-					<option value="04:50 KST">04:50 KST</option>
-					<option value="04:40 KST">04:40 KST</option>
-					<option value="04:30 KST">04:30 KST</option>
-					<option value="04:20 KST">04:20 KST</option>
-					<option value="04:10 KST">04:10 KST</option>
-					<option value="04:00 KST">04:00 KST</option>
-					<option value="03:50 KST">03:50 KST</option>
-					<option value="03:40 KST">03:40 KST</option>
-					<option value="03:30 KST">03:30 KST</option>
-					<option value="03:20 KST">03:20 KST</option>
-					<option value="03:10 KST">03:10 KST</option>
-					<option value="03:00 KST">03:00 KST</option>
-					<option value="02:50 KST">02:50 KST</option>
-					<option value="02:40 KST">02:40 KST</option>
-					<option value="02:30 KST">02:30 KST</option>
-					<option value="02:20 KST">02:20 KST</option>
-					<option value="02:10 KST">02:10 KST</option>
-					<option value="02:00 KST">02:00 KST</option>
-					<option value="01:50 KST">01:50 KST</option>
-					<option value="01:40 KST">01:40 KST</option>
-					<option value="01:30 KST">01:30 KST</option>
-					<option value="01:20 KST">01:20 KST</option>
-					<option value="01:10 KST">01:10 KST</option>
-					<option value="01:00 KST">01:00 KST</option>
-					<option value="00:50 KST">00:50 KST</option>
-					<option value="00:40 KST">00:40 KST</option>
-					<option value="00:30 KST">00:30 KST</option>
-					<option value="00:20 KST">00:20 KST</option>
-					<option value="00:10 KST">00:10 KST</option>
-					<option value="00:00 KST">00:00 KST</option></select>
+			<input id="date" type="date"> <select id="searchTime"
+				class="searchTime">
 
-				<button type="button" class="nowBtn">NOW</button>
+
+			</select>
+
+			<button type="button" class="nowBtn">NOW</button>
 		</div>
 		<div class="condition">
 			<div class="menu" data-idx="0">

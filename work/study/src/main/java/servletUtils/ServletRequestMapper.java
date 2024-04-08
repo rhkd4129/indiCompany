@@ -169,8 +169,6 @@ public class ServletRequestMapper {
     		// className은 클래스 명 , methoName은 호출할 메서드 
     		// parmaMap은 requset에서 얻은 paramter정보들  
     	    // model은 view보여줄 model 정보 
-    	
-    	
     	  	Map<String, Object> model = new HashMap<>();
             Class<?> clazz = Class.forName(className);
             Method getInstanceMethod = clazz.getMethod("getInstance");

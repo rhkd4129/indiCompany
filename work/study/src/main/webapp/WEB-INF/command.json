@@ -58,5 +58,9 @@
 	"/weatherCrawler/imageShow.do": {
 		"type" : "json",
 		"viewName": ""
+	},
+	"/weatherCrawler/drawSelectBox.do": {
+		"type" : "json",
+		"viewName": ""
 	}
 }
