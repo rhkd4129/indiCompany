@@ -1,4 +1,4 @@
-package FrontCotroller;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -36,31 +36,30 @@ import java.io.IOException;
 public class Controller extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
-	private static Map<String, Map<String, String>> configMap = new HashMap<>();
+	public static Map<String, String> configMap = new HashMap<>();
 	Map<String, Map<String, String>>commandMap = new HashMap<>();
 	
 
 	public void init(ServletConfig config) throws ServletException {
 		try {
 			commandMap = FileUtil.loadCommandsFromJson(config, "command");
-			configMap = FileUtil.loadCommandsFromJson(config, "config");
+			//configMap = FileUtil.loadCommandsFromJson( "config",config);
 		} catch (Exception e) {
 			logger.error("commands map 읽기 실패 : {} 서버 종료" , e.getMessage());
 			
 		}
 	}
-	public static String getConfigValue(String topLevelKey, String secondLevelKey) {
-	    Map<String, String> secondLevelMap = configMap.get(topLevelKey);
-	    if (secondLevelMap != null) {
-	        return secondLevelMap.get(secondLevelKey);
-	    } else {
-	        return null;
-	    }
-	}
+//	public static String getConfigValue(String topLevelKey, String secondLevelKey) {
+//	    Map<String, String> secondLevelMap = configMap.get(topLevelKey);
+//	    if (secondLevelMap != null) {
+//	        return secondLevelMap.get(secondLevelKey);
+//	    } else {
+//	        return null;
+//	    }
+//	}
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		String method, className = null;

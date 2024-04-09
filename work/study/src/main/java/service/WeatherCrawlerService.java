@@ -6,23 +6,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Map;
 import java.io.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 import commonUtils.FileUtil;
 import commonUtils.WeatherCrawlerUtil;
 
-
 public class WeatherCrawlerService {
 	private static final WeatherCrawlerService instance = new WeatherCrawlerService();
-	public static final String filePath = "C:\\cr\\";
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+	public static final String filePath = "C:\\cr\\";
 
 	private WeatherCrawlerService() {
 	}
@@ -35,13 +30,13 @@ public class WeatherCrawlerService {
 			throws SQLException, NullPointerException, Exception {
 		return model;
 	}
-	
-	
+
 	public Map<String, Object> drawSelectBox(Map<String, Object> paramMap, Map<String, Object> model) {
-		 
-		String kstSelectData = (String) paramMap.get("selectedDate");
 		// 2024-04-08
-		Map<String, List<String>> dateToUtcTimeMap  = WeatherCrawlerUtil.convertKtcToUtc(kstSelectData);
+		String kstSelectData = (String) paramMap.get("selectedDate");
+		// 해당 날짜에 대응하는 UTC 시간 map으로
+		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKtcToUtcMap(kstSelectData);
+		// 이미지가 잇으면 바
 		List<String> kstTimeList = WeatherCrawlerUtil.checkerFileExistence(dateToUtcTimeMap);
 		model.put("kstTimeList", kstTimeList);
 		return model;
@@ -51,15 +46,15 @@ public class WeatherCrawlerService {
 		// VIEW에서 선택한 값 날짜와 시간
 		String kstDate = (String) paramMap.get("selectedDate");
 		String kstTime = (String) paramMap.get("selectedTime");
-		String utcDate = WeatherCrawlerUtil.convertKtu(kstDate + kstTime);
-		String a[] = utcDate.split(" ");
-		String base64Image = WeatherCrawlerUtil.incodingImage(a[0], a[1]);
+		String utcDataTime = WeatherCrawlerUtil.convertKtu(kstDate + kstTime);
+		String utcDataTimeList[] = utcDataTime.split(" ");
+		String base64Image = WeatherCrawlerUtil.incodingImage(utcDataTimeList[0], utcDataTimeList[1]);
 		model.put("image", base64Image);
 		return model;
 	}
-
-	//개발중 
+	// 개발중
 	//////////////////////////////////////////////////////////////////////////////////////
+
 	public Map<String, Object> movieShow(Map<String, Object> paramMap, Map<String, Object> model) throws IOException {
 		String kstData = (String) paramMap.get("selectedDate");
 		String modifiedString = kstData.replace("-", "");
@@ -68,17 +63,15 @@ public class WeatherCrawlerService {
 
 		return model;
 	}
+
 	public static List<String> questFile(String folderName) throws IOException {
 		List<String> fileNameList = new ArrayList<>();
-		Path path = Paths.get(filePath, folderName);
-		// 폴더가 존재하는지 확인
+		Path path = Paths.get(filePath, folderName); // 폴더가 존재하는지 확인
 		if (!Files.exists(path) || !Files.isDirectory(path)) {
 			return fileNameList;
-		}
-		// 폴더가 존재하면, 해당 폴더 내의 파일들의 이름을 리스트로 수집
+		} // 폴더가 존재하면, 해당 폴더 내의 파일들의 이름을 리스트로 수집
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-			for (Path file : stream) {
-				// 디렉토리는 제외하고 파일 이름만 추가
+			for (Path file : stream) { // 디렉토리는 제외하고 파일 이름만 추가
 				if (Files.isRegularFile(file)) {
 					fileNameList.add(file.getFileName().toString());
 				}

@@ -1,9 +1,4 @@
-package commonUtils;
-
-import javax.servlet.http.HttpServletRequest;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+package test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -22,37 +17,33 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.apache.catalina.filters.ExpiresFilter.XServletOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import commonUtils.WeatherCrawlerUtil;
 
-public class WeatherCrawlerUtil {
-	private static final Logger logger = LoggerFactory.getLogger(WeatherCrawlerUtil.class);
-	public static final String filePath = "C:\\cr\\";
+public class FileSelectTest {
+	private static final Logger logger = LoggerFactory.getLogger(FileSelectTest.class);
 	private static final ZoneId KST_ZONE_ID = ZoneId.of("Asia/Seoul");
 	private static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 	private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-ddHHmm");
 
-	private WeatherCrawlerUtil() {
+	public static final String filePath = "C:\\cr\\";
+
+	private FileSelectTest() {
 	};
 
 	/**
 	 * 시간을 입력받으면 KTC-> UTC
-	 */ // yyyy-MM-ddHHmm
+	 */
 	public static String convertKtu(String kstData) {
 		LocalDateTime localDateTime = LocalDateTime.parse(kstData, DATETIME_FORMATTER);
 		ZonedDateTime kstZonedDateTime = localDateTime.atZone(KST_ZONE_ID);
@@ -60,6 +51,9 @@ public class WeatherCrawlerUtil {
 		return utcZonedDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd HHmm"));
 	}
 
+	// KST에서 UTC로 변환하는 함수입니다. 주어진 KST 날짜(kstDate)에 대해 해당 날짜의 00:00부터 23:59까지 10분
+	// 간격으로
+	// UTC 시간으로 변환한 후, 그 결과를 Map으로 반환합니다.
 	/**
 	 * KST에서 UTC로 변환하는 함수 주어진 KST 날짜(kstDate)에 대해 해당 날짜의 00:00~23:59까지 10분 간격으로 UTC
 	 * 변환 후, 그 결과를 Map으로 반환. 이 Map은 UTC 날짜를 키로, 해당 날짜의 모든 UTC 시간들을 list로 저장
@@ -67,9 +61,8 @@ public class WeatherCrawlerUtil {
 	 * @param 사용자에게 입력받은 (시간제외) 날짜
 	 * @return 입력받은 날짜에 해당한 00:00~23:59 (UTC)시간
 	 */
-	public static Map<String, List<String>> convertKtcToUtcMap(String kstDate) {
+	public static Map<String, List<String>> convertKtcToUtc(String kstDate) {
 		Map<String, List<String>> dateToUtcTimes = new HashMap<>();
-		//static으로 그냥 설정해도 무방
 		LocalDateTime start = LocalDateTime.parse(kstDate + "T00:00:00");
 		LocalDateTime end = LocalDateTime.parse(kstDate + "T23:59:00");
 		// 시작 시간과 종료 시간을 지정된 날짜의 00:00부터 23:59까지로 설정
@@ -85,10 +78,10 @@ public class WeatherCrawlerUtil {
 			dateToUtcTimes.get(dateKey).add(utcZonedDateTime.format(TIME_FORMATTER));
 			start = start.plusMinutes(10);
 		}
-		dateToUtcTimes.forEach((date, times) -> {
-			System.out.println(date + ": " + times);
-		});
-
+		/*
+		 * dateToUtcTimes.forEach((date, times) -> { System.out.println(date + ": " +
+		 * times); });
+		 */
 		return dateToUtcTimes;
 	}
 
@@ -106,7 +99,7 @@ public class WeatherCrawlerUtil {
 			List<String> partialFileNames = entry.getValue();
 
 			Path folderPath = Paths.get(filePath + folderName);
-			System.out.println("해당 폴더 검사: " + filePath + folderName);
+			System.out.println("해당 폴더 검사: " + folderName);
 			// 각 부분 파일 이름에 대해 파일 존재 여부 확인
 			for (String partialFileName : partialFileNames) {
 				try (Stream<Path> paths = Files.walk(folderPath)) {
@@ -115,8 +108,8 @@ public class WeatherCrawlerUtil {
 							.anyMatch(path -> path.getFileName().toString().contains(folderName + partialFileName));
 					// 파일이 존재하면 UTC 시간을 KST로 변환하여 리스트에 추가
 					if (fileExists) {
-
-						ZonedDateTime utcDateTime = ZonedDateTime.parse(folderName + partialFileName,DateTimeFormatter.ofPattern("yyyyMMddHHmm").withZone(UTC_ZONE_ID));
+						ZonedDateTime utcDateTime = ZonedDateTime.parse(folderName + partialFileName,
+								DateTimeFormatter.ofPattern("yyyyMMddHHmm").withZone(UTC_ZONE_ID));
 						ZonedDateTime kstDateTime = utcDateTime.withZoneSameInstant(KST_ZONE_ID);
 						String kstDateTimeStr = kstDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 						kstTimes.add(kstDateTimeStr);
@@ -184,7 +177,7 @@ public class WeatherCrawlerUtil {
 			// 이미지 파일의 URL 구성
 			String url = "https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/" + year + month + "/" + day + "/"
 					+ hour + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + utcDate + utcTime + ".srv.png";
-			System.out.println(url);
+
 			// 다운로드할 이미지의 파일명 추출 및 최종 저장 경로 결정
 			String fileName = url.substring(url.lastIndexOf('/') + 1);
 			String destinationFile = destinationPath + File.separator + fileName;
@@ -203,6 +196,20 @@ public class WeatherCrawlerUtil {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void main(String[] args) {
+		String kstSelectData = "2024-04-07"; // ktc기준
+		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKtcToUtcMap(kstSelectData);
+
+		List<String> kstTimeList = WeatherCrawlerUtil.checkerFileExistence(dateToUtcTimeMap);
+
+		System.out.println(dateToUtcTimeMap);
+
+		// String a= WeatherCrawlerUtil.convertKtu("2024-04-091350");
+		// System.out.println(a);
+		// WeatherCrawlerUtil.downloadImage("20240409","0450" );
+		// 2024-04-08
 	}
 
 	/*

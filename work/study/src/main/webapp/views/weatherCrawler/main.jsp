@@ -12,32 +12,39 @@
 	// KST는  한국의 표준시간대를  UTC+9 시간대에 해당
 	function initData() {
 		$('#date').val(new Date().toISOString().substring(0, 10));
+		
 		drawSelectBox(function() {
-			// 콜백 함수 내에서 시간 선택 값 읽기
 			var selectedDate = $('#date').val(); // 날짜 가져오기
-			var selectedTime = $('#searchTime').val().split(' ')[1].replace(
-					':', ''); // 시간 가져오
+			var selectedTime = $('#searchTime').val().split(' ')[1].replace(':', ''); // 시간 가져오
 			console.log(selectedDate, selectedTime);
 			checkTodayData(selectedDate, selectedTime);
 		});
 	}
 
 	function initEvent() {
-		$('.searchBox').on(
-				'change',
-				'input, select',
+		$('.searchBox').on('change','input, select',
 				function() {
-					console.log("modify");
 					var selectedDate = $('#date').val(); // 날짜 가져오기
-					var selectedTime = $('#searchTime').val().split(' ')[1]
-							.replace(':', '');
-					checkTodayData(selectedDate, selectedTime);
+					var previouslySelectedTime = $('#searchTime').val(); // 기존에 선택된 시간 저장
+					console.log("modify");
+					drawSelectBox(function() {
+						$('#searchTime').val(previouslySelectedTime); // 셀렉트 박스 업데이트 후 이전에 선택된 시간을 다시 설정
+						if ($('#searchTime').val() === null) { // 이전에 선택된 값이 새로운 목록에 없는 경우
+							$('#searchTime option:first').prop('selected', true); // 첫 번째 옵션을 선택
+						}
+						var selectedTime = $('#searchTime').val().split(' ')[1].replace(':', ''); // 새로운 선택(또는 기본 선택) 반영
+						console.log(selectedDate, selectedTime);
+						checkTodayData(selectedDate, selectedTime);
+					});
 				});
 
-		$('.movie').on('click', function() {
-			var selectData = getSelectedData()
-			showMovie(selectData.date, selectData.time)
-		});
+		$('.movie').on(
+				'click',
+				function() {
+					var selectedDate = $('#date').val(); // 날짜 가져오기
+					var selectedTime = $('#searchTime').val().split(' ')[1].replace(':', ''); // 시간 가져오
+					showMovie(selectedDate, selectedTime);
+				});
 
 	}
 
@@ -52,16 +59,15 @@
 			dataType : 'json',
 			success : function(data) {
 				$('#searchTime').empty();
-				data.kstTimeList.reverse();
 				console.log(data);
-				$.each(data.kstTimeList, function(index, value) {
+				var a = data.kstTimeList.reverse();
+				$.each(a, function(index, value) {
 					var time = value.split(" ")[1];
 					$('#searchTime').append($('<option>', {
 						value : value,
 						text : time + " KST"
 					}));
 				});
-				$('#searchTime option:first').prop('selected', true);
 				// 콜백 함수가 제공되면 실행
 				if (callback && typeof (callback) === "function") {
 					callback();
@@ -94,7 +100,7 @@
 	}
 
 	function changeImageSrc(newSrc) {
-		$('#imageContainer img').attr('src', newSrc);
+		$('#showImage').attr('src', newSrc);
 	}
 
 	function showMovie(date, time) {
@@ -107,10 +113,11 @@
 			},
 			dataType : 'json',
 			success : function(images) {
+				console.log(images);
 				let index = 0;
 				var intervalId = setInterval(function() {
 					// 이미지 변경 로직 실행
-					var imageUrl = "http://localhost:8080/IMG/"
+				var imageUrl = "http://localhost:8080/IMG/"
 							+ date.replace(/-/g, "") + "/"
 							+ images.fileNameList[index];
 					console.log(imageUrl);

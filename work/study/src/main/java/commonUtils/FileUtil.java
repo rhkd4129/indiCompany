@@ -23,32 +23,23 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import FrontCotroller.Controller;
+
+
+
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class FileUtil {
-
-	private static final Pattern UUID_PATTERN = Pattern
-			.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
+	private static final Pattern UUID_PATTERN = Pattern.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 	private static String boardFilePath = "C:\\uploadTest\\";
-	static {
-		// initConfig();
-	}
+	
+
 
 	private FileUtil() {
 	}
 
-	/*
-	 * private static void initConfig() { boardFilePath =
-	 * Controller.getConfigValue("Path", "boardFile"); if (boardFilePath == null) {
-	 * logger.info("Board File Path is not configured.");
-	 * System.out.println("Dnnn"); } System.out.println("Dddd");
-	 * logger.info(boardFilePath);
-	 * 
-	 * }
-	 */
+
 
 	public static Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config, String key)
 			throws StreamReadException, DatabindException, IOException {
@@ -62,6 +53,18 @@ public class FileUtil {
 		return map;
 
 	}
+	
+	public static Map<String, String> loadCommandsFromJson(String key ,ServletConfig config)throws StreamReadException, DatabindException, IOException {
+		String props = config.getInitParameter(key);
+		String configFilePath = config.getServletContext().getRealPath(props);
+		Map<String,String> map = new HashMap<>();
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		map = objectMapper.readValue(new File(configFilePath), new TypeReference<Map<String,  String>>() {});
+		return map;
+
+	}
+	
 
 	/**
 	 * 주어진 파일명 목록의 각 파일명에 대해 고유 식별자(UUID) 추가. 파일명에 확장자가 있는 경우, UUID를 확장자 앞에 삽입하고,
@@ -168,7 +171,6 @@ public class FileUtil {
 	public static List<String> getDirectoryFiles(Object identifier) throws IOException {
 		List<String> fileNameList = new ArrayList<>();
 		Path path;
-
 		if (identifier instanceof Integer) {
 			path = Paths.get(boardFilePath, identifier.toString());
 		} else if (identifier instanceof String) {
@@ -178,7 +180,6 @@ public class FileUtil {
 			// 지원되지 않는 타입인 경우
 			throw new IllegalArgumentException("Unsupported identifier type");
 		}
-
 		// 폴더 존재 여부 확인
 		if (!Files.exists(path) || !Files.isDirectory(path)) {
 			System.out.println("없냐");
@@ -224,8 +225,5 @@ public class FileUtil {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
-	
-	
-	
-	
+
 }

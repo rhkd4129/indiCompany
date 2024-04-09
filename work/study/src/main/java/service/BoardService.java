@@ -14,7 +14,7 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import FrontCotroller.Controller;
+
 import commonUtils.FileUtil;
 import dao.BoardDao;
 import dto.BoardDto;
