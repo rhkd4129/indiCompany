@@ -32,12 +32,13 @@ import java.util.regex.Matcher;
 public class FileUtil {
 	private static final Pattern UUID_PATTERN = Pattern.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
-	private static String boardFilePath = "C:\\uploadTest\\";
+	
+	
+	private static String boardFilePath = "C:\\uploadTest\\"; ///설정파일에저장예정
 	
 
 
-	private FileUtil() {
-	}
+	private FileUtil() {}
 
 
 
@@ -76,7 +77,6 @@ public class FileUtil {
 
 	public static List<String> addUUIDFileNames(List<String> fileNames) {
 		List<String> modifiedFileNames = new ArrayList<>(); /* 수정된 파일 이름을 저장할 리스트 생성 */
-
 		for (String fileName : fileNames) {
 			/* 확장자 구분 . */
 			int dotIndex = fileName.lastIndexOf('.');

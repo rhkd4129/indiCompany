@@ -59,7 +59,7 @@
 		"type" : "json",
 		"viewName": ""
 	},
-	"/weatherCrawler/drawSelectBox.do": {
+	"/weatherCrawler/dateList.do": {
 		"type" : "json",
 		"viewName": ""
 	}

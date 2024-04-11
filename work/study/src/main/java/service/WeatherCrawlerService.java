@@ -17,10 +17,10 @@ import commonUtils.WeatherCrawlerUtil;
 public class WeatherCrawlerService {
 	private static final WeatherCrawlerService instance = new WeatherCrawlerService();
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
-	public static final String filePath = "C:\\cr\\";
 
-	private WeatherCrawlerService() {
-	}
+	public static final String filePath = "C:\\cr\\";  //설정파일에 저장예정
+
+	private WeatherCrawlerService() {}
 
 	public static WeatherCrawlerService getInstance() {
 		return instance;
@@ -31,12 +31,11 @@ public class WeatherCrawlerService {
 		return model;
 	}
 
-	public Map<String, Object> drawSelectBox(Map<String, Object> paramMap, Map<String, Object> model) {
+	public Map<String, Object> dateList(Map<String, Object> paramMap, Map<String, Object> model) {
 		// 2024-04-08
-		String kstSelectData = (String) paramMap.get("selectedDate");
+		String kstSelectData = (String) paramMap.get("formattedDate");
 		// 해당 날짜에 대응하는 UTC 시간 map으로
-		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKtcToUtcMap(kstSelectData);
-		// 이미지가 잇으면 바
+		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKSTToUtcMap(kstSelectData);
 		List<String> kstTimeList = WeatherCrawlerUtil.checkerFileExistence(dateToUtcTimeMap);
 		model.put("kstTimeList", kstTimeList);
 		return model;
@@ -44,12 +43,14 @@ public class WeatherCrawlerService {
 
 	public Map<String, Object> imageShow(Map<String, Object> paramMap, Map<String, Object> model) throws IOException {
 		// VIEW에서 선택한 값 날짜와 시간
-		String kstDate = (String) paramMap.get("selectedDate");
-		String kstTime = (String) paramMap.get("selectedTime");
-		String utcDataTime = WeatherCrawlerUtil.convertKtu(kstDate + kstTime);
-		String utcDataTimeList[] = utcDataTime.split(" ");
-		String base64Image = WeatherCrawlerUtil.incodingImage(utcDataTimeList[0], utcDataTimeList[1]);
-		model.put("image", base64Image);
+		String kstDate = (String) paramMap.get("formattedDate");
+		System.out.println(kstDate);
+		String utcDataTime = WeatherCrawlerUtil.convertKtu(kstDate);
+		//String utcDataTimeList[] = utcDataTime.split(" ");
+		//String base64Image = WeatherCrawlerUtil.incodingImage(utcDataTimeList[0], utcDataTimeList[1]);
+//		model.put("date", utcDataTimeList[0]);
+//		model.put("time", utcDataTimeList[1]);
+		model.put("utcDataTime",utcDataTime);
 		return model;
 	}
 	// 개발중
@@ -64,6 +65,9 @@ public class WeatherCrawlerService {
 		return model;
 	}
 
+	
+	
+	///////////   UTILS로 뺴기  //////////
 	public static List<String> questFile(String folderName) throws IOException {
 		List<String> fileNameList = new ArrayList<>();
 		Path path = Paths.get(filePath, folderName); // 폴더가 존재하는지 확인

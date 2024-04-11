@@ -40,18 +40,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WeatherCrawlerUtil {
 	private static final Logger logger = LoggerFactory.getLogger(WeatherCrawlerUtil.class);
-	public static final String filePath = "C:\\cr\\";
 	private static final ZoneId KST_ZONE_ID = ZoneId.of("Asia/Seoul");
 	private static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
-	private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-ddHHmm");
+	private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+
+	public static final String filePath = "C:\\cr\\"; // 설정파일에 저장예정
+	// 설정파일로
 
 	private WeatherCrawlerUtil() {
 	};
 
 	/**
-	 * 시간을 입력받으면 KTC-> UTC
+	 * 시간을 입력받으면 KST-> UTC
 	 */ // yyyy-MM-ddHHmm
 	public static String convertKtu(String kstData) {
 		LocalDateTime localDateTime = LocalDateTime.parse(kstData, DATETIME_FORMATTER);
@@ -67,24 +69,26 @@ public class WeatherCrawlerUtil {
 	 * @param 사용자에게 입력받은 (시간제외) 날짜
 	 * @return 입력받은 날짜에 해당한 00:00~23:59 (UTC)시간
 	 */
-	public static Map<String, List<String>> convertKtcToUtcMap(String kstDate) {
+	public static Map<String, List<String>> convertKSTToUtcMap(String kstDate) {
 		Map<String, List<String>> dateToUtcTimes = new HashMap<>();
-		//static으로 그냥 설정해도 무방
-		LocalDateTime start = LocalDateTime.parse(kstDate + "T00:00:00");
-		LocalDateTime end = LocalDateTime.parse(kstDate + "T23:59:00");
-		// 시작 시간과 종료 시간을 지정된 날짜의 00:00부터 23:59까지로 설정
+		System.out.println(kstDate);
+		String formattedDate = kstDate.substring(0, 4) + "-" + kstDate.substring(4, 6) + "-" + kstDate.substring(6, 8);
+
+		LocalDateTime start = LocalDateTime.parse(formattedDate + "T00:00:00");
+		LocalDateTime end = LocalDateTime.parse(formattedDate + "T23:59:00");
+
 		while (start.isBefore(end) || start.isEqual(end)) {
-			// LocalDateTime을 KST와 UTC ZonedDateTime으로 변환
 			ZonedDateTime kstZonedDateTime = start.atZone(KST_ZONE_ID);
 			ZonedDateTime utcZonedDateTime = kstZonedDateTime.withZoneSameInstant(UTC_ZONE_ID);
 
-			// 변환된 UTC 날짜를 키로 사용
 			String dateKey = utcZonedDateTime.format(DATE_FORMATTER);
 
 			dateToUtcTimes.putIfAbsent(dateKey, new ArrayList<>());
 			dateToUtcTimes.get(dateKey).add(utcZonedDateTime.format(TIME_FORMATTER));
+
 			start = start.plusMinutes(10);
 		}
+
 		dateToUtcTimes.forEach((date, times) -> {
 			System.out.println(date + ": " + times);
 		});
@@ -92,12 +96,14 @@ public class WeatherCrawlerUtil {
 		return dateToUtcTimes;
 	}
 
+	
+
 	/**
 	 * 파일 존재 여부를 확인하는 함수. 주어진 UTC 시간 정보(Map)를 바탕으로 특정 폴더에서 해당 UTC 시간과 일치하는 파일이 있는지
-	 * 검사합니다. 파일이 존재하는 경우, 그 파일의 이름에 해당하는 KST 시간을 List로 반환합니다.
+	 * 검사 파일이 존재하는 경우, 그 파일의 이름에 해당하는 KST 시간을 List로 반환.
 	 * 
 	 * @param KST를 변환후 해당하는 UTC시간대 (MAP형태)
-	 * @return 최종 view화면에 select에 표시될 KTC 값들
+	 * @return 최종 view화면에 select에 표시될 KST 값들
 	 */
 	public static List<String> checkerFileExistence(Map<String, List<String>> utcTimes) {
 		List<String> kstTimes = new ArrayList<>();
@@ -116,10 +122,12 @@ public class WeatherCrawlerUtil {
 					// 파일이 존재하면 UTC 시간을 KST로 변환하여 리스트에 추가
 					if (fileExists) {
 
-						ZonedDateTime utcDateTime = ZonedDateTime.parse(folderName + partialFileName,DateTimeFormatter.ofPattern("yyyyMMddHHmm").withZone(UTC_ZONE_ID));
+						ZonedDateTime utcDateTime = ZonedDateTime.parse(folderName + partialFileName,
+								DateTimeFormatter.ofPattern("yyyyMMddHHmm").withZone(UTC_ZONE_ID));
 						ZonedDateTime kstDateTime = utcDateTime.withZoneSameInstant(KST_ZONE_ID);
-						String kstDateTimeStr = kstDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+						String kstDateTimeStr = kstDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
 						kstTimes.add(kstDateTimeStr);
+						Collections.reverse(kstTimes);
 					}
 				} catch (IOException e) {
 

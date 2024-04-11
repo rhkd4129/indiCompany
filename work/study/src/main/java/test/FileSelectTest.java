@@ -42,7 +42,7 @@ public class FileSelectTest {
 	};
 
 	/**
-	 * 시간을 입력받으면 KTC-> UTC
+	 * 시간을 입력받으면 KST-> UTC
 	 */
 	public static String convertKtu(String kstData) {
 		LocalDateTime localDateTime = LocalDateTime.parse(kstData, DATETIME_FORMATTER);
@@ -61,7 +61,7 @@ public class FileSelectTest {
 	 * @param 사용자에게 입력받은 (시간제외) 날짜
 	 * @return 입력받은 날짜에 해당한 00:00~23:59 (UTC)시간
 	 */
-	public static Map<String, List<String>> convertKtcToUtc(String kstDate) {
+	public static Map<String, List<String>> convertKSTToUtc(String kstDate) {
 		Map<String, List<String>> dateToUtcTimes = new HashMap<>();
 		LocalDateTime start = LocalDateTime.parse(kstDate + "T00:00:00");
 		LocalDateTime end = LocalDateTime.parse(kstDate + "T23:59:00");
@@ -90,7 +90,7 @@ public class FileSelectTest {
 	 * 검사합니다. 파일이 존재하는 경우, 그 파일의 이름에 해당하는 KST 시간을 List로 반환합니다.
 	 * 
 	 * @param KST를 변환후 해당하는 UTC시간대 (MAP형태)
-	 * @return 최종 view화면에 select에 표시될 KTC 값들
+	 * @return 최종 view화면에 select에 표시될 KST 값들
 	 */
 	public static List<String> checkerFileExistence(Map<String, List<String>> utcTimes) {
 		List<String> kstTimes = new ArrayList<>();
@@ -199,12 +199,17 @@ public class FileSelectTest {
 	}
 
 	public static void main(String[] args) {
-		String kstSelectData = "2024-04-07"; // ktc기준
-		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKtcToUtcMap(kstSelectData);
+		String kstSelectData = "2024-04-06"; // kst기준
+		
+		//향후 개선사항
+		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKSTToUtcMap(kstSelectData);
 
+		
+		//맵의 값을 가지고 파일이 있는지 체크 
 		List<String> kstTimeList = WeatherCrawlerUtil.checkerFileExistence(dateToUtcTimeMap);
 
-		System.out.println(dateToUtcTimeMap);
+		//System.out.println(dateToUtcTimeMap);
+		System.out.println(kstTimeList);
 
 		// String a= WeatherCrawlerUtil.convertKtu("2024-04-091350");
 		// System.out.println(a);

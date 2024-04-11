@@ -12,129 +12,123 @@
 	// KST는  한국의 표준시간대를  UTC+9 시간대에 해당
 	function initData() {
 		$('#date').val(new Date().toISOString().substring(0, 10));
-		
-		drawSelectBox(function() {
-			var selectedDate = $('#date').val(); // 날짜 가져오기
-			var selectedTime = $('#searchTime').val().split(' ')[1].replace(':', ''); // 시간 가져오
-			console.log(selectedDate, selectedTime);
-			checkTodayData(selectedDate, selectedTime);
-		});
+		var formattedDate = $('#date').val().replace(/-/g, ''); // '-'를 제거하여 'yyyymmdd' 형식으로 변환합니다.
+		drawSelectBox(formattedDate);
+		checkTodayData();
 	}
-
-	function initEvent() {
-		$('.searchBox').on('change','input, select',
-				function() {
-					var selectedDate = $('#date').val(); // 날짜 가져오기
-					var previouslySelectedTime = $('#searchTime').val(); // 기존에 선택된 시간 저장
-					console.log("modify");
-					drawSelectBox(function() {
-						$('#searchTime').val(previouslySelectedTime); // 셀렉트 박스 업데이트 후 이전에 선택된 시간을 다시 설정
-						if ($('#searchTime').val() === null) { // 이전에 선택된 값이 새로운 목록에 없는 경우
-							$('#searchTime option:first').prop('selected', true); // 첫 번째 옵션을 선택
-						}
-						var selectedTime = $('#searchTime').val().split(' ')[1].replace(':', ''); // 새로운 선택(또는 기본 선택) 반영
-						console.log(selectedDate, selectedTime);
-						checkTodayData(selectedDate, selectedTime);
-					});
-				});
-
-		$('.movie').on(
-				'click',
-				function() {
-					var selectedDate = $('#date').val(); // 날짜 가져오기
-					var selectedTime = $('#searchTime').val().split(' ')[1].replace(':', ''); // 시간 가져오
-					showMovie(selectedDate, selectedTime);
-				});
-
-	}
-
-	function drawSelectBox(callback) {
-		var selectedDate = $('#date').val(); // 날짜 가져오기
+	function drawSelectBox(formattedDate) {	
 		$.ajax({
-			url : '/weatherCrawler/drawSelectBox.do',
+			url : '/weatherCrawler/dateList.do',
 			type : 'GET',
 			data : {
-				selectedDate : selectedDate,
+				formattedDate : formattedDate,
 			},
 			dataType : 'json',
 			success : function(data) {
 				$('#searchTime').empty();
-				console.log(data);
-				var a = data.kstTimeList.reverse();
-				$.each(a, function(index, value) {
-					var time = value.split(" ")[1];
+				console.log(data);			
+				$.each(data.kstTimeList, function(index, value) {
 					$('#searchTime').append($('<option>', {
 						value : value,
-						text : time + " KST"
+						text : value.substr(8, 2) + ':' + value.substr(10, 2) + " KST"
 					}));
 				});
-				// 콜백 함수가 제공되면 실행
-				if (callback && typeof (callback) === "function") {
-					callback();
-				}
 			},
 			error : function(xhr, status, error) {
 				console.error("Error occurred: " + error);
 			}
 		});
 	}
-
-	function checkTodayData(selectedDate, selectedTime) {
+	
+	
+	function checkTodayData() {
+		
+		
+		console.log(formattedDate);
 		$.ajax({
 			url : '/weatherCrawler/imageShow.do',
 			type : 'GET',
 			data : {
-				selectedDate : selectedDate,
-				selectedTime : selectedTime
+				formattedDate:formattedDate
 			},
 			dataType : 'json',
 			success : function(data) {
 				console.log(data);
-				var imgSrc = 'data:image/png;base64,' + data.image;
-				changeImageSrc(imgSrc);
+				var imgUrl = "http://localhost:8080/IMG/"+ data.date+ "/gk2a_ami_le1b_rgb-s-true_ea020lc_"+data.date+data.time+'.srv.png';
+				
+				changeImageSrc(imgUrl);
 			},
 			error : function(xhr, status, error) {
 				console.error("Error occurred: " + error);
 			}
 		});
 	}
+	
+	function initEvent() {
+		$('.searchBox').on(
+				'change',
+				'input, select',
+				function() {
+					var selectedDate = $('#date').val(); // 날짜 가져오기
+					var previouslySelectedTime = $('#searchTime').val(); // 기존에 선택된 시간 저장
+					console.log("modify");
+					var formattedDate = $('#date').val().replace(/-/g, ''); // '-'를 제거하여 'yyyymmdd' 형식으로 변환합니다.
+					/* drawSelectBox(function() {
+						$('#searchTime').val(previouslySelectedTime); // 셀렉트 박스 업데이트 후 이전에 선택된 시간을 다시 설정
+						if ($('#searchTime').val() === null) { // 이전에 선택된 값이 새로운 목록에 없는 경우
+							$('#searchTime option:first')
+									.prop('selected', true); // 첫 번째 옵션을 선택
+						}
+						checkTodayData(selectedDate, filterSelectedTime);
+					}); */
+				});
+
+		$('.movie').on('click', function() {
+			/* var selectedTime = $('#searchTime').val();
+			console.log(selectedDate, selectedTime)
+			if (selectedDate == null || selectedTime == null) {
+				alert("날짜와 시간을 선택해주세요");
+				return;
+			} */
+			var timeList = [];
+			var date = "";
+			$("#searchTime option").each(function(index) {
+				timeList.push($(this).val().split(' ')[1].replace(':', ''));
+			});
+			
+			showMovie(date, timeList);
+		});
+
+	}
+
+	
+
 
 	function changeImageSrc(newSrc) {
 		$('#showImage').attr('src', newSrc);
 	}
 
-	function showMovie(date, time) {
-		$.ajax({
-			url : '/weatherCrawler/movieShow.do',
-			type : 'GET',
-			data : {
-				selectedDate : date,
-				selectedTime : time
-			},
-			dataType : 'json',
-			success : function(images) {
-				console.log(images);
-				let index = 0;
-				var intervalId = setInterval(function() {
-					// 이미지 변경 로직 실행
-				var imageUrl = "http://localhost:8080/IMG/"
-							+ date.replace(/-/g, "") + "/"
-							+ images.fileNameList[index];
-					console.log(imageUrl);
-					changeImageSrc(imageUrl);
-					index++;
-					// fileNameList의 길이를 넘어서면 인터벌을 정지하고 마지막 이미지 유지
-					if (index >= images.fileNameList.length) {
-						clearInterval(intervalId);
-						// 마지막 이미지로 설정하기 위해 인덱스를 마지막 요소로 설정
-						// 이미 위에서 마지막 이미지를 설정했으므로 여기서 추가로 설정할 필요는 없음
-					}
-				}, 500); // 0.5초마다 이미지 변경
-			},
-			error : function(xhr, status, error) {
-				console.error("Error occurred: " + error);
+	function showMovie(date, timeList) {
+		console.log(date);
+		let index = 0;
+		
+		var intervalId = setInterval(function() {
+
+			var imageUrl = "http://localhost:8080/IMG/"
+					+ date
+					+ "/gk2a_ami_le1b_rgb-s-true_ea020lc_/" +date+ timeList[index]
+					+ ".srv.png";
+			console.log(imageUrl);
+			changeImageSrc(imageUrl);
+			index++;
+			// fileNameList의 길이를 넘어서면 인터벌을 정지하고 마지막 이미지 유지
+			if (index >= timeList.length) {
+				clearInterval(intervalId);
+				// 마지막 이미지로 설정하기 위해 인덱스를 마지막 요소로 설정
+				// 이미 위에서 마지막 이미지를 설정했으므로 여기서 추가로 설정할 필요는 없음
 			}
-		});
+		}, 500); // 0.5초마다 이미지 변경
+
 	}
 </script>
 </head>
