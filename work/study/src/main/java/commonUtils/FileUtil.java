@@ -41,7 +41,6 @@ public class FileUtil {
 	private FileUtil() {}
 
 
-
 	public static Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config, String key)
 			throws StreamReadException, DatabindException, IOException {
 		String props = config.getInitParameter(key);
@@ -90,7 +89,6 @@ public class FileUtil {
 		}
 		return modifiedFileNames;
 	}
-
 	/**
 	 * 파일이름_UUID.확장자형식의 파일이름에서 UUID를 제거하는 로직 사용자게에 보여주기 위해
 	 * 
@@ -107,7 +105,6 @@ public class FileUtil {
 		}
 		return fileNames;
 	}
-
 	/**
 	 * 지정된 게시판 코드의 경로에 물리적 파일 저장. 제공된 파일 데이터 목록에 따라 저장. 저장 경로는 기본 파일 경로와 게시판 코드를
 	 * 조합하여 결정, 해당 경로에 폴더(boardCode)가 존재하지 않는 경우 새로 생성.
@@ -118,7 +115,6 @@ public class FileUtil {
 	 */
 	public static void saveFiles(Integer boardCode, List<String> fileNamesWithUUID, List<byte[]> fileDataList)
 			throws IOException {
-
 		String folderPath = Paths.get(boardFilePath, Integer.toString(boardCode))
 				.toString(); /* C:\\uploadTest\\1 <-- 이미지의 실제 저장위치 */
 		File folder = new File(folderPath);
@@ -133,7 +129,6 @@ public class FileUtil {
 			}
 		}
 	}
-
 	/**
 	 * 지정된 게시판 코드에 해당하는 경로에서 이 파일들을 삭제. 파일 이름은 콤마(,)로 구분된 문자열에서 추출되며, 각 파일은 제공된 게시판
 	 * 코드를 기반으로 한 경로에서 삭제됩니다.
@@ -196,7 +191,6 @@ public class FileUtil {
 		} catch (IOException e) {
 			throw new IOException("파일 읽는 중 오류 발생", e);
 		}
-
 		return fileNameList;
 	}
 
@@ -210,11 +204,9 @@ public class FileUtil {
 	//
 	public static void downloadFile(HttpServletResponse response, Map<String, Object> model) throws IOException {
 		// 파일의 실제 경로를 구성
-
 		Integer boardCode = (Integer) model.get("boardCode");
 		String fileName = (String) model.get("fileName");
 		File file = new File(boardFilePath + boardCode + "\\", fileName);
-
 		if (file.exists()) {
 			String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
 			response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);

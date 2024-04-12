@@ -16,10 +16,14 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
@@ -27,6 +31,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.jsoup.Jsoup;
@@ -52,15 +59,28 @@ public class WeatherCrawlerUtil {
 	private WeatherCrawlerUtil() {
 	};
 
-	/**
-	 * 시간을 입력받으면 KST-> UTC
-	 */ // yyyy-MM-ddHHmm
-	public static String convertKtu(String kstData) {
-		LocalDateTime localDateTime = LocalDateTime.parse(kstData, DATETIME_FORMATTER);
-		ZonedDateTime kstZonedDateTime = localDateTime.atZone(KST_ZONE_ID);
-		ZonedDateTime utcZonedDateTime = kstZonedDateTime.withZoneSameInstant(UTC_ZONE_ID);
-		return utcZonedDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd HHmm"));
-	}
+	
+	/*
+	 * ScheduledExecutorService scheduler =
+	 * Executors.newSingleThreadScheduledExecutor();
+	 * 
+	 * // 현재 시간과 자정 사이의 시간을 계산 (초 단위) long initialDelay =
+	 * LocalTime.now().until(LocalTime.MIDNIGHT, ChronoUnit.SECONDS); // long period
+	 * = TimeUnit.DAYS.toSeconds(1); // 24시간을 초로 변환 long period = 1; // 24시간을 초로 변환
+	 * 
+	 * scheduler.scheduleAtFixedRate(() -> { // 전날 날짜를 계산 // String yesterday =
+	 * LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+	 * // System.out.println("Downloading images for date: " + yesterday); String
+	 * yesterdayDateTime =
+	 * LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern(
+	 * "yyyyMMddHHmmss"));
+	 * System.out.println("Yesterday's date and time in yyyyMMddHHmmss format: " +
+	 * yesterdayDateTime);
+	 * 
+	 * // 여기에 이미지 다운로드 로직 호출 //
+	 * ImageDownloader.downloadImagesForDateRange(yesterday, yesterday); },
+	 * initialDelay, period, TimeUnit.SECONDS); }
+	 */
 
 	/**
 	 * KST에서 UTC로 변환하는 함수 주어진 KST 날짜(kstDate)에 대해 해당 날짜의 00:00~23:59까지 10분 간격으로 UTC
@@ -71,12 +91,9 @@ public class WeatherCrawlerUtil {
 	 */
 	public static Map<String, List<String>> convertKSTToUtcMap(String kstDate) {
 		Map<String, List<String>> dateToUtcTimes = new HashMap<>();
-		System.out.println(kstDate);
 		String formattedDate = kstDate.substring(0, 4) + "-" + kstDate.substring(4, 6) + "-" + kstDate.substring(6, 8);
-
 		LocalDateTime start = LocalDateTime.parse(formattedDate + "T00:00:00");
 		LocalDateTime end = LocalDateTime.parse(formattedDate + "T23:59:00");
-
 		while (start.isBefore(end) || start.isEqual(end)) {
 			ZonedDateTime kstZonedDateTime = start.atZone(KST_ZONE_ID);
 			ZonedDateTime utcZonedDateTime = kstZonedDateTime.withZoneSameInstant(UTC_ZONE_ID);
@@ -95,8 +112,6 @@ public class WeatherCrawlerUtil {
 
 		return dateToUtcTimes;
 	}
-
-	
 
 	/**
 	 * 파일 존재 여부를 확인하는 함수. 주어진 UTC 시간 정보(Map)를 바탕으로 특정 폴더에서 해당 UTC 시간과 일치하는 파일이 있는지
@@ -121,21 +136,70 @@ public class WeatherCrawlerUtil {
 							.anyMatch(path -> path.getFileName().toString().contains(folderName + partialFileName));
 					// 파일이 존재하면 UTC 시간을 KST로 변환하여 리스트에 추가
 					if (fileExists) {
-
 						ZonedDateTime utcDateTime = ZonedDateTime.parse(folderName + partialFileName,
-								DateTimeFormatter.ofPattern("yyyyMMddHHmm").withZone(UTC_ZONE_ID));
+								DATETIME_FORMATTER.withZone(UTC_ZONE_ID));
 						ZonedDateTime kstDateTime = utcDateTime.withZoneSameInstant(KST_ZONE_ID);
-						String kstDateTimeStr = kstDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+						String kstDateTimeStr = kstDateTime.format(DATETIME_FORMATTER);
 						kstTimes.add(kstDateTimeStr);
-						Collections.reverse(kstTimes);
 					}
 				} catch (IOException e) {
 
 					logger.error("esssrror : {}", e.getMessage());
 				}
 			}
+			Collections.reverse(kstTimes);
 		}
 		return kstTimes;
+	}
+
+	/**
+	 * 주어진 UTC 날짜/시간에 해당하는 이미지 다운, 파일 저장.
+	 * 
+	 * @param utcDate 이미지 검색하기 위한 UTC 날짜. 형식 "yyyyMMdd"
+	 * @param utcTime 이미지 검색하기 위한 UTC 시간. 형식 "HHmm"
+	 */
+	public static void downloadImage(String utcDate, String utcTime) {
+		try {
+			// 파일 저장을 위한 디렉토리 경로 생성
+			String destinationPath = filePath + File.separator + utcDate;
+			File directory = new File(destinationPath);
+			if (!directory.exists()) {
+				directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
+			}
+
+			// https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/%Y%m/%d/%Y%m%d%H%M%S.png
+			// python (glob+ datetime)
+			// URL 생성에 사용될 날짜와 시간의 구성 요소 추출
+			String year = utcDate.substring(0, 4);
+			String month = utcDate.substring(4, 6);
+			String day = utcDate.substring(6, 8);
+			String hour = utcTime.substring(0, 2);
+			// 이미지 파일의 URL 구성
+			String url = "https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/" + year + month + "/" + day + "/"
+					+ hour + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + utcDate + utcTime + ".srv.png";
+			System.out.println(url);
+			// 다운로드할 이미지의 파일명 추출 및 최종 저장 경로 결정
+			String fileName = url.substring(url.lastIndexOf('/') + 1);
+			String destinationFile = destinationPath + File.separator + fileName;
+
+			File fileInfo = new File(destinationPath, destinationFile);
+			if (fileInfo.exists())
+				return;
+
+			// 이미지 다운로드 및 파일 시스템에 저장
+			try (InputStream in = new URL(url).openStream(); OutputStream out = new FileOutputStream(destinationFile)) {
+				byte[] buffer = new byte[4096]; // 읽기/쓰기를 위한 버퍼
+				int bytesRead; // 실제로 읽은 바이트 수
+				while ((bytesRead = in.read(buffer)) != -1) {
+					out.write(buffer, 0, bytesRead);
+				}
+
+				logger.info("이미지 다운 성공 :{}", destinationFile);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -169,56 +233,13 @@ public class WeatherCrawlerUtil {
 	}
 
 	/**
-	 * 주어진 UTC 날짜/시간에 해당하는 이미지 다운, 파일 저장.
-	 * 
-	 * @param utcDate 이미지 검색하기 위한 UTC 날짜. 형식 "yyyyMMdd"
-	 * @param utcTime 이미지 검색하기 위한 UTC 시간. 형식 "HHmm"
-	 */
-	public static void downloadImage(String utcDate, String utcTime) {
-		try {
-			// 파일 저장을 위한 디렉토리 경로 생성
-			String destinationPath = filePath + File.separator + utcDate;
-			File directory = new File(destinationPath);
-			if (!directory.exists()) {
-				directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
-			}
-			// https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/%Y%m/%d/%Y%m%d%H%M%S.png
-			// python (glob+ datetime)
-			// URL 생성에 사용될 날짜와 시간의 구성 요소 추출
-			String year = utcDate.substring(0, 4);
-			String month = utcDate.substring(4, 6);
-			String day = utcDate.substring(6, 8);
-			String hour = utcTime.substring(0, 2);
-			// 이미지 파일의 URL 구성
-			String url = "https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/" + year + month + "/" + day + "/"
-					+ hour + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + utcDate + utcTime + ".srv.png";
-			System.out.println(url);
-			// 다운로드할 이미지의 파일명 추출 및 최종 저장 경로 결정
-			String fileName = url.substring(url.lastIndexOf('/') + 1);
-			String destinationFile = destinationPath + File.separator + fileName;
-
-			// 이미지 다운로드 및 파일 시스템에 저장
-			try (InputStream in = new URL(url).openStream(); OutputStream out = new FileOutputStream(destinationFile)) {
-				byte[] buffer = new byte[4096]; // 읽기/쓰기를 위한 버퍼
-				int bytesRead; // 실제로 읽은 바이트 수
-				while ((bytesRead = in.read(buffer)) != -1) {
-					out.write(buffer, 0, bytesRead);
-				}
-
-				logger.info("이미지 다운 성공 :{}", destinationFile);
-
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	 * 시간을 입력받으면 KST-> UTC
+	 */ // yyyy-MM-ddHHmm
+	public static String convertKtu(String kstData) {
+		LocalDateTime localDateTime = LocalDateTime.parse(kstData, DATETIME_FORMATTER);
+		ZonedDateTime kstZonedDateTime = localDateTime.atZone(KST_ZONE_ID);
+		ZonedDateTime utcZonedDateTime = kstZonedDateTime.withZoneSameInstant(UTC_ZONE_ID);
+		return utcZonedDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd HHmm"));
 	}
-
-	/*
-	 * backGround 함수 view 실제 시간 00 : 15 10 : 25 20 : 35 30 : 45 40 : 55
-	 * 
-	 * 1. 내가 선택한 날짜 폴더가 없으면 현재시간부터 00:00까지 이미지 다운 2. 실제시간마다 url파싱하여 이미지 다운로드 3.
-	 * 파일탐색후 해당 시간대에 대해 이미지가 잇으면 view - select option추가
-	 * 
-	 */
 
 }

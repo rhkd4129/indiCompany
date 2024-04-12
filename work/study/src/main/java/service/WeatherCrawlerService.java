@@ -18,7 +18,6 @@ public class WeatherCrawlerService {
 	private static final WeatherCrawlerService instance = new WeatherCrawlerService();
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
-	public static final String filePath = "C:\\cr\\";  //설정파일에 저장예정
 
 	private WeatherCrawlerService() {}
 
@@ -32,45 +31,42 @@ public class WeatherCrawlerService {
 	}
 
 	public Map<String, Object> dateList(Map<String, Object> paramMap, Map<String, Object> model) {
-		// 2024-04-08
-		String kstSelectData = (String) paramMap.get("formattedDate");
+		// 20240408
+		String selectDate = (String) paramMap.get("selectDate");
 		// 해당 날짜에 대응하는 UTC 시간 map으로
-		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKSTToUtcMap(kstSelectData);
+		Map<String, List<String>> dateToUtcTimeMap = WeatherCrawlerUtil.convertKSTToUtcMap(selectDate);
 		List<String> kstTimeList = WeatherCrawlerUtil.checkerFileExistence(dateToUtcTimeMap);
 		model.put("kstTimeList", kstTimeList);
 		return model;
 	}
 
+	
+	
+	
+//////////////////////////////////////////////////////////////////////////////////////
 	public Map<String, Object> imageShow(Map<String, Object> paramMap, Map<String, Object> model) throws IOException {
-		// VIEW에서 선택한 값 날짜와 시간
-		String kstDate = (String) paramMap.get("formattedDate");
-		System.out.println(kstDate);
-		String utcDataTime = WeatherCrawlerUtil.convertKtu(kstDate);
-		//String utcDataTimeList[] = utcDataTime.split(" ");
+	
+		String selectDate = (String) paramMap.get("selectDate");
+		String utcDataTime = WeatherCrawlerUtil.convertKtu(selectDate);
+		String utcDataTimeList[] = utcDataTime.split(" ");
 		//String base64Image = WeatherCrawlerUtil.incodingImage(utcDataTimeList[0], utcDataTimeList[1]);
-//		model.put("date", utcDataTimeList[0]);
-//		model.put("time", utcDataTimeList[1]);
-		model.put("utcDataTime",utcDataTime);
+		model.put("date", utcDataTimeList[0]);
+		model.put("time", utcDataTimeList[1]);
 		return model;
 	}
-	// 개발중
-	//////////////////////////////////////////////////////////////////////////////////////
 
 	public Map<String, Object> movieShow(Map<String, Object> paramMap, Map<String, Object> model) throws IOException {
-		String kstData = (String) paramMap.get("selectedDate");
-		String modifiedString = kstData.replace("-", "");
+		String selectDate = (String) paramMap.get("selectedDate");
+		String modifiedString = selectDate.replace("-", "");
 		List<String> fileNameList = questFile(modifiedString);
 		model.put("fileNameList", fileNameList);
-
 		return model;
 	}
-
-	
-	
 	///////////   UTILS로 뺴기  //////////
 	public static List<String> questFile(String folderName) throws IOException {
 		List<String> fileNameList = new ArrayList<>();
-		Path path = Paths.get(filePath, folderName); // 폴더가 존재하는지 확인
+//		Path path = Paths.get(filePath, folderName); // 폴더가 존재하는지 확인
+		Path path = Paths.get( folderName); // 폴더가 존재하는지 확인
 		if (!Files.exists(path) || !Files.isDirectory(path)) {
 			return fileNameList;
 		} // 폴더가 존재하면, 해당 폴더 내의 파일들의 이름을 리스트로 수집
@@ -85,13 +81,4 @@ public class WeatherCrawlerService {
 		}
 		return fileNameList;
 	}
-
-} /*
-	 * // 폴더가 있는지 없는지 검사 없으면 다운로드 if (JsopUtil.checkDayDirectory(utcDate, utcTime))
-	 * // 폴더가 존재한다면 logger.info("폴더 존재"); //폴더가 존재하지만 ex) 4/2일 자료가 잇는 상태에서 4/3일 else
-	 * { logger.info("폴더 존재 x"); for (int i = 0; i < utcDateList.size(); i++) {
-	 * JsopUtil.downloadImage(utcDateList.get(i), utcTimeList.get(i)); } String
-	 * base64Image = JsopUtil.incodingImage(utcDate, utcTime); model.put("image",
-	 * base64Image);
-	 */
-//}
+} 

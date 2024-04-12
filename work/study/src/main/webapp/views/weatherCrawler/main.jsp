@@ -4,132 +4,146 @@
 	pageEncoding="UTF-8"%>
 <head>
 <title>이미지 크롤링 결과</title>
+<script src="/views/static/js/moment.min.js"></script>
+<script src="/views/static/js/moment-timezone-with-data.min.js"></script>
+<script src="/views/static/js/fullcalendar-6.1.11/dist/index.global.js"></script>
 <script>
 	$(function() {
 		initData();
 		initEvent();
+		
+		let metaData = {
+			"gk2a:ami:le1b:rgb-s-true:ea020lc": "%ROOT_PATH:8080/IMG/%Y%m%d/gk2a_ami_le1b_rgb-s-true_ea020lc_%Y%m%d%H%M.srv.png"
+		};
 	});
+	function replaceMetaData(metaData) {
+	    const formatDate = moment().format('YYYYMMDDHHmm'); // 현재 날짜와 시간을 'YYYYMMDDHHmm' 포맷으로
+
+	    // 문자열 치환 함수
+	    function replaceString(str) {
+	        return str.replace(/%ROOT_PATH/g, 'http://localhost:8080')
+	                  .replace(/%Y%m/g, formatDate.substr(0, 6))
+	                  .replace(/%d%H%M/g, formatDate.substr(6));
+	    }
+
+	    // 객체 내 모든 키의 값을 치환
+	    for (let key in metaData) {
+	        metaData[key] = replaceString(metaData[key]);
+	    }
+	    return metaData;
+	}
+	// metaData[]
 	// KST는  한국의 표준시간대를  UTC+9 시간대에 해당
-	function initData() {
-		$('#date').val(new Date().toISOString().substring(0, 10));
-		var formattedDate = $('#date').val().replace(/-/g, ''); // '-'를 제거하여 'yyyymmdd' 형식으로 변환합니다.
-		drawSelectBox(formattedDate);
-		checkTodayData();
+	// 비동기 순서보장 - > SELECT 안에 먼저 그리고 나서 값을 가져옴
+	 function initData() {
+	    $('#date').val(new Date().toISOString().substring(0, 10));
+	    var selectDate = $('#date').val().replace(/-/g, '');
+	     // '-'를 제거하여 'yyyymmdd' 형식으로 변환
+	     getSelectionOption(selectDate);	 
 	}
-	function drawSelectBox(formattedDate) {	
-		$.ajax({
-			url : '/weatherCrawler/dateList.do',
-			type : 'GET',
-			data : {
-				formattedDate : formattedDate,
-			},
-			dataType : 'json',
-			success : function(data) {
-				$('#searchTime').empty();
-				console.log(data);			
-				$.each(data.kstTimeList, function(index, value) {
-					$('#searchTime').append($('<option>', {
-						value : value,
-						text : value.substr(8, 2) + ':' + value.substr(10, 2) + " KST"
-					}));
-				});
-			},
-			error : function(xhr, status, error) {
-				console.error("Error occurred: " + error);
-			}
-		});
-	}
-	
-	
-	function checkTodayData() {
-		
-		
-		console.log(formattedDate);
-		$.ajax({
-			url : '/weatherCrawler/imageShow.do',
-			type : 'GET',
-			data : {
-				formattedDate:formattedDate
-			},
-			dataType : 'json',
-			success : function(data) {
-				console.log(data);
-				var imgUrl = "http://localhost:8080/IMG/"+ data.date+ "/gk2a_ami_le1b_rgb-s-true_ea020lc_"+data.date+data.time+'.srv.png';
-				
-				changeImageSrc(imgUrl);
-			},
-			error : function(xhr, status, error) {
-				console.error("Error occurred: " + error);
-			}
-		});
-	}
-	
+
 	function initEvent() {
-		$('.searchBox').on(
-				'change',
-				'input, select',
-				function() {
-					var selectedDate = $('#date').val(); // 날짜 가져오기
-					var previouslySelectedTime = $('#searchTime').val(); // 기존에 선택된 시간 저장
-					console.log("modify");
-					var formattedDate = $('#date').val().replace(/-/g, ''); // '-'를 제거하여 'yyyymmdd' 형식으로 변환합니다.
-					/* drawSelectBox(function() {
-						$('#searchTime').val(previouslySelectedTime); // 셀렉트 박스 업데이트 후 이전에 선택된 시간을 다시 설정
-						if ($('#searchTime').val() === null) { // 이전에 선택된 값이 새로운 목록에 없는 경우
-							$('#searchTime option:first')
-									.prop('selected', true); // 첫 번째 옵션을 선택
-						}
-						checkTodayData(selectedDate, filterSelectedTime);
-					}); */
-				});
-
-		$('.movie').on('click', function() {
-			/* var selectedTime = $('#searchTime').val();
-			console.log(selectedDate, selectedTime)
-			if (selectedDate == null || selectedTime == null) {
-				alert("날짜와 시간을 선택해주세요");
-				return;
-			} */
-			var timeList = [];
-			var date = "";
-			$("#searchTime option").each(function(index) {
-				timeList.push($(this).val().split(' ')[1].replace(':', ''));
-			});
-			
-			showMovie(date, timeList);
-		});
-
+	    $('.searchBox').on('change', 'input, select', function() {
+	        console.log("modify");
+	        var selectDate = $('#date').val().replace(/-/g, ''); // 날짜 선택에서 '-' 문자를 제거
+	        getSelectionOption(selectDate); // 선택된 날짜와 이전에 선택된 시간을 함수로 전달
+	    });
+	    $('.movie').on('click', showMovie);
 	}
 
+	function getSelectionOption(selectDate) {
+	    var previouslySelectedTime = $('#searchTime').val(); // 함수 내에서 직접 현재 선택된 시간을 가져옴
+	    $.ajax({
+	        url: '/weatherCrawler/dateList.do',
+	        type: 'GET',
+	        data: { selectDate: selectDate },
+	        dataType: 'json',
+	        success: function(data) {
+	        	//data가 nuil일수도 잇다 .
+	            if (!data.kstTimeList || data.kstTimeList.length === 0) {
+	                console.error("date List 받아오기 실패");
+	                $('#searchTime').append($('<option>', {
+	                    value: "",
+	                    text: "시간 정보를 받아오지 못했습니다."
+	                }));
+	                return;
+	            }
+
+	            $('#searchTime').empty();
+	            data.kstTimeList.forEach(function(time) {
+	                $('#searchTime').append($('<option>', {
+	                    value: time,
+	                    text: time.substr(8, 2) + ':' + time.substr(10, 2) + " KST"
+	                }));
+	            });
+
+	            if (previouslySelectedTime && $('#searchTime option[value="' + previouslySelectedTime + '"]').length > 0) {
+	                $('#searchTime').val(previouslySelectedTime);
+	            } else {
+	                $('#searchTime').val($('#searchTime option:first').val());
+	            }
+
+	            updateImageDisplay($('#searchTime').val());
+	        },
+	        error: function(xhr, status, error) {
+	            console.error("Error loading times:", error);
+	            $('#searchTime').append($('<option>', {
+	                value: "",
+	                text: "시간 정보 로딩 오류"
+	            }));
+	        }
+	    });
+	}
+	//날짜 정보로 utc로 변환 후 url 생성 
+	function updateImageDisplay(selectDate) {
+		var { date, time } = convertToUTC(selectDate);
+		var imgUrl = "http://localhost:8080/IMG/"
+					+ date
+					+ "/gk2a_ami_le1b_rgb-s-true_ea020lc_"
+					+ date+time
+					+ ".srv.png";
+		 $('#showImage').attr('src', imgUrl);
+	}
+
+	function showMovie() {
+	    var dateList = getAllOptionValues();  // 옵션 값들을 가져옴
+	    let index = 0;  // 현재 인덱스 초기화
+	    var intervalId = setInterval(() => {
+	        if (index >= dateList.length) {
+	            clearInterval(intervalId);  // 인덱스가 리스트 길이를 넘으면 인터벌 중지
+	            return;
+	        }
+	        var selectDate = dateList[index++];
+	        var { date, time } = convertToUTC(selectDate);  // 선택된 날짜를 UTC로 변환
+	        var imgUrl = "http://localhost:8080/IMG/" + date + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + date + time + ".srv.png";
+	        $('#showImage').attr('src', imgUrl);
+	    }, 500); // 0.5초 마다 이미지 변경
+	}
+
+	/**
+	 * 현재 select box 안에 있는 모든 option 값을 get
+	 * @return {Array<string>} 선택된 모든 옵션 값의 배열
+	 */
+	function getAllOptionValues(){
+	    var optionValueList = [];
+	    $("#searchTime option").each(function() {
+	    	optionValueList.push($(this).val()); // 각 option의 값을 배열에 추가
+	    });
+	    return optionValueList;
+	}
 	
 
+	 /**
+	  * 주어진 날짜 문자열을 KST ->  UTC로 변환
+	  * @param {string} dateStr - (KST)날짜 문자열 (YYYYMMDDHHmm 형식)
+	  * @returns {{date: string, time: string}} 변환된 UTC 날짜와 시간
+	  */
+ 	function convertToUTC(dateStr) {
+        var kstMoment = moment.tz(dateStr, "YYYYMMDDHHmm", "Asia/Seoul");
+        var utcMoment = kstMoment.clone().tz("UTC");
+        return { date: utcMoment.format("YYYYMMDD"), time: utcMoment.format("HHmm") };
+    }
 
-	function changeImageSrc(newSrc) {
-		$('#showImage').attr('src', newSrc);
-	}
-
-	function showMovie(date, timeList) {
-		console.log(date);
-		let index = 0;
-		
-		var intervalId = setInterval(function() {
-
-			var imageUrl = "http://localhost:8080/IMG/"
-					+ date
-					+ "/gk2a_ami_le1b_rgb-s-true_ea020lc_/" +date+ timeList[index]
-					+ ".srv.png";
-			console.log(imageUrl);
-			changeImageSrc(imageUrl);
-			index++;
-			// fileNameList의 길이를 넘어서면 인터벌을 정지하고 마지막 이미지 유지
-			if (index >= timeList.length) {
-				clearInterval(intervalId);
-				// 마지막 이미지로 설정하기 위해 인덱스를 마지막 요소로 설정
-				// 이미 위에서 마지막 이미지를 설정했으므로 여기서 추가로 설정할 필요는 없음
-			}
-		}, 500); // 0.5초마다 이미지 변경
-
-	}
 </script>
 </head>
 <body>
@@ -139,110 +153,113 @@
 	</div>
 	<div class="searchBox">
 		<div class="dateTime">
-			<input id="date" type="date"> <select id="searchTime"
-				class="searchTime">
+
+			<input type="date" id="date">
+		</div>
+		<select id="searchTime" class="searchTime">
 
 
+		</select>
+
+		<button type="button" class="nowBtn">NOW</button>
+	</div>
+	<div class="condition">
+		<div class="menu" data-idx="0">
+			<label class="label" for="satellite">위성</label> <select
+				id="satellite" name="sat">
+				<option value="GK2A">천리안위성 2A호</option>
+				<option value="GK2A">천리안위성 2A호</option>
+				<option value="COMS">천리안위성 1호(종료)</option>
+				<option value="NOAA">NOAA</option>
+				<option value="SNPP">SNPP</option>
+				<option value="METOP">METOP</option>
 			</select>
-
-			<button type="button" class="nowBtn">NOW</button>
-		</div>
-		<div class="condition">
-			<div class="menu" data-idx="0">
-				<label class="label" for="satellite">위성</label> <select
-					id="satellite" name="sat">
-					<option value="GK2A">천리안위성 2A호</option>
-					<option value="GK2A">천리안위성 2A호</option>
-					<option value="COMS">천리안위성 1호(종료)</option>
-					<option value="NOAA">NOAA</option>
-					<option value="SNPP">SNPP</option>
-					<option value="METOP">METOP</option>
-				</select>
-			</div>
-
-			<div class="menu" data-idx="1">
-				<label class="label" for="dataLevel">자료레벨</label> <select
-					id="dataLevel" name="level">
-					<option value="LE1B">기본영상</option>
-					<option value="LE2-ETC">위험기상</option>
-					<option value="LE2-ETC2">구름</option>
-					<option value="LE2-ETC3">지면∙해양</option>
-					<option value="LE2-ETC4">대기</option>
-					<option value="LE2-ETC5">항공</option>
-					<option value="LE2-ETC6">복사</option>
-					<!-- options omitted for brevity -->
-				</select>
-			</div>
-
-			<div class="menu" data-idx="2">
-				<label class="label" for="dataKind">자료종류</label> <select
-					id="dataKind" name="type">
-					<optgroup refcode="type1" label="::::: 단일채널 :::::">
-						<option value="VI004">가시(0.47μm):파랑</option>
-						<option value="VI005">가시(0.51μm):초록</option>
-						<option value="VI006">가시(0.64μm):빨강</option>
-						<option value="VI008">가시(0.86μm):식생</option>
-						<option value="NR013">근적외(1.37μm):권운</option>
-						<option value="NR016">근적외(1.6μm):눈/얼음</option>
-						<option value="SW038">단파적외(3.8μm):야간안개/하층운</option>
-						<option value="WV063">수증기(6.3μm):상층 수증기</option>
-						<option value="WV069">수증기(6.9μm):중층 수증기</option>
-						<option value="WV073">수증기(7.3μm):하층 수증기</option>
-						<option value="IR087">적외(8.7μm):구름상</option>
-						<option value="IR096">적외(9.6μm):오존</option>
-						<option value="IR105">적외(10.5μm):깨끗한 대기창</option>
-						<option value="IR112">적외(11.2μm):대기창</option>
-						<option value="IR123">적외(12.3μm):오염된 대기창</option>
-						<option value="IR133">적외(13.3μm):이산화탄소</option>
-					</optgroup>
-					<optgroup refcode="type2" label="::::: RGB :::::">
-						<option value="RGB-TRUE">RGB 천연색</option>
-						<option value="RGB-S-TRUE">RGB 천연색(AI)</option>
-						<option value="RGB-WV-1">RGB 3채널 수증기</option>
-						<option value="RGB-NATURAL">RGB 자연색</option>
-						<option value="RGB-AIRMASS">RGB 기단</option>
-						<option value="RGB-DUST">RGB 황사</option>
-						<option value="RGB-DAYNIGHT">RGB 주야간 합성</option>
-						<option value="RGB-S-DAYNIGHT">RGB 주야간 합성(AI)</option>
-						<option value="RGB-FOG">RGB 주야간 안개</option>
-						<option value="RGB-STORM">RGB 주간 대류운</option>
-						<option value="RGB-SNOWFOG">RGB 주간적설안개</option>
-						<option value="RGB-CLOUD">RGB 운상</option>
-						<option value="RGB-ASH">RGB 화산재</option>
-					</optgroup>
-					<optgroup refcode="type3" label="::::: 컬러강조 :::::">
-						<option value="EIR-WV063">컬러수증기(6.3μm) 강조</option>
-						<option value="EIR-WV069">컬러수증기(6.9μm) 강조</option>
-						<option value="EIR-WV073">컬러수증기(7.3μm) 강조</option>
-						<option value="EIR-IR105-COLOR">컬러적외(10.5μm) 강조</option>
-					</optgroup>
-				</select>
-			</div>
-
-			<div class="menu" data-idx="3">
-				<label class="label" for="area">영역</label> <select id="area"
-					name="area">
-					<option value="EA">동아시아</option>
-					<option value="KO">한반도</option>
-				</select>
-			</div>
 		</div>
 
-		<div class="conf">
-			<div class="help">
-				<button class="helpBtn" title="새 창 알림  - 도움말을 확인하세요">
-					<span class="txt">도움말</span>
-				</button>
-				<button class="movie">
-					<span class="txt">영상보기</span>
-				</button>
-			</div>
+		<div class="menu" data-idx="1">
+			<label class="label" for="dataLevel">자료레벨</label> <select
+				id="dataLevel" name="level">
+				<option value="LE1B">기본영상</option>
+				<option value="LE2-ETC">위험기상</option>
+				<option value="LE2-ETC2">구름</option>
+				<option value="LE2-ETC3">지면∙해양</option>
+				<option value="LE2-ETC4">대기</option>
+				<option value="LE2-ETC5">항공</option>
+				<option value="LE2-ETC6">복사</option>
+				<!-- options omitted for brevity -->
+			</select>
 		</div>
+
+		<div class="menu" data-idx="2">
+			<label class="label" for="dataKind">자료종류</label> <select
+				id="dataKind" name="type">
+				<optgroup refcode="type1" label="::::: 단일채널 :::::">
+					<option value="VI004">가시(0.47μm):파랑</option>
+					<option value="VI005">가시(0.51μm):초록</option>
+					<option value="VI006">가시(0.64μm):빨강</option>
+					<option value="VI008">가시(0.86μm):식생</option>
+					<option value="NR013">근적외(1.37μm):권운</option>
+					<option value="NR016">근적외(1.6μm):눈/얼음</option>
+					<option value="SW038">단파적외(3.8μm):야간안개/하층운</option>
+					<option value="WV063">수증기(6.3μm):상층 수증기</option>
+					<option value="WV069">수증기(6.9μm):중층 수증기</option>
+					<option value="WV073">수증기(7.3μm):하층 수증기</option>
+					<option value="IR087">적외(8.7μm):구름상</option>
+					<option value="IR096">적외(9.6μm):오존</option>
+					<option value="IR105">적외(10.5μm):깨끗한 대기창</option>
+					<option value="IR112">적외(11.2μm):대기창</option>
+					<option value="IR123">적외(12.3μm):오염된 대기창</option>
+					<option value="IR133">적외(13.3μm):이산화탄소</option>
+				</optgroup>
+				<optgroup refcode="type2" label="::::: RGB :::::">
+					<option value="RGB-TRUE">RGB 천연색</option>
+					<option value="RGB-S-TRUE">RGB 천연색(AI)</option>
+					<option value="RGB-WV-1">RGB 3채널 수증기</option>
+					<option value="RGB-NATURAL">RGB 자연색</option>
+					<option value="RGB-AIRMASS">RGB 기단</option>
+					<option value="RGB-DUST">RGB 황사</option>
+					<option value="RGB-DAYNIGHT">RGB 주야간 합성</option>
+					<option value="RGB-S-DAYNIGHT">RGB 주야간 합성(AI)</option>
+					<option value="RGB-FOG">RGB 주야간 안개</option>
+					<option value="RGB-STORM">RGB 주간 대류운</option>
+					<option value="RGB-SNOWFOG">RGB 주간적설안개</option>
+					<option value="RGB-CLOUD">RGB 운상</option>
+					<option value="RGB-ASH">RGB 화산재</option>
+				</optgroup>
+				<optgroup refcode="type3" label="::::: 컬러강조 :::::">
+					<option value="EIR-WV063">컬러수증기(6.3μm) 강조</option>
+					<option value="EIR-WV069">컬러수증기(6.9μm) 강조</option>
+					<option value="EIR-WV073">컬러수증기(7.3μm) 강조</option>
+					<option value="EIR-IR105-COLOR">컬러적외(10.5μm) 강조</option>
+				</optgroup>
+			</select>
+		</div>
+
+		<div class="menu" data-idx="3">
+			<label class="label" for="area">영역</label> <select id="area"
+				name="area">
+				<option value="EA">동아시아</option>
+				<option value="KO">한반도</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="conf">
+		<div class="help">
+			<button class="helpBtn" title="새 창 알림  - 도움말을 확인하세요">
+				<span class="txt">도움말</span>
+			</button>
+			<button class="movie">
+				<span class="txt">영상보기</span>
+			</button>
+		</div>
+	</div>
 	</div>
 
 
 	<div id="imageContainer" class="imageContainer">
-		<img id="showImage" src="">
+		<img id="showImage" alt="이미지가 없습니다" src="">
 	</div>
 </body>
 </html>
+
