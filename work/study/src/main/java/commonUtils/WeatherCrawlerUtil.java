@@ -28,9 +28,12 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -52,35 +55,13 @@ public class WeatherCrawlerUtil {
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 	private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+	private static final DateTimeFormatter DATETIME_FORMATTER2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
 
 	public static final String filePath = "C:\\cr\\"; // 설정파일에 저장예정
 	// 설정파일로
 
 	private WeatherCrawlerUtil() {
 	};
-
-	
-	/*
-	 * ScheduledExecutorService scheduler =
-	 * Executors.newSingleThreadScheduledExecutor();
-	 * 
-	 * // 현재 시간과 자정 사이의 시간을 계산 (초 단위) long initialDelay =
-	 * LocalTime.now().until(LocalTime.MIDNIGHT, ChronoUnit.SECONDS); // long period
-	 * = TimeUnit.DAYS.toSeconds(1); // 24시간을 초로 변환 long period = 1; // 24시간을 초로 변환
-	 * 
-	 * scheduler.scheduleAtFixedRate(() -> { // 전날 날짜를 계산 // String yesterday =
-	 * LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-	 * // System.out.println("Downloading images for date: " + yesterday); String
-	 * yesterdayDateTime =
-	 * LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern(
-	 * "yyyyMMddHHmmss"));
-	 * System.out.println("Yesterday's date and time in yyyyMMddHHmmss format: " +
-	 * yesterdayDateTime);
-	 * 
-	 * // 여기에 이미지 다운로드 로직 호출 //
-	 * ImageDownloader.downloadImagesForDateRange(yesterday, yesterday); },
-	 * initialDelay, period, TimeUnit.SECONDS); }
-	 */
 
 	/**
 	 * KST에서 UTC로 변환하는 함수 주어진 KST 날짜(kstDate)에 대해 해당 날짜의 00:00~23:59까지 10분 간격으로 UTC
@@ -90,7 +71,7 @@ public class WeatherCrawlerUtil {
 	 * @return 입력받은 날짜에 해당한 00:00~23:59 (UTC)시간
 	 */
 	public static Map<String, List<String>> convertKSTToUtcMap(String kstDate) {
-		Map<String, List<String>> dateToUtcTimes = new HashMap<>();
+		Map<String, List<String>> dateToUtcTimeMap = new HashMap<>();
 		String formattedDate = kstDate.substring(0, 4) + "-" + kstDate.substring(4, 6) + "-" + kstDate.substring(6, 8);
 		LocalDateTime start = LocalDateTime.parse(formattedDate + "T00:00:00");
 		LocalDateTime end = LocalDateTime.parse(formattedDate + "T23:59:00");
@@ -100,36 +81,37 @@ public class WeatherCrawlerUtil {
 
 			String dateKey = utcZonedDateTime.format(DATE_FORMATTER);
 
-			dateToUtcTimes.putIfAbsent(dateKey, new ArrayList<>());
-			dateToUtcTimes.get(dateKey).add(utcZonedDateTime.format(TIME_FORMATTER));
+			dateToUtcTimeMap.putIfAbsent(dateKey, new ArrayList<>());
+			dateToUtcTimeMap.get(dateKey).add(utcZonedDateTime.format(TIME_FORMATTER));
 
 			start = start.plusMinutes(10);
 		}
 
-		dateToUtcTimes.forEach((date, times) -> {
+		dateToUtcTimeMap.forEach((date, times) -> {
 			System.out.println(date + ": " + times);
 		});
 
-		return dateToUtcTimes;
+		return dateToUtcTimeMap;
 	}
 
 	/**
-	 * 파일 존재 여부를 확인하는 함수. 주어진 UTC 시간 정보(Map)를 바탕으로 특정 폴더에서 해당 UTC 시간과 일치하는 파일이 있는지
-	 * 검사 파일이 존재하는 경우, 그 파일의 이름에 해당하는 KST 시간을 List로 반환.
-	 * 
-	 * @param KST를 변환후 해당하는 UTC시간대 (MAP형태)
-	 * @return 최종 view화면에 select에 표시될 KST 값들
+	 * 파일 존재 여부를 확인하고, 존재하는 파일의 KST 시간을 반환 주어진 UTC 시간 목록 사용하여 특정 폴더에서 파일이 존재하는지 검사
+	 * 파일이 존재하면 해당 파일의 이름에서 KST 시간 정보를 추출하여 정렬된 목록으로 반환.
+	 *
+	 * @param utcTimes 각 UTC 시간이 매핑된 폴더 이름과 파일 이름 부분 목록을 포함하는 맵
+	 * @return 존재하는 파일의 KST 시간 정보가 담긴 정렬된 List
 	 */
 	public static List<String> checkerFileExistence(Map<String, List<String>> utcTimes) {
-		List<String> kstTimes = new ArrayList<>();
-		for (Map.Entry<String, List<String>> entry : utcTimes.entrySet()) {
-			String folderName = entry.getKey();
-			List<String> partialFileNames = entry.getValue();
+		Set<String> sortedKstTimes = new TreeSet<>(); // TreeSet을 사용하여 자동으로 시간을 정렬
 
-			Path folderPath = Paths.get(filePath + folderName);
-			System.out.println("해당 폴더 검사: " + filePath + folderName);
-			// 각 부분 파일 이름에 대해 파일 존재 여부 확인
-			for (String partialFileName : partialFileNames) {
+		for (Map.Entry<String, List<String>> entry : utcTimes.entrySet()) {
+			String folderName = entry.getKey(); // 폴더 이름
+			List<String> partialFileNameList = entry.getValue(); // 해당 폴더 내부에서 검색할 파일 이름 부분 리스트
+
+			Path folderPath = Paths.get(filePath + folderName); // 파일 경로 생성
+			logger.info("해당 폴더 검사: {}", folderPath);
+
+			for (String partialFileName : partialFileNameList) {
 				try (Stream<Path> paths = Files.walk(folderPath)) {
 					// 폴더 내의 모든 파일을 순회하면서 파일 이름이 조건을 만족하는지 검사
 					boolean fileExists = paths.filter(Files::isRegularFile)
@@ -140,16 +122,15 @@ public class WeatherCrawlerUtil {
 								DATETIME_FORMATTER.withZone(UTC_ZONE_ID));
 						ZonedDateTime kstDateTime = utcDateTime.withZoneSameInstant(KST_ZONE_ID);
 						String kstDateTimeStr = kstDateTime.format(DATETIME_FORMATTER);
-						kstTimes.add(kstDateTimeStr);
+						sortedKstTimes.add(kstDateTimeStr); // 정렬된 Set에 KST 시간 추가
 					}
 				} catch (IOException e) {
-
-					logger.error("esssrror : {}", e.getMessage());
+					logger.error("File search error: {}", e.getMessage());
 				}
 			}
-			Collections.reverse(kstTimes);
 		}
-		return kstTimes;
+
+		return new ArrayList<>(sortedKstTimes); // 정렬된 TreeSet을 ArrayList로 변환하여 반환
 	}
 
 	/**
@@ -181,10 +162,15 @@ public class WeatherCrawlerUtil {
 			// 다운로드할 이미지의 파일명 추출 및 최종 저장 경로 결정
 			String fileName = url.substring(url.lastIndexOf('/') + 1);
 			String destinationFile = destinationPath + File.separator + fileName;
-
 			File fileInfo = new File(destinationPath, destinationFile);
-			if (fileInfo.exists())
+			if (fileInfo.exists()) {
+				logger.info("파일 존재하므로 패스");
 				return;
+			}
+				
+			if (utcTime.equals("0040")) {
+				return;
+			}
 
 			// 이미지 다운로드 및 파일 시스템에 저장
 			try (InputStream in = new URL(url).openStream(); OutputStream out = new FileOutputStream(destinationFile)) {
@@ -201,7 +187,7 @@ public class WeatherCrawlerUtil {
 			e.printStackTrace();
 		}
 	}
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * 지정된 데이터와 시간 기반으로 한 파일 경로에서 이미지를 읽고 Base64 인코딩된 문자열로 변환
 	 * 

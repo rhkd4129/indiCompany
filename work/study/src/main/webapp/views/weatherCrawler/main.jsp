@@ -8,85 +8,90 @@
 <script src="/views/static/js/moment-timezone-with-data.min.js"></script>
 <script src="/views/static/js/fullcalendar-6.1.11/dist/index.global.js"></script>
 <script>
+	const metaData = {
+			"imageURL": "%ROOT_PATH/IMG/%Y%m%d/gk2a_ami_le1b_rgb-s-true_ea020lc_%Y%m%d%H%M.srv.png",			};
+
 	$(function() {
 		initData();
 		initEvent();
-		
-		let metaData = {
-			"gk2a:ami:le1b:rgb-s-true:ea020lc": "%ROOT_PATH:8080/IMG/%Y%m%d/gk2a_ami_le1b_rgb-s-true_ea020lc_%Y%m%d%H%M.srv.png"
-		};
 	});
-	function replaceMetaData(metaData) {
-	    const formatDate = moment().format('YYYYMMDDHHmm'); // 현재 날짜와 시간을 'YYYYMMDDHHmm' 포맷으로
-
-	    // 문자열 치환 함수
-	    function replaceString(str) {
-	        return str.replace(/%ROOT_PATH/g, 'http://localhost:8080')
-	                  .replace(/%Y%m/g, formatDate.substr(0, 6))
-	                  .replace(/%d%H%M/g, formatDate.substr(6));
-	    }
-
-	    // 객체 내 모든 키의 값을 치환
-	    for (let key in metaData) {
-	        metaData[key] = replaceString(metaData[key]);
-	    }
-	    return metaData;
+	
+	function replaceMetaData(urlTemplate, utcDate, utcTime) {
+	    return urlTemplate
+	        .replace(/%ROOT_PATH/g, 'http://localhost:8080')
+	        .replace(/%Y%m%d/g, utcDate)
+	        .replace(/%H%M/g, utcTime);
 	}
+
+
+	
 	// metaData[]
 	// KST는  한국의 표준시간대를  UTC+9 시간대에 해당
-	// 비동기 순서보장 - > SELECT 안에 먼저 그리고 나서 값을 가져옴
+
 	 function initData() {
 	    $('#date').val(new Date().toISOString().substring(0, 10));
-	    var selectDate = $('#date').val().replace(/-/g, '');
-	     // '-'를 제거하여 'yyyymmdd' 형식으로 변환
+        var selectDate = moment($('#date').val()).format('YYYYMMDD');
 	     getSelectionOption(selectDate);	 
 	}
 
 	function initEvent() {
 	    $('.searchBox').on('change', 'input, select', function() {
 	        console.log("modify");
-	        var selectDate = $('#date').val().replace(/-/g, ''); // 날짜 선택에서 '-' 문자를 제거
+	        var selectDate = moment($('#date').val()).format('YYYYMMDD');
 	        getSelectionOption(selectDate); // 선택된 날짜와 이전에 선택된 시간을 함수로 전달
 	    });
 	    $('.movie').on('click', showMovie);
 	}
 
+	/**
+	 * 선택된 날짜에 대한 시간 옵션을 불러와 선택 상자를 업데이트하는 함수
+	 * 서버에서 선택된 날짜에 해당하는 시간 목록을 가져오고, 이를 바탕으로 시간 select option구성
+	 * 이전에 선택된 시간이 존재하면 해당 시간을 다시 선택.
+	 *
+	 * @param {string} selectDate - 사용자가 선택한 날짜 (YYYYMMDD 형식)
+	 */
 	function getSelectionOption(selectDate) {
-	    var previouslySelectedTime = $('#searchTime').val(); // 함수 내에서 직접 현재 선택된 시간을 가져옴
+	    var previouslySelectedTime = $('#searchTime').val(); // 현재 선택된 시간을 가져옴
+
 	    $.ajax({
 	        url: '/weatherCrawler/dateList.do',
 	        type: 'GET',
 	        data: { selectDate: selectDate },
 	        dataType: 'json',
 	        success: function(data) {
-	        	//data가 nuil일수도 잇다 .
-	            if (!data.kstTimeList || data.kstTimeList.length === 0) {
+	            console.log(data);
+	         	// 서버로부터 유효한 데이터를 받지 못했을 경우
+	            if (!data || !data.kstTimeList || data.kstTimeList.length === 0) { 
+	            	
 	                console.error("date List 받아오기 실패");
-	                $('#searchTime').append($('<option>', {
+	                $('#showImage').attr('src', ""); // 이미지 표시를 초기화
+	                $('#searchTime').empty().append($('<option>', {
 	                    value: "",
 	                    text: "시간 정보를 받아오지 못했습니다."
 	                }));
 	                return;
 	            }
 
-	            $('#searchTime').empty();
-	            data.kstTimeList.forEach(function(time) {
+	            $('#searchTime').empty(); // 이전에 불러온 시간 목록을 비움
+	            data.kstTimeList.forEach(function(time) { // 새로운 시간 데이터로 목록 채우기
 	                $('#searchTime').append($('<option>', {
 	                    value: time,
-	                    text: time.substr(8, 2) + ':' + time.substr(10, 2) + " KST"
+	                    text: time.substr(8, 2) + ':' + time.substr(10, 2) + " KST" // 시간 형식 설정
 	                }));
 	            });
 
+	            // 기존에 선택된 값이 존재하고 옵션에 존재하는 경우, 해당 값을 다시 선택
 	            if (previouslySelectedTime && $('#searchTime option[value="' + previouslySelectedTime + '"]').length > 0) {
 	                $('#searchTime').val(previouslySelectedTime);
 	            } else {
-	                $('#searchTime').val($('#searchTime option:first').val());
+	                $('#searchTime').val($('#searchTime option:first').val());// 기존 선택된 값이 없으면 첫 번째 옵션을 선택 
 	            }
 
-	            updateImageDisplay($('#searchTime').val());
+	            updateImageDisplay(); // 이미지 표시 업데이트
 	        },
 	        error: function(xhr, status, error) {
 	            console.error("Error loading times:", error);
+	            $('#showImage').attr('src', ""); // 이미지 표시를 초기화
 	            $('#searchTime').append($('<option>', {
 	                value: "",
 	                text: "시간 정보 로딩 오류"
@@ -94,30 +99,34 @@
 	        }
 	    });
 	}
+
 	//날짜 정보로 utc로 변환 후 url 생성 
-	function updateImageDisplay(selectDate) {
-		var { date, time } = convertToUTC(selectDate);
-		var imgUrl = "http://localhost:8080/IMG/"
-					+ date
-					+ "/gk2a_ami_le1b_rgb-s-true_ea020lc_"
-					+ date+time
-					+ ".srv.png";
-		 $('#showImage').attr('src', imgUrl);
+	function updateImageDisplay() {
+		//image가 완전히 로드 되면 다음 이미지 생성해야함
+		var { date, time } = convertToUTC($('#searchTime').val());
+		var imgUrl = replaceMetaData(metaData.imageURL, date, time);
+		$('#showImage').attr('src', imgUrl);
 	}
 
 	function showMovie() {
 	    var dateList = getAllOptionValues();  // 옵션 값들을 가져옴
 	    let index = 0;  // 현재 인덱스 초기화
-	    var intervalId = setInterval(() => {
+	    var delay = 300;
+
+	    function loadImage() {
 	        if (index >= dateList.length) {
-	            clearInterval(intervalId);  // 인덱스가 리스트 길이를 넘으면 인터벌 중지
-	            return;
+	        	updateImageDisplay();  // 모든 이미지 로드 후, 선택된 시간의 이미지로 다시 업데이트
+	            return;  // 모든 이미지 처리 완료
 	        }
 	        var selectDate = dateList[index++];
 	        var { date, time } = convertToUTC(selectDate);  // 선택된 날짜를 UTC로 변환
-	        var imgUrl = "http://localhost:8080/IMG/" + date + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + date + time + ".srv.png";
-	        $('#showImage').attr('src', imgUrl);
-	    }, 500); // 0.5초 마다 이미지 변경
+	        var imgUrl = replaceMetaData(metaData.imageURL, date, time);
+	        $('#showImage').attr('src', imgUrl).off('load').on('load', function() {
+	            setTimeout(loadImage, delay);  // 다음 이미지 로드를 위한 딜레이
+	        });
+	    }
+	    loadImage();  // 최초 이미지 로딩 시작
+	    
 	}
 
 	/**
@@ -258,7 +267,7 @@
 
 
 	<div id="imageContainer" class="imageContainer">
-		<img id="showImage" alt="이미지가 없습니다" src="">
+		<img id="showImage" alt="" src="">
 	</div>
 </body>
 </html>
