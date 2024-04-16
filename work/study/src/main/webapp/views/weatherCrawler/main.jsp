@@ -9,7 +9,8 @@
 <script src="/views/static/js/fullcalendar-6.1.11/dist/index.global.js"></script>
 <script>
 	const metaData = {
-			"imageURL": "%ROOT_PATH/IMG/%Y%m%d/gk2a_ami_le1b_rgb-s-true_ea020lc_%Y%m%d%H%M.srv.png",			};
+			"imageURL": "%ROOT_PATH/IMG/%Y%m%d/gk2a_ami_le1b_rgb-s-true_ea020lc_%Y%m%d%H%M.srv.png",
+			};
 
 	$(function() {
 		initData();
@@ -21,16 +22,14 @@
 	        .replace(/%ROOT_PATH/g, 'http://localhost:8080')
 	        .replace(/%Y%m%d/g, utcDate)
 	        .replace(/%H%M/g, utcTime);
-	}
-
-
-	
-	// metaData[]
+	}	
 	// KST는  한국의 표준시간대를  UTC+9 시간대에 해당
-
 	 function initData() {
-	    $('#date').val(new Date().toISOString().substring(0, 10));
-        var selectDate = moment($('#date').val()).format('YYYYMMDD');
+		    // 최대 선택 가능 날짜를 오늘 날짜로 설정
+		    var today = moment().format('YYYY-MM-DD');
+		    $('#date').val(today);
+		    $('#date').attr('max', today);
+		    var selectDate = moment($('#date').val()).format('YYYYMMDD');
 	     getSelectionOption(selectDate);	 
 	}
 
@@ -38,6 +37,7 @@
 	    $('.searchBox').on('change', 'input, select', function() {
 	        console.log("modify");
 	        var selectDate = moment($('#date').val()).format('YYYYMMDD');
+	        console.log('선택된 날짜: ', selectDate);
 	        getSelectionOption(selectDate); // 선택된 날짜와 이전에 선택된 시간을 함수로 전달
 	    });
 	    $('.movie').on('click', showMovie);
@@ -64,7 +64,10 @@
 	            if (!data || !data.kstTimeList || data.kstTimeList.length === 0) { 
 	            	
 	                console.error("date List 받아오기 실패");
-	                $('#showImage').attr('src', ""); // 이미지 표시를 초기화
+	                $('#showImage').attr({
+	                    'src': '',
+	                    'alt': '이미지 정보를 받아오지 못했습니다.'
+	                });
 	                $('#searchTime').empty().append($('<option>', {
 	                    value: "",
 	                    text: "시간 정보를 받아오지 못했습니다."
@@ -79,19 +82,22 @@
 	                    text: time.substr(8, 2) + ':' + time.substr(10, 2) + " KST" // 시간 형식 설정
 	                }));
 	            });
-
 	            // 기존에 선택된 값이 존재하고 옵션에 존재하는 경우, 해당 값을 다시 선택
 	            if (previouslySelectedTime && $('#searchTime option[value="' + previouslySelectedTime + '"]').length > 0) {
 	                $('#searchTime').val(previouslySelectedTime);
 	            } else {
 	                $('#searchTime').val($('#searchTime option:first').val());// 기존 선택된 값이 없으면 첫 번째 옵션을 선택 
 	            }
-
 	            updateImageDisplay(); // 이미지 표시 업데이트
 	        },
 	        error: function(xhr, status, error) {
 	            console.error("Error loading times:", error);
-	            $('#showImage').attr('src', ""); // 이미지 표시를 초기화
+	            
+	            
+	            $('#showImage').attr({
+                    'src': '',
+                    'alt': '이미지 로딩 중 오류'
+                });
 	            $('#searchTime').append($('<option>', {
 	                value: "",
 	                text: "시간 정보 로딩 오류"
@@ -107,7 +113,7 @@
 		var imgUrl = replaceMetaData(metaData.imageURL, date, time);
 		$('#showImage').attr('src', imgUrl);
 	}
-
+	
 	function showMovie() {
 	    var dateList = getAllOptionValues();  // 옵션 값들을 가져옴
 	    let index = 0;  // 현재 인덱스 초기화
@@ -140,7 +146,6 @@
 	    });
 	    return optionValueList;
 	}
-	
 
 	 /**
 	  * 주어진 날짜 문자열을 KST ->  UTC로 변환

@@ -2,6 +2,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import commonUtils.WeatherCrawlerUtil;
 import test.DownloadTest;
 
 import java.time.LocalDateTime;
@@ -18,8 +19,15 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+    	// 스케줄러를 초기화합니다.
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        // 서버 시작과 동시에 단 한 번 실행되는 작업
+        scheduler.schedule(() -> {
+           WeatherCrawlerUtil.downloadRecentImages();
+        }, 0, TimeUnit.SECONDS);
+
+        
     	
-    	DownloadTest.downloadRecentImages();
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::scheduleTask, 0, 1, TimeUnit.MINUTES);
     }
