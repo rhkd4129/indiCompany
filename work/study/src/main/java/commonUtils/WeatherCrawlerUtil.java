@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +35,10 @@ public class WeatherCrawlerUtil {
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 	private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
-	private static final DateTimeFormatter DATETIME_FORMATTER2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
-
 	public static final String filePath = "C:\\cr\\"; // 설정파일에 저장예정
 	// 설정파일로
 
-	private WeatherCrawlerUtil() {
-	};
+	private WeatherCrawlerUtil() {	};
 
 	/**
 	 * KST에서 UTC로 변환하는 함수 주어진 KST 날짜(kstDate)에 대해 해당 날짜의 00:00~23:59까지 10분 간격으로 UTC
@@ -50,12 +49,10 @@ public class WeatherCrawlerUtil {
 	 */
 	public static Map<String, List<String>> convertKSTToUtcMap(String kstDate) {
 	    Map<String, List<String>> dateToUtcTimeMap = new HashMap<>();
-
 	    // 입력된 KST 날짜를 LocalDateTime 객체로 변환. 여기서 하루의 시작 시간 설정
 	    LocalDateTime start = LocalDate.parse(kstDate, DateTimeFormatter.BASIC_ISO_DATE).atStartOfDay();
 	    // 시작 시간에서 하루를 더하고 1분을 빼서 하루의 마지막 시간을 구하기.
 	    LocalDateTime end = start.plusDays(1).minusMinutes(1);
-
 	    while (!start.isAfter(end)) {     	    // 시작 시간이 종료 시간 이후가 될 때까지 반복
 	        ZonedDateTime kstZonedDateTime = start.atZone(KST_ZONE_ID);
 	        // 위에서 생성된 KST ->  UTC 변환 후 정해진 포맷으로 변환(키)
@@ -84,7 +81,7 @@ public class WeatherCrawlerUtil {
 	 * @return 존재하는 파일의 KST 시간 정보가 담긴 정렬된 List
 	 */
 	public static List<String> checkerFileExistence(Map<String, List<String>> utcTimes) {
-	    Set<String> sortedKstTimes = new TreeSet<>(); // TreeSet을 사용하여 KST 시간을 자동으로 정렬.
+	    Set<String> sortedKstTimes = new TreeSet<>(Comparator.reverseOrder()); // TreeSet을 사용하여 KST 시간을 자동으로 역순 정렬.
 	    for (Map.Entry<String, List<String>> entry : utcTimes.entrySet()) {
 	        String folderName = entry.getKey(); // 폴더 이름.
 	        List<String> partialFileNameList = entry.getValue(); //파일이름 
@@ -212,91 +209,94 @@ public class WeatherCrawlerUtil {
 	 * @param utcTime 이미지 검색하기 위한 UTC 시간. 형식 "HHmm"
 	 */
 	public static void downloadImage(String utcDate, String utcTime) {
-		String destinationPath = filePath + File.separator + utcDate;
-		File directory = new File(destinationPath);
-		if (!directory.exists()) {
-			directory.mkdirs();
-		}
-		String url = "https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/" + utcDate.substring(0, 4)
-				+ utcDate.substring(4, 6) + "/" + utcDate.substring(6, 8) + "/" + utcTime.substring(0, 2)
-				+ "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + utcDate + utcTime + ".srv.png";
-		String fileName = url.substring(url.lastIndexOf('/') + 1);
+	    String destinationPath = filePath + File.separator + utcDate;
+	    File directory = new File(destinationPath);
+	    if (!directory.exists()) {
+	        directory.mkdirs();
+	    }
+	    String url = "https://nmsc.kma.go.kr/IMG/GK2A/AMI/PRIMARY/L1B/COMPLETE/EA/" + utcDate.substring(0, 4)
+	            + utcDate.substring(4, 6) + "/" + utcDate.substring(6, 8) + "/" + utcTime.substring(0, 2)
+	            + "/gk2a_ami_le1b_rgb-s-true_ea020lc_" + utcDate + utcTime + ".srv.png";
+	    String fileName = url.substring(url.lastIndexOf('/') + 1);
 
-		String destinationFile = destinationPath + File.separator + fileName;
-		File fileInfo = new File(destinationPath, destinationFile);
-		if (fileInfo.exists()) {
-			logger.info("File already exists, skipping download: {}", destinationFile);
-			return;
-		}
-		if (utcTime.equals("0040")) {
-			return;
-		}
+	    String destinationFile = destinationPath + File.separator + fileName;
+	    File fileInfo = new File(destinationFile);
+	    if (fileInfo.exists()) {
+	        logger.info("File already exists, skipping download: {}", destinationFile);
+	        return;
+	    }
+	    if (utcTime.equals("0040")) {
+	        return;
+	    }
 
-		try (InputStream in = new URL(url).openStream(); OutputStream out = new FileOutputStream(destinationFile)) {
-			byte[] buffer = new byte[4096];
-			int bytesRead;
-			while ((bytesRead = in.read(buffer)) != -1) {
-				out.write(buffer, 0, bytesRead);
-			}
-			logger.info("이미지 다운 성공: {} 해당 URL: {} ", destinationFile,url);
-		} catch (Exception e) {
-			logger.error("이미지 다운 중 에러: {}", e.getMessage());
-		}
+	    try {
+	        URL imageUrl = new URL(url);
+	        HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
+	        connection.setRequestMethod("GET");
+	        int responseCode = connection.getResponseCode();
+
+	        if (responseCode == HttpURLConnection.HTTP_OK) {
+	            try (InputStream in = connection.getInputStream(); OutputStream out = new FileOutputStream(destinationFile)) {
+	                byte[] buffer = new byte[4096];
+	                int bytesRead;
+	                while ((bytesRead = in.read(buffer)) != -1) {
+	                    out.write(buffer, 0, bytesRead);
+	                }
+	                // 파일 크기 검사
+	                if (fileInfo.length() == 0) {
+	                    logger.error("다운로드된 파일이 비어 있음: {}", destinationFile);
+	                    fileInfo.delete(); // 비어 있는 파일 삭제
+	                } else {
+	                    logger.info("이미지 다운 성공: {} 해당 URL: {}", destinationFile, url);
+	                }
+	            }
+	        } else {
+	            logger.error("서버 에러, HTTP 응답 코드: {}", responseCode);
+	        }
+	    } catch (Exception e) {
+	        logger.error("이미지 다운 중 에러: {}", e.getMessage());
+	    }
 	}
-	
+
 	/**
 	 * 생성된 시간 맵을 사용하여 각 날짜와 시간에 대한 image download.
 	 * 
 	 * @param timeMap 날짜와 시간이 저장된 맵.
 	 */
-	public static void processDownload(Map<String, List<String>> timeMap) {
-		timeMap.forEach((date, times) -> {
-			times.forEach(time -> {
-				WeatherCrawlerUtil.downloadImage(date, time);
-			});
-		});
-	}
-	/*
-	 * logger.info("가장 최근 시간: {}시", latestTime); ZonedDateTime startDate =
-	 * ZonedDateTime.parse(latestFolderName + latestTime,
-	 * DATETIME_FORMATTER2.withZone(UTC_ZONE_ID)); ZonedDateTime nowUTC =
-	 * ZonedDateTime.now(UTC_ZONE_ID).truncatedTo(ChronoUnit.HOURS);
-	 */
 	
-	public static void downloadRecentImages() {
-		logger.info("이미지 다운로드 시작");
-		String latestFolderName = findLatestFolder(filePath);
-		if (latestFolderName != null) {
-			logger.info("가장 최근 폴더: {}", latestFolderName);
-			String latestTime = findLatestTimeInFolder(filePath + latestFolderName);
-			if (!latestTime.equals("-1")) {
-				logger.info("가장 최근 시간: {}시", latestTime);
-				ZonedDateTime startDate = ZonedDateTime.parse(latestFolderName + latestTime, DATETIME_FORMATTER.withZone(UTC_ZONE_ID));
-				ZonedDateTime nowUTC = ZonedDateTime.now(UTC_ZONE_ID);
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm"); // 시간과 분만 포매팅하는 포매터를 생성합니다.
-				String formattedTime = nowUTC.format(formatter); // 포매터를 사용하여 ZonedDateTime 객체를 문자열로 변환합니다.
-				
-				//ZonedDateTime updatedZonedDateTime = nowUTC.withHour(hour).withMinute(minute).withSecond(0).withNano(0);
-				if (startDate.isEqual(nowUTC)) {
-					logger.info("최근 데이터 시간이 현재 시간과 동일합니다. 작업을 종료합니다.");
-					return; // 현재 시간과 최근 데이터 시간이 같으면 작업 종료
+	
+	 public static void downloadRecentImages() {
+			logger.info("이미지 다운로드 시작");
+			String latestFolderName = findLatestFolder(filePath);
+			if (latestFolderName != null) {
+				logger.info("가장 최근 폴더: {}", latestFolderName);
+				String latestTime = findLatestTimeInFolder(filePath + latestFolderName);
+				if (!latestTime.equals("-1")) {
+					logger.info("가장 최근 시간: {}시", latestTime);
+					ZonedDateTime startDate = ZonedDateTime.parse(latestFolderName + latestTime, DATETIME_FORMATTER.withZone(UTC_ZONE_ID));
+					ZonedDateTime nowUTC = ZonedDateTime.now(UTC_ZONE_ID);
+					ZonedDateTime nowUTCMinus15Minutes = nowUTC.minusMinutes(15);
+					if (startDate.isEqual(nowUTC)) {
+						logger.info("최근 데이터 시간이 현재 시간과 동일합니다. 작업을 종료합니다.");
+						return; // 현재 시간과 최근 데이터 시간이 같으면 작업 종료
+					}
+					Map<String, List<String>> timeMap = generateTimeMap(startDate, nowUTCMinus15Minutes, 10);
+					
+					timeMap.forEach((date, times) -> {
+						times.forEach(time -> {
+							WeatherCrawlerUtil.downloadImage(date, time);
+						});
+					});
+					//timeMap.forEach((date, times) -> logger.info("{}: {}", date, times))''
+					logger.info("다운로드할 이미지 MAP 목록들");
+					System.out.println(timeMap);					
+				} else {
+					logger.info("적합한 파일이 없습니다.");
 				}
-
-				Map<String, List<String>> timeMap = generateTimeMap(startDate, nowUTC, 10);
-				
-				//timeMap.forEach((date, times) -> logger.info("{}: {}", date, times))''
-				logger.info("다운로드할 이미지 MAP 목록들");
-				System.out.println(timeMap);
-				
-				processDownload(timeMap);
 			} else {
-				logger.info("적합한 파일이 없습니다.");
+				logger.info("적합한 폴더가 없습니다.");
 			}
-		} else {
-			logger.info("적합한 폴더가 없습니다.");
 		}
-	}
-	
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*	*//**

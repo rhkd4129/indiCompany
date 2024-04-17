@@ -35,7 +35,6 @@
 
 	function initEvent() {
 	    $('.searchBox').on('change', 'input, select', function() {
-	        console.log("modify");
 	        var selectDate = moment($('#date').val()).format('YYYYMMDD');
 	        console.log('선택된 날짜: ', selectDate);
 	        getSelectionOption(selectDate); // 선택된 날짜와 이전에 선택된 시간을 함수로 전달
@@ -92,8 +91,6 @@
 	        },
 	        error: function(xhr, status, error) {
 	            console.error("Error loading times:", error);
-	            
-	            
 	            $('#showImage').attr({
                     'src': '',
                     'alt': '이미지 로딩 중 오류'
@@ -113,6 +110,8 @@
 		var imgUrl = replaceMetaData(metaData.imageURL, date, time);
 		$('#showImage').attr('src', imgUrl);
 	}
+	
+	
 	
 	function showMovie() {
 	    var dateList = getAllOptionValues();  // 옵션 값들을 가져옴
