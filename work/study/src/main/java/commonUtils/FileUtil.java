@@ -24,22 +24,23 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class FileUtil {
-	private static final Pattern UUID_PATTERN = Pattern.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
+	private static final Pattern UUID_PATTERN = Pattern
+			.compile("_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\\..+)?$");
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
-	
-	
-	private static String boardFilePath = "C:\\uploadTest\\"; ///설정파일에저장예정
-	
+	private static final String CONFIG_FILE_PATH = "C:\\gitRepository\\indiCompany\\work\\study\\src\\main\\webapp\\WEB-INF";
+	private static String boardFilePath = null;
+	private static Map<String, String> configMap;
 
+	private FileUtil() {
+	}
 
-	private FileUtil() {}
-
+	static {
+		boardFilePath = FileUtil.getConfigValue("config.json", "boardFilePath");
+	}
 
 	public static Map<String, Map<String, String>> loadCommandsFromJson(ServletConfig config, String key)
 			throws StreamReadException, DatabindException, IOException {
@@ -53,18 +54,21 @@ public class FileUtil {
 		return map;
 
 	}
-	
-	public static Map<String, String> loadCommandsFromJson(String key ,ServletConfig config)throws StreamReadException, DatabindException, IOException {
-		String props = config.getInitParameter(key);
-		String configFilePath = config.getServletContext().getRealPath(props);
-		Map<String,String> map = new HashMap<>();
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		map = objectMapper.readValue(new File(configFilePath), new TypeReference<Map<String,  String>>() {});
-		return map;
-
+	public static String getConfigValue(String filename, String keyName) {
+		if (configMap == null) {
+			try {
+				File file = Paths.get(CONFIG_FILE_PATH, filename).toFile();
+				ObjectMapper objectMapper = new ObjectMapper();
+				configMap = objectMapper.readValue(file, new TypeReference<Map<String, String>>() {
+				});
+			} catch (IOException e) {
+				System.err.println("Error reading the config file: " + e.getMessage());
+				return null; // Or handle the error as appropriate
+			}
+		}
+		return configMap.get(keyName);
 	}
-	
 
 	/**
 	 * 주어진 파일명 목록의 각 파일명에 대해 고유 식별자(UUID) 추가. 파일명에 확장자가 있는 경우, UUID를 확장자 앞에 삽입하고,
@@ -89,6 +93,7 @@ public class FileUtil {
 		}
 		return modifiedFileNames;
 	}
+
 	/**
 	 * 파일이름_UUID.확장자형식의 파일이름에서 UUID를 제거하는 로직 사용자게에 보여주기 위해
 	 * 
@@ -105,6 +110,7 @@ public class FileUtil {
 		}
 		return fileNames;
 	}
+
 	/**
 	 * 지정된 게시판 코드의 경로에 물리적 파일 저장. 제공된 파일 데이터 목록에 따라 저장. 저장 경로는 기본 파일 경로와 게시판 코드를
 	 * 조합하여 결정, 해당 경로에 폴더(boardCode)가 존재하지 않는 경우 새로 생성.
@@ -129,6 +135,7 @@ public class FileUtil {
 			}
 		}
 	}
+
 	/**
 	 * 지정된 게시판 코드에 해당하는 경로에서 이 파일들을 삭제. 파일 이름은 콤마(,)로 구분된 문자열에서 추출되며, 각 파일은 제공된 게시판
 	 * 코드를 기반으로 한 경로에서 삭제됩니다.
@@ -175,9 +182,9 @@ public class FileUtil {
 			// 지원되지 않는 타입인 경우
 			throw new IllegalArgumentException("Unsupported identifier type");
 		}
+
 		// 폴더 존재 여부 확인
 		if (!Files.exists(path) || !Files.isDirectory(path)) {
-			System.out.println("없냐");
 			return fileNameList; // 빈 목록 반환
 		}
 
